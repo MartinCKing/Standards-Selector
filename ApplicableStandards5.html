@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #keywordInput {
+            width: 50%; /* Half the width of the screen */
+            min-height: 120px; /* Minimum height for five lines */
+            margin-bottom: 20px;
+            padding: 8px;
+            resize: none;
+        }
+        #buttonContainer {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        #tableContainer {
+            width: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+            cursor: pointer;
+        }
+        th {
+            background-color: #add8e6;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tr:nth-child(even) {
+            background-color: #e6f2ff;
+        }
+        tr.selected-row {
+            background-color: yellow;
+        }
+        button {
+            padding: 10px;
+        }
+        #loadingIndicator {
+            display: none;
+            margin-left: 10px;
+        }
+        #progressMessage {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</h1>
+    <textarea id="keywordInput" placeholder="Search Context: Enter keywords, standards number, text from document..."></textarea>
+    <div id="buttonContainer">
+        <button id="submitContext">Submit Context</button>
+        <button id="clearContext">Clear Context</button>
+        <button id="displaySelected">Display All Selected Rows</button>
+        <button id="export">Export Selected Rows</button>
+        <button id="reset">Reset</button>
+        <span id="loadingIndicator">Loading...</span>
+    </div>
+    <div id="progressMessage"></div>
+    <div id="tableContainer">
+        <table id="dataTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script>
+        $(document).ready(function() {
+            const csvUrl = 'https://martincking.github.io/Standards-Selector/Approved ANS Data.csv';
+            let allRows = []; // Array to store all rows
+            let originalRows = []; // Array to store original rows for reference
+            let selectedRows = new Set(); // Track selected row indices
+            let displayedRows = new Set(); // Track displayed row IDs to avoid duplicates
+
+            $.get(csvUrl, function(data) {
+                const lines = data.split('\n').map(line => line.split(','));
+                const header = lines[0];
+                const rows = lines.slice(1);
+
+                // Populate table header
+                const headerHtml = header.map(col => `<th>${col}</th>`).join('');
+                $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
+
+                // Store all rows in an array
+                allRows = rows.map((row, index) => `
+                    <tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>
+                `);
+                originalRows = allRows.slice(); // Keep a reference to the original rows
+                $('#dataTable tbody').html(originalRows.join(''));
+
+                // Row click toggle functionality
+                $('#dataTable tbody').on('click', 'tr', function() {
+                    const rowIndex = $(this).index();
+                    $(this).toggleClass('selected-row');
+                    if (selectedRows.has(rowIndex)) {
+                        selectedRows.delete(rowIndex);
+                    } else {
+                        selectedRows.add(rowIndex);
+                    }
+                });
+
+                // Display selected rows
+                $('#displaySelected').click(function() {
+                    const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
+                    const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
+
+                    if (selectedHtml.length === 0) {
+                        // If no selected rows, behave like reset
+                        $('#dataTable tbody').html(originalRows.join(''));
+                        selectedRows.clear();
+                    } else {
+                        $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
+                    }
+                });
+
+                // Reset button functionality
+                $('#reset').click(function() {
+                    $('#dataTable tbody tr').removeClass('selected-row');
+                    selectedRows.clear();
+                    $('#dataTable tbody').html(originalRows.join(''));
+                    displayedRows.clear(); // Reset displayed rows
+                });
+
+                // Clear Context button functionality
+                $('#clearContext').click(function() {
+                    $('#keywordInput').val(''); // Clear the keyword input
+                    $('#dataTable tbody').html(originalRows.join('')); // Reset table display
+                    displayedRows.clear(); // Clear displayed rows
+                });
+
+                // Export functionality
+                $('#export').click(function() {
+                    let csvContent = header.join(',') + '\n';
+                    $('#dataTable tbody tr.selected-row').each(function() {
+                        const row = $(this).find('td').map(function() {
+                            return $(this).text().trim();
+                        }).get();
+                        if (row.some(cell => cell.length > 0)) {
+                            csvContent += row.join(',') + '\n';
+                        }
+                    });
+
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.setAttribute('href', URL.createObjectURL(blob));
+                    link.setAttribute('download', 'selected_rows.csv');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            });
+
+            // Function to extract keywords and phrases using NLP logic
+            function extractKeywords(context) {
+                // Simulating advanced NLP: extracting meaningful single words and short phrases
+                return context.match(/(?:\w+\s+){0,2}\w+/g) || [];
+            }
+
+            // Function to extract numbers from context
+            function extractNumbers(context) {
+                return context.match(/\d+/g) || []; // Capture all numbers
+            }
+
+            // Match and display function for stacking results
+            function matchAndDisplay(matchingItems) {
+                matchingItems.forEach(item => {
+                    allRows.forEach(rowHtml => {
+                        const rowText = $(rowHtml).text().toLowerCase(); // Get text of the entire row
+                        if (rowText.includes(item.trim().toLowerCase())) {
+                            const rowId = $(rowHtml).data('id');
+                            if (!displayedRows.has(rowId)) {
+                                $('#dataTable tbody').prepend(rowHtml); // Move to the top
+                                displayedRows.add(rowId); // Mark this row as displayed
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Submit Context functionality
+            $('#submitContext').click(function() {
+                const context = $('#keywordInput').val();
+                $('#loadingIndicator').show(); // Show loading indicator
+                $('#progressMessage').text('Searching...'); // Show progress message
+
+                // Extract numbers and keywords using advanced NLP
+                const numbers = extractNumbers(context);
+                const keywords = extractKeywords(context);
+
+                // Match numbers and keywords
+                matchAndDisplay(numbers); // Match numbers
+                matchAndDisplay(keywords); // Match keywords
+
+                $('#loadingIndicator').hide(); // Hide loading indicator
+                $('#progressMessage').text('Search complete.'); // Show completion message
+            });
+        });
+    </script>
+</body>
+</html>
