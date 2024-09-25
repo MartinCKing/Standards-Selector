@@ -17,15 +17,15 @@
         }
         #topContainer {
             width: 100%;
-            background-color: white; /* Solid black background */
+            background-color: white;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 20px; /* Space between wordcloud and table */
-        }        
+            padding-bottom: 20px;
+        }
         h1 {
             margin-bottom: 20px;
             background-color: white;
@@ -34,8 +34,8 @@
             width: fit-content;
         }
         #keywordInput {
-            width: 50%; /* Half the width of the screen */
-            min-height: 120px; /* Minimum height for five lines */
+            width: 50%;
+            min-height: 120px;
             margin-bottom: 20px;
             padding: 8px;
             resize: none;
@@ -102,7 +102,7 @@
         2. Click on Submit Context
         3. Select rows that you need with mouse click, they will toggle yellow 
         4. Repeat 1-3 as needed
-        5. Export selected  rows to a file"></textarea>
+        5. Export selected rows to a file"></textarea>
     <div id="buttonContainer">
         <button id="submitContext">Submit Context</button>
         <button id="clearContext">Clear Context</button>
@@ -129,17 +129,37 @@
 
             $.get(csvUrl, function(data) {
                 const lines = data.split('\n').map(line => line.split(','));
-                const header = lines[0];
+                const header = lines[0].slice(0, 4); // Only take the first 4 columns for the header
                 const rows = lines.slice(1);
 
-                // Populate table header
+                // Populate table header with only the first 4 columns
                 const headerHtml = header.map(col => `<th>${col}</th>`).join('');
                 $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
-                // Store all rows in an array
-                allRows = rows.map((row, index) => `
-                    <tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>
-                `);
+                // Store all rows in an array, limited to 4 columns
+                allRows = rows.map((row, index) => {
+                    const limitedRow = row.slice(0, 4); // Limit the row to 4 columns
+
+if (limitedRow.length >= 4) {
+    const secondColumnText = limitedRow[1]; // Text in the second column
+    const link = limitedRow[3]; // Link in the 4th column
+
+    // If the link is valid (starts with "https://"), else leave it blank
+    if (link && link.trim().startsWith('https://')) {
+        limitedRow[1] = `<a href="${link}" target="_blank">${secondColumnText}</a>`;
+    } else {
+        limitedRow[3] = ''; // Leave the 4th column blank if not a valid link
+    }
+
+    // Keep the text in the 3rd column unchanged
+    const thirdColumnText = limitedRow[2]; // Retain the original 3rd column text
+}
+
+
+                    return `<tr data-id="${index}">${limitedRow.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+                });
+                
+
                 originalRows = allRows.slice(); // Keep a reference to the original rows
                 $('#dataTable tbody').html(originalRows.join(''));
 
