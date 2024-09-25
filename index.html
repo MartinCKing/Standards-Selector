@@ -94,7 +94,7 @@
  <header>
         <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo">
         <a href="https://www.linkedin.com/groups/12741229/">
-        <img src="https://media.licdn.com/dms/image/v2/D4E07AQFTIdPpIdlhCQ/group-logo_image-shrink_92x92/group-logo_image-shrink_92x92/0/1670075584338?e=1727251200&v=beta&t=AMnZJByYCIfH29QmZAA7wbJdIHsBDBgdxvZm0pWJOWg" alt="QARA Logo"></a>     
+        <img src="https://media.licdn.com/dms/image/v2/D4E07AQFTIdPpIdlhCQ/group-logo_image-shrink_92x92/group-logo_image-shrink_92x92/0/1670075584338?e=1727884800&v=beta&t=J8szLXmrM9RSWZ2YPdkVfvIgkTSfnP50baeyLTXO6OA" alt="QARA Logo"></a>     
  </header>    
 <h1>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</h1>
     <textarea id="keywordInput" placeholder="
@@ -126,31 +126,34 @@
             let originalRows = []; // Array to store original rows for reference
             let selectedRows = new Set(); // Track selected row indices
             let displayedRows = new Set(); // Track displayed row IDs to avoid duplicates
-$.get(csvUrl, function(data) {
-    const lines = data.split('\n').map(line => line.split(','));
-    const header = lines[0];
-    const rows = lines.slice(1);
 
-    // Populate table header
-    const headerHtml = header.map(col => `<th>${col}</th>`).join('');
-    $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
+            $.get(csvUrl, function(data) {
+                const lines = data.split('\n').map(line => line.split(','));
+                const header = lines[0];
+                const rows = lines.slice(1);
 
-    // Store all rows in an array
-    allRows = rows.map((row, index) => {
-        // If the row has 4 columns, modify the 4th one to be a hyperlink
-        if (row.length >= 4) {
-            const standard = row[2]; // Standard column
-            const link = row[3]; // Link column
-            row[3] = `<a href="${link}" target="_blank">${standard}</a>`; // Make the 4th column a hyperlink
-        }
-        
-        return `<tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
-    });
-    originalRows = allRows.slice(); // Keep a reference to the original rows
-    $('#dataTable tbody').html(originalRows.join(''));
+                // Populate table header
+                const headerHtml = header.map(col => `<th>${col}</th>`).join('');
+                $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
-    // The rest of the script remains unchanged...
-});
+                // Store all rows in an array
+                allRows = rows.map((row, index) => `
+                    <tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>
+                `);
+                originalRows = allRows.slice(); // Keep a reference to the original rows
+                $('#dataTable tbody').html(originalRows.join(''));
+
+                // Row click toggle functionality
+                $('#dataTable tbody').on('click', 'tr', function() {
+                    const rowIndex = $(this).index();
+                    $(this).toggleClass('selected-row');
+                    if (selectedRows.has(rowIndex)) {
+                        selectedRows.delete(rowIndex);
+                    } else {
+                        selectedRows.add(rowIndex);
+                    }
+                });
+
                 // Display selected rows
                 $('#displaySelected').click(function() {
                     const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
