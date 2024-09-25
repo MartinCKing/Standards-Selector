@@ -137,21 +137,16 @@
                 $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
                 // Store all rows in an array
-                allRows = rows.map((row, index) => `
-                    <tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>
-                `);
-                originalRows = allRows.slice(); // Keep a reference to the original rows
-                $('#dataTable tbody').html(originalRows.join(''));
+                allRows = rows.map((row, index) => {
+                // Check if the row has at least 4 columns
+                if (row.length >= 4) {
+                 // Assuming the hyperlink is in the 4th column (index 3) and the standard in the 3rd column (index 2)
+                const standard = row[2]; // Standards column
+                const link = row[3]; // Hyperlink column
+                 row[3] = `<a href="${link}" target="_blank">${standard}</a>`; // Create hyperlink using standard as text
+                }
 
-                // Row click toggle functionality
-                $('#dataTable tbody').on('click', 'tr', function() {
-                    const rowIndex = $(this).index();
-                    $(this).toggleClass('selected-row');
-                    if (selectedRows.has(rowIndex)) {
-                        selectedRows.delete(rowIndex);
-                    } else {
-                        selectedRows.add(rowIndex);
-                    }
+                return `<tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
                 });
 
                 // Display selected rows
