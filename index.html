@@ -126,29 +126,31 @@
             let originalRows = []; // Array to store original rows for reference
             let selectedRows = new Set(); // Track selected row indices
             let displayedRows = new Set(); // Track displayed row IDs to avoid duplicates
+$.get(csvUrl, function(data) {
+    const lines = data.split('\n').map(line => line.split(','));
+    const header = lines[0];
+    const rows = lines.slice(1);
 
-            $.get(csvUrl, function(data) {
-                const lines = data.split('\n').map(line => line.split(','));
-                const header = lines[0];
-                const rows = lines.slice(1);
+    // Populate table header
+    const headerHtml = header.map(col => `<th>${col}</th>`).join('');
+    $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
-                // Populate table header
-                const headerHtml = header.map(col => `<th>${col}</th>`).join('');
-                $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
+    // Store all rows in an array
+    allRows = rows.map((row, index) => {
+        // If the row has 4 columns, modify the 4th one to be a hyperlink
+        if (row.length >= 4) {
+            const standard = row[2]; // Standard column
+            const link = row[3]; // Link column
+            row[3] = `<a href="${link}" target="_blank">${standard}</a>`; // Make the 4th column a hyperlink
+        }
+        
+        return `<tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+    });
+    originalRows = allRows.slice(); // Keep a reference to the original rows
+    $('#dataTable tbody').html(originalRows.join(''));
 
-                // Store all rows in an array
-                allRows = rows.map((row, index) => {
-                // Check if the row has at least 4 columns
-                if (row.length >= 4) {
-                 // Assuming the hyperlink is in the 4th column (index 3) and the standard in the 3rd column (index 2)
-                const standard = row[2]; // Standards column
-                const link = row[3]; // Hyperlink column
-                 row[3] = `<a href="${link}" target="_blank">${standard}</a>`; // Create hyperlink using standard as text
-                }
-
-                return `<tr data-id="${index}">${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
-                });
-
+    // The rest of the script remains unchanged...
+});
                 // Display selected rows
                 $('#displaySelected').click(function() {
                     const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
