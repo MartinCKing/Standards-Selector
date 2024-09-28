@@ -75,6 +75,9 @@
         tr.selected-row {
             background-color: yellow;
         }
+        tr.new-row {
+            background-color: lightgreen;
+        }
         button {
             padding: 10px;
         }
@@ -130,51 +133,45 @@
     <script>
         $(document).ready(function() {
             const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards.csv';
-            let allRows = []; // Array to store all rows
-            let originalRows = []; // Array to store original rows for reference
-            let selectedRows = new Set(); // Track selected row indices
-            let displayedRows = new Set(); // Track displayed row IDs to avoid duplicates
+            let allRows = []; 
+            let originalRows = [];
+            let selectedRows = new Set(); 
+            let displayedRows = new Set(); 
+            let newTopRows = new Set(); 
 
             $.get(csvUrl, function(data) {
                 const lines = data.split('\n').map(line => line.split(','));
-                const header = lines[0].slice(0, 4); // Only take the first 4 columns for the header
+                const header = lines[0].slice(0, 4); 
                 const rows = lines.slice(1);
 
-                // Populate table header with only the first 4 columns
                 const headerHtml = header.map(col => `<th>${col}</th>`).join('');
                 $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
-                // Store all rows in an array, limited to 4 columns
                 allRows = rows.map((row, index) => {
-                    const limitedRow = row.slice(0, 4); // Limit the row to 4 columns
+                    const limitedRow = row.slice(0, 4); 
 
-if (limitedRow.length >= 4) {
-    const secondColumnText = limitedRow[1]; // Text in the second column
-    const link = limitedRow[3]; // Link in the 4th column
+                    if (limitedRow.length >= 4) {
+                        const secondColumnText = limitedRow[1]; 
+                        const link = limitedRow[3]; 
 
-    // If the link is valid (starts with "https://"), else leave it blank
-    if (link && link.trim().startsWith('https://')) {
-        limitedRow[1] = `<a href="${link}" target="_blank">${secondColumnText}</a>`;
-    } else {
-        limitedRow[3] = ''; // Leave the 4th column blank if not a valid link
-    }
-
-    // Keep the text in the 3rd column unchanged
-    const thirdColumnText = limitedRow[2]; // Retain the original 3rd column text
-}
-
+                        if (link && link.trim().startsWith('https://')) {
+                            limitedRow[1] = `<a href="${link}" target="_blank">${secondColumnText}</a>`;
+                        } else {
+                            limitedRow[3] = '';
+                        }
+                    }
 
                     return `<tr data-id="${index}">${limitedRow.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
                 });
-                
 
-                originalRows = allRows.slice(); // Keep a reference to the original rows
+                originalRows = allRows.slice(); 
                 $('#dataTable tbody').html(originalRows.join(''));
 
-                // Row click toggle functionality
+                // Row click to toggle selection
                 $('#dataTable tbody').on('click', 'tr', function() {
                     const rowIndex = $(this).index();
                     $(this).toggleClass('selected-row');
+                    $(this).removeClass('new-row'); 
                     if (selectedRows.has(rowIndex)) {
                         selectedRows.delete(rowIndex);
                     } else {
@@ -182,13 +179,12 @@ if (limitedRow.length >= 4) {
                     }
                 });
 
-                // Display selected rows
+                // Display only selected rows when "Display Selected" is clicked
                 $('#displaySelected').click(function() {
                     const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
                     const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
 
                     if (selectedHtml.length === 0) {
-                        // If no selected rows, behave like reset
                         $('#dataTable tbody').html(originalRows.join(''));
                         selectedRows.clear();
                     } else {
@@ -198,17 +194,23 @@ if (limitedRow.length >= 4) {
 
                 // Reset button functionality
                 $('#reset').click(function() {
-                    $('#dataTable tbody tr').removeClass('selected-row');
+                    $('#dataTable tbody tr').removeClass('selected-row new-row');
                     selectedRows.clear();
                     $('#dataTable tbody').html(originalRows.join(''));
-                    displayedRows.clear(); // Reset displayed rows
+                    displayedRows.clear(); 
+                    newTopRows.clear(); 
                 });
 
-                // Clear Context button functionality
+                // Clear Context button functionality (updates made here)
                 $('#clearContext').click(function() {
                     $('#keywordInput').val(''); // Clear the keyword input
-                    $('#dataTable tbody').html(originalRows.join('')); // Reset table display
-                    displayedRows.clear(); // Clear displayed rows
+
+                    // Keep selected rows intact, reset the rest to original state
+                    $('#dataTable tbody tr').each(function() {
+                        if (!$(this).hasClass('selected-row')) {
+                            $(this).removeClass('new-row'); // Revert green rows
+                        }
+                    });
                 });
 
                 // Export functionality
@@ -231,52 +233,70 @@ if (limitedRow.length >= 4) {
                     link.click();
                     document.body.removeChild(link);
                 });
-            });
 
-            // Function to extract keywords and phrases using NLP logic
-            function extractKeywords(context) {
-                // Simulating advanced NLP: extracting meaningful single words and short phrases
-                return context.match(/(?:\w+\s+){0,2}\w+/g) || [];
-            }
+                function extractKeywords(context) {
+                    return context.match(/(?:\w+\s+){0,2}\w+/g) || [];
+                }
 
-            // Function to extract numbers from context
-            function extractNumbers(context) {
-                return context.match(/\d+/g) || []; // Capture all numbers
-            }
+                function extractNumbers(context) {
+                    return context.match(/\d+/g) || []; 
+                }
 
-            // Match and display function for stacking results
-            function matchAndDisplay(matchingItems) {
-                matchingItems.forEach(item => {
-                    allRows.forEach(rowHtml => {
-                        const rowText = $(rowHtml).text().toLowerCase(); // Get text of the entire row
-                        if (rowText.includes(item.trim().toLowerCase())) {
-                            const rowId = $(rowHtml).data('id');
-                            if (!displayedRows.has(rowId)) {
-                                $('#dataTable tbody').prepend(rowHtml); // Move to the top
-                                displayedRows.add(rowId); // Mark this row as displayed
-                            }
+                function matchAndDisplay(matchingItems) {
+                    // Reset the green highlighting for previously green rows unless they are selected
+                    $('#dataTable tbody tr').each(function() {
+                        if (!$(this).hasClass('selected-row')) {
+                            $(this).removeClass('new-row'); 
                         }
                     });
+
+                    matchingItems.forEach(item => {
+                        allRows.forEach((rowHtml, index) => {
+                            const rowText = $(rowHtml).text().toLowerCase(); 
+                            if (rowText.includes(item.trim().toLowerCase())) {
+                                const rowId = $(rowHtml).data('id');
+                                if (!displayedRows.has(rowId)) {
+                                    $('#dataTable tbody').prepend(rowHtml); 
+                                    displayedRows.add(rowId); 
+                                    newTopRows.add(rowId); 
+                                }
+                            }
+                        });
+                    });
+
+                    $('#dataTable tbody tr').each(function() {
+                        const rowId = $(this).data('id');
+                        if (newTopRows.has(rowId) && !$(this).hasClass('selected-row')) {
+                            $(this).addClass('new-row'); 
+                        } else if (!selectedRows.has(rowId)) {
+                            $(this).removeClass('new-row'); 
+                        }
+                    });
+                }
+
+                $('#submitContext').click(function() {
+                    const context = $('#keywordInput').val();
+                    $('#loadingIndicator').show(); 
+                    $('#progressMessage').text('Searching...'); 
+
+                    const numbers = extractNumbers(context);
+                    const keywords = extractKeywords(context);
+
+                    newTopRows.clear(); // Clear previous new rows set
+
+                    matchAndDisplay(numbers); 
+                    matchAndDisplay(keywords); 
+
+                    $('#loadingIndicator').hide(); 
+                    $('#progressMessage').text('Search complete.'); 
                 });
-            }
-
-            // Submit Context functionality
-            $('#submitContext').click(function() {
-                const context = $('#keywordInput').val();
-                $('#loadingIndicator').show(); // Show loading indicator
-                $('#progressMessage').text('Searching...'); // Show progress message
-
-                // Extract numbers and keywords using advanced NLP
-                const numbers = extractNumbers(context);
-                const keywords = extractKeywords(context);
-
-                // Match numbers and keywords
-                matchAndDisplay(numbers); // Match numbers
-                matchAndDisplay(keywords); // Match keywords
-
-                $('#loadingIndicator').hide(); // Hide loading indicator
-                $('#progressMessage').text('Search complete.'); // Show completion message
             });
+
+            $('<style>').prop('type', 'text/css').html(`
+                .new-row {
+                    background-color: lightgreen;
+                }
+            `).appendTo('head');
         });
     </script>
 </body>
