@@ -6,8 +6,7 @@
     <title>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</title>
     <style>
         .copyright-notice {
-            font-size: 0.8em; /* Keeps the text small */
-            position: absolute;
+            font-size: 0.8em; /* Keeps the text small */  
             top: 10px;
             center: 10px;
             padding: 5px;
@@ -133,11 +132,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> <!-- Added PapaParse -->
 </head>
 <body>
-    <div id="topContainer">
-        <h1>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</h1>
-        <div class="copyright-notice">
+        </header>    
+ 	<div class="copyright-notice">
             &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used, are protected under copyright law.
         </div>
+ 	<div class="image-container">
+        <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo">
+        <a href="https://www.linkedin.com/groups/12741229/">
+        <img src="https://media.licdn.com/dms/image/v2/D4E07AQFTIdPpIdlhCQ/group-logo_image-shrink_92x92/group-logo_image-shrink_92x92/0/1670075584338?e=1727884800&v=beta&t=J8szLXmrM9RSWZ2YPdkVfvIgkTSfnP50baeyLTXO6OA" alt="QARA Logo">
+        </a>
+	</div>
+ 	<div id="topContainer">   
+        <h1>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</h1>
         <textarea id="keywordInput" placeholder="
         1. Search Context: Enter keywords, standards number, text from document... here.
         2. Click on Submit Context
@@ -170,7 +176,7 @@
             let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
             let newTopRows = new Set();
             let header = []; // Declare header globally
-            let abstractVisible = false; // Track visibility of column 4 (abstract)
+            let abstractVisible = true; // Track visibility of column 4 (abstract)
 
             // Store rows as structured data (not just HTML)
             let rowData = []; // To store original structured data for resetting
