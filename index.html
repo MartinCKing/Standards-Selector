@@ -4,130 +4,172 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</title>
-    <style>
-        .copyright-notice {
-            font-size: 0.8em; /* Keeps the text small */  
-            top: 10px;
-            center: 10px;
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.7);
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-	    height: auto;
-            min-height: 100vh;
-            align-items: center;
-        }
-        #topContainer {
-            width: 100%;
-            background-color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-bottom: 20px;
-        }
-        h1 {
-            margin-bottom: 20px;
-            background-color: white;
-            padding: 10px 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        #keywordInput {
-            width: 90%;
-            max-width: 600px;
-            height: auto;
-            margin-bottom: 20px;
-            padding: 8px;
-            resize: none;
-            min-height: 80px;
-        }
-         #buttonContainer {
+<style>
+    .copyright-notice {
+        font-size: 0.8em; /* Keeps the text small */  
+        top: 10px;
+        center: 10px;
+        padding: 5px;
+        background-color: rgba(255, 255, 255, 0.7);
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        align-items: center;
+    }
+
+    #topContainer {
+        width: 100%;
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 20px;
+    }
+
+    h1 {
+    margin-bottom: 4px;
+    background-color: white;
+    padding: 4px 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    line-height: 1.0; /* Control the line height for better readability */
+    height:20px; /* Set a fixed height for the h1 */
+    overflow: hidden; /* If text is longer, it will be clipped */
+    font-size: 2rem; /* Adjust the font size as needed */
+    }
+
+    #keywordInput {
+        width: 90%;
+        max-width: 600px;
+        height: auto;
+        margin-bottom: 20px;
+        padding: 8px;
+        resize: none;
+        min-height: 80px;
+    }
+
+    /* Button container sticky behavior for larger screens */
+    #buttonContainer {
+        background-color: white;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        border-bottom: 1px solid #ccc;
+        z-index: 100;
+    }
+
+    #tableContainer {
+        width: 100%;
+        max-width: 1000px;
+        flex-grow: 1;
+        overflow-x: auto;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+
+    /* Make the table scrollable and sticky on large screens */
+    @media (min-width: 769px) {
+        #buttonContainer {
             position: sticky;
-            top: 0; /* Stick the button container to the top */
-            z-index: 100; /* Ensure it appears above other content */
-            background-color: white; /* Give it a background to prevent overlap issues */
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            border-bottom: 1px solid #ccc; /* Optional: Add a border to make it more visible */
-            }
-	/* Ensure the table still scrolls beneath the sticky button bar */
+            top: 0; /* Stick the buttons to the top */
+        }
+
+        #tableContainer {
+            margin-top: 10px; /* Provide some spacing from the buttons */
+            max-height: 60vh; /* Set max height so that the table scrolls properly on large screens */
+            overflow-y: auto;
+        }
+    }
+
+    /* Responsive behavior for small screens */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        #keywordInput {
+            width: 95%;
+            min-height: 60px;
+        }
 
         button {
-            padding: 10px;
-            font-size: 1rem;
-        }
-        #tableContainer {
-            width: 100%;
-            max-width: 1000px;
-            flex-grow: 1;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #add8e6;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        tr:nth-child(even) {
-            background-color: #e6f2ff;
-        }
-        tr.selected-row {
-            background-color: yellow;
-        }
-        tr.new-row {
-            background-color: lightgreen;
-        }
-        #loadingIndicator {
-            display: none;
-            margin-left: 10px;
-        }
-        #progressMessage {
-            margin-top: 10px;
-            font-weight: bold;
+            font-size: 0.9rem;
         }
 
-        /* Hide the first column initially */
-        td:nth-child(1), th:nth-child(1),
-	td:nth-child(4), th:nth-child(4),
-	td:nth-child(5), th:nth-child(5)     
-	{
-            display: none;
+        #buttonContainer {
+            position: fixed;
+            bottom: 0; /* Float the button bar at the bottom on small screens */
+            width: 100%; /* Ensure the button bar spans the entire width */
+            justify-content: space-around;
+            flex-wrap: wrap;
+            background-color: white;
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for visibility */
         }
-        /* Add responsiveness for smaller screens */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-            #keywordInput {
-                width: 95%;
-                min-height: 60px;
-            }
-            button {
-                font-size: 0.9rem;
-            }
-            #buttonContainer {
-                flex-direction: column;
-            }
+
+        #tableContainer {
+            margin-bottom: 60px; /* Add margin to avoid overlap with the floating button bar */
+            max-height: none; /* Remove the fixed height for small screens so the whole page can scroll */
+            overflow-y: visible; /* Let the whole page scroll naturally */
         }
-    </style>
+    }
+
+    /* Table and row styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #add8e6;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e6f2ff;
+    }
+
+    tr.selected-row {
+        background-color: yellow;
+    }
+
+    tr.new-row {
+        background-color: lightgreen;
+    }
+
+    #loadingIndicator {
+        display: none;
+        margin-left: 10px;
+    }
+
+    #progressMessage {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    /* Hide the first column initially */
+    td:nth-child(1), th:nth-child(1),
+    td:nth-child(4), th:nth-child(4),
+    td:nth-child(5), th:nth-child(5) {
+        display: none;
+    }
+</style>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
@@ -143,14 +185,10 @@
  	<div class="copyright-notice">
             &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used, are protected under copyright law.
         </div>
- 	<div class="image-container">
-        <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo">
-        <a href="https://www.linkedin.com/groups/12741229/">
-        <img src="https://media.licdn.com/dms/image/v2/D4E07AQFTIdPpIdlhCQ/group-logo_image-shrink_92x92/group-logo_image-shrink_92x92/0/1670075584338?e=1727884800&v=beta&t=J8szLXmrM9RSWZ2YPdkVfvIgkTSfnP50baeyLTXO6OA" alt="QARA Logo">
-        </a>
-	</div>
- 	<div id="topContainer">   
-        <h1>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</h1>
+<h1 style="font-size: 100%; display: flex; align-items: right; margin:0;">
+</a>Ask ✅ - Med Minds 🔎 Applicable Standards Selector
+</h1>
+ 	<div id="topContainer"; align-items: center;>   
         <textarea id="keywordInput" placeholder="
         1. Search Context: Enter keywords, standards number, text from document... here.
         2. Click on Submit Context
