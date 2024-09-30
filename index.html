@@ -46,13 +46,19 @@
             resize: none;
             min-height: 80px;
         }
-        #buttonContainer {
+         #buttonContainer {
+            position: sticky;
+            top: 0; /* Stick the button container to the top */
+            z-index: 100; /* Ensure it appears above other content */
+            background-color: white; /* Give it a background to prevent overlap issues */
+            padding: 10px;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 10px;
-        }
+            border-bottom: 1px solid #ccc; /* Optional: Add a border to make it more visible */
+            }
+	/* Ensure the table still scrolls beneath the sticky button bar */
+
         button {
             padding: 10px;
             font-size: 1rem;
