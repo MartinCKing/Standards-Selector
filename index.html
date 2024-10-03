@@ -10,17 +10,37 @@
         top: 0px;
         center: 10px;
         padding: 0px;
-        background-color: rgba(255, 255, 255, 0.7);
+        background-color: black;
+        color: white;
     }
 
+.highlight {
+    background-color: orange;
+    color: black;
+    font-weight: bold;
+}
+        /* Image Container */
+        .image-container {
+            background-color: white;
+            padding: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
     body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            background-color: black;
+            color: white;
     }
 
     #topContainer {
@@ -30,6 +50,8 @@
         flex-direction: column;
         align-items: center;
         padding-bottom: 20px;
+        background-color: black;
+        color: white;
     }
 
     h1 {
@@ -42,6 +64,8 @@
     height:20px; /* Set a fixed height for the h1 */
     overflow: hidden; /* If text is longer, it will be clipped */
     font-size: 2rem; /* Adjust the font size as needed */
+    background-color: white;
+    color: black;
     }
 
     #keywordInput {
@@ -56,13 +80,15 @@
 
     /* Button container sticky behavior for larger screens */
     #buttonContainer {
-        background-color: white;
+        background-color: black;
         padding: 10px;
         display: flex;
         justify-content: center;
         gap: 10px;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid #;
         z-index: 100;
+    background-color: black;
+    color: white;
     }
 
     #tableContainer {
@@ -117,6 +143,8 @@
             margin-bottom: 60px; /* Add margin to avoid overlap with the floating button bar */
             max-height: none; /* Remove the fixed height for small screens so the whole page can scroll */
             overflow-y: visible; /* Let the whole page scroll naturally */
+            background-color: white;
+            color: black;
         }
     }
 
@@ -124,6 +152,8 @@
     table {
         width: 100%;
         border-collapse: collapse;
+        background-color: white;
+        color: black;
     }
 
     th, td {
@@ -139,6 +169,13 @@
         top: 0;
         z-index: 10;
     }
+        th:nth-child(4) {
+            background-color: #add8e6;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10
+        }
 
     tr:nth-child(even) {
         background-color: #e6f2ff;
@@ -164,10 +201,10 @@
 
     /* Hide the first column initially */
     td:nth-child(1), th:nth-child(1),
-    td:nth-child(4), th:nth-child(4),
     td:nth-child(5), th:nth-child(5) {
         display: none;
     }
+
 </style>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
@@ -181,19 +218,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> <!-- Added PapaParse -->
 </head>
 <body>
-       <header>    
-       <div class="image-container" style="display: inline-block; align-items: center; text-align: center;">
-       <a href="https://www.linkedin.com/groups/12741229/">
-       <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo" style="width:20%; height: 20%;">
-       <img src="QARA1.png" alt="QARA Logo"style="width:5%; height: 5%;">
-        </a>     
-        </header>    
- 	<h1 style="font-size: 100%; display: flex; align-items: right; margin:0;">
-	</a>Ask ✅ - Med Minds 🔎 Applicable Standards Selector
-	</h1>
-	<div class="copyright-notice">
-            &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used, are protected under copyright law.
+<!-- Header -->
+    <header class="custom-header">
+        <div class="content-container">
+            <div class="image-container" style="display: inline-block; align-items: center; text-align: center;">
+                <a href="https://www.linkedin.com/groups/12741229/">
+                    <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo" style="width:10%; height: 10%;">
+                    <img src="QARA1.png" alt="QARA Logo" style="width:3%; height: 3%;">
+                </a>
+        
+            <h1 style="font-size: 100%; padding: 0px;">
+            Ask ✅ - Med Minds 🔎 Applicable Standards Selector</h1>
+       <div class="copyright-notice">
+        &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used are protected under copyright law.
         </div>
+        </div>
+    </header>
 
  	<div id="topContainer"; align-items: center;>   
         <textarea id="keywordInput" placeholder="
@@ -208,7 +248,7 @@
             <button id="displaySelected">Display All Selected Rows</button>
             <button id="export">Export Selected Rows</button>
             <button id="reset">Reset</button>
-            <button id="toggleAbstract">Show Abstract</button> <!-- New Show Abstract button -->
+            <button id="toggleAbstract">Hide Abstract</button> <!-- New Show Abstract button -->
             <span id="loadingIndicator">Loading...</span>
         </div>
         <div id="progressMessage"></div>
@@ -285,12 +325,12 @@
 
                 if (abstractVisible) {
                     // Show column 4
-                    $('td:nth-child(4), th:nth-child(4)').hide();
-                    $('#toggleAbstract').text('Show Abstract');
-                } else {
-                    // Hide column 4
                     $('td:nth-child(4), th:nth-child(4)').show();
                     $('#toggleAbstract').text('Hide Abstract');
+                } else {
+                    // Hide column 4
+                    $('td:nth-child(4), th:nth-child(4)').hide();
+                    $('#toggleAbstract').text('Show Abstract');
                 }
             });
 
@@ -308,7 +348,8 @@
 
                 // Apply the reset HTML back to the table
                 $('#dataTable tbody').html(resetHtml.join(''));
-
+                $('td:nth-child(4), th:nth-child(4)').hide();
+                $('#toggleAbstract').text('Show Abstract');
                 // Restore selected rows (yellow highlighting)
                 $('#dataTable tbody tr').each(function() {
                     const rowId = $(this).data('id');
@@ -323,12 +364,38 @@
                 matchAndDisplay(numbers);  // Match and display rows based on numbers
                 matchAndDisplay(keywords);  // Match and display rows based on keywords
 
+                // Perform exact string search
+                performStringSearch(context); // New: Perform string search
+
                 $('#loadingIndicator').hide(); // Hide the loading indicator
                 $('#progressMessage').text('Search complete.');
 
                 // Scroll to the top of the table
                 $('#tableContainer').scrollTop(0);
             });
+// Function to perform string search
+function performStringSearch(searchString) {
+    // Convert searchString to lowercase to ensure case-insensitive match
+    const lowerCaseSearchString = searchString.trim().toLowerCase();
+
+    // New: Skip searching if string includes "DOCTYPE html"
+    if (lowerCaseSearchString.includes('doctype html')) {
+        $('#progressMessage').text('No search performed due to "DOCTYPE html" detected.');
+        return; // Skip searching if DOCTYPE html is present
+    }
+
+    // Iterate over each row in the table to check for the string match
+    $('#dataTable tbody tr').each(function() {
+        const rowText = $(this).text().toLowerCase(); // Convert row text to lowercase for case-insensitive comparison
+
+        // Check if the row text contains the search string
+        if (rowText.includes(lowerCaseSearchString)) {
+            $(this).addClass('new-row'); // Highlight matching row in green
+        } else {
+            $(this).removeClass('new-row'); // Remove highlight if no match
+        }
+    });
+}
 
             // Function to extract keywords from the context
             function extractKeywords(context) {
