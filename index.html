@@ -14,33 +14,55 @@
         color: white;
     }
 
-.highlight {
-    background-color: orange;
-    color: black;
-    font-weight: bold;
-}
-        /* Image Container */
-        .image-container {
-            background-color: white;
-            padding: 0px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            border-radius: 5px;
-            width: 100%;
-        }
+    .highlight {
+        background-color: orange;
+        color: black;
+        font-weight: bold;
+    }
+
+    /* Image Container */
+    .image-container {
+        background-color: white;
+        padding: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        border-radius: 5px;
+        width: 100%;
+    }
 
     body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            align-items: center;
-            background-color: black;
-            color: white;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        align-items: center;
+        background-color: black;
+        color: white;
+    }
+    /* Change the color of hyperlinks */
+    a {
+        color: blue; /* Normal link color (blue) */
+        text-decoration: none; /* Remove underline */
+    }
+
+    /* Change the color when the link is hovered over */
+    a:hover {
+        color: orange; /* Hover color (orange) */
+        text-decoration: underline; /* Underline when hovered */
+    }
+
+    /* Change the color of visited links */
+    a:visited {
+        color: red; /* Visited link color (purple) */
+    }
+
+    /* Change the color when the link is active (clicked) */
+    a:active {
+        color: red; /* Active link color (red) */
     }
 
     #topContainer {
@@ -55,18 +77,17 @@
     }
 
     h1 {
-    margin-bottom: 4px;
-    background-color: white;
-    padding: 4px 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    line-height: 1.0; /* Control the line height for better readability */
-    height:20px; /* Set a fixed height for the h1 */
-    overflow: hidden; /* If text is longer, it will be clipped */
-    font-size: 2rem; /* Adjust the font size as needed */
-    border-radius: 5px;
-    background-color: white;
-    color: black;
+        margin-bottom: 4px;
+        background-color: white;
+        padding: 4px 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        line-height: 1.0; /* Control the line height for better readability */
+        height:20px; /* Set a fixed height for the h1 */
+        overflow: hidden; /* If text is longer, it will be clipped */
+        font-size: 2rem; /* Adjust the font size as needed */
+        background-color: white;
+        color: black;
     }
 
     #keywordInput {
@@ -88,8 +109,8 @@
         gap: 10px;
         border-bottom: 1px solid #;
         z-index: 100;
-    background-color: black;
-    color: white;
+        background-color: black;
+        color: white;
     }
 
     #tableContainer {
@@ -111,7 +132,6 @@
         #tableContainer {
             margin-top: 10px; /* Provide some spacing from the buttons */
             max-height: 60vh; /* Set max height so that the table scrolls properly on large screens */
-            max-width: 1920px
             overflow-y: auto;
         }
     }
@@ -171,13 +191,14 @@
         top: 0;
         z-index: 10;
     }
-        th:nth-child(4) {
-            background-color: #add8e6;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 10
-        }
+
+    th:nth-child(4) {
+        background-color: #add8e6;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
 
     tr:nth-child(even) {
         background-color: #e6f2ff;
@@ -367,7 +388,7 @@
                 matchAndDisplay(keywords);  // Match and display rows based on keywords
 
                 // Perform exact string search
-                performStringSearch(context); // New: Perform string search
+                performSearch(context); // New: Perform string search
 
                 $('#loadingIndicator').hide(); // Hide the loading indicator
                 $('#progressMessage').text('Search complete.');
@@ -375,29 +396,7 @@
                 // Scroll to the top of the table
                 $('#tableContainer').scrollTop(0);
             });
-// Function to perform string search
-function performStringSearch(searchString) {
-    // Convert searchString to lowercase to ensure case-insensitive match
-    const lowerCaseSearchString = searchString.trim().toLowerCase();
 
-    // New: Skip searching if string includes "DOCTYPE html"
-    if (lowerCaseSearchString.includes('doctype html')) {
-        $('#progressMessage').text('No search performed due to "DOCTYPE html" detected.');
-        return; // Skip searching if DOCTYPE html is present
-    }
-
-    // Iterate over each row in the table to check for the string match
-    $('#dataTable tbody tr').each(function() {
-        const rowText = $(this).text().toLowerCase(); // Convert row text to lowercase for case-insensitive comparison
-
-        // Check if the row text contains the search string
-        if (rowText.includes(lowerCaseSearchString)) {
-            $(this).addClass('new-row'); // Highlight matching row in green
-        } else {
-            $(this).removeClass('new-row'); // Remove highlight if no match
-        }
-    });
-}
 
             // Function to extract keywords from the context
             function extractKeywords(context) {
@@ -408,6 +407,71 @@ function performStringSearch(searchString) {
             function extractNumbers(context) {
                 return context.match(/\d+/g) || []; // Extract numbers
             }
+
+// Function to perform search and highlight matching words with <span>
+function performSearch(searchString) {
+    const lowerCaseSearchString = searchString.trim().toLowerCase();
+    let hasMatch = false;
+
+    // Skip searching if string includes "DOCTYPE html"
+    if (lowerCaseSearchString.includes('doctype html')) {
+        $('#progressMessage').text('No search performed due to "DOCTYPE html" detected.');
+        return;
+    }
+
+    // 1. Perform string search across all rows
+    $('#dataTable tbody tr').each(function() {
+        const row = $(this);
+        let rowText = row.text().toLowerCase();
+
+        // Check if the row contains the exact search string
+        if (rowText.includes(lowerCaseSearchString)) {
+            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matching text with <span>
+            hasMatch = true; // Mark that at least one match was found
+        } else {
+            unhighlightRow(row); // Unhighlight if no match is found
+        }
+    });
+}
+
+// Function to highlight matched words in each <td> element (wrap matching words with <span>)
+// Skip highlighting in the designation column (assumed to be the first column) and cells with hyperlinks
+function highlightWordsInRow(row, searchString) {
+    const regex = new RegExp(`(${searchString})`, 'gi'); // 'gi' for global and case-insensitive search
+
+    // Iterate through each cell (<td>) in the row
+    row.find('td').each(function(index) {
+        // Skip the first column (designation column) and cells with <a> tags (links)
+        if (index === 0 || $(this).find('a').length > 0) {
+            return; // Skip this cell if it's in the first column or contains a link
+        }
+
+        const cellHtml = $(this).html(); // Get the original HTML content of the cell
+
+        // Replace matching text with <span> tag for highlighting
+        if (cellHtml.toLowerCase().includes(searchString.toLowerCase())) {
+            const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
+            $(this).html(highlightedHtml); // Update the cell content
+        }
+    });
+}
+
+// Function to unhighlight a row (remove <span class="highlight"> tags)
+function unhighlightRow(row) {
+    // Iterate through each cell (<td>) in the row to remove <span> tags
+    row.find('td').each(function() {
+        const cellHtml = $(this).html(); // Get the original HTML content
+
+        // Remove <span> tags
+        const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+        $(this).html(unhighlightedHtml); // Restore the original content
+    });
+}
+
+// Function to extract keywords from the context (fallback to keyword search)
+function extractKeywords(context) {
+    return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
+}
 
             // Function to match and display rows that match the search criteria
             function matchAndDisplay(matchingItems) {
