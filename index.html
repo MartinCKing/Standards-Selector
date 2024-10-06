@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask ✅LinkedIn QARA - Med Minds🔎 Applicable Standards Selector</title>
+<style>
+    .copyright-notice {
+        font-size: 0.6em; /* Keeps the text small */  
+        top: 0px;
+        center: 10px;
+        padding: 0px;
+        background-color: black;
+        color: white;
+    }
+
+    .highlight {
+        background-color: orange;
+        color: black;
+        font-weight: bold;
+    }
+
+    /* Image Container */
+    .image-container {
+        background-color: white;
+        padding: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        align-items: center;
+        background-color: black;
+        color: white;
+    }
+    /* Change the color of hyperlinks */
+    a {
+        color: blue; /* Normal link color (blue) */
+        text-decoration: none; /* Remove underline */
+    }
+
+    /* Change the color when the link is hovered over */
+    a:hover {
+        color: orange; /* Hover color (orange) */
+        text-decoration: underline; /* Underline when hovered */
+    }
+
+    /* Change the color of visited links */
+    a:visited {
+        color: red; /* Visited link color (purple) */
+    }
+
+    /* Change the color when the link is active (clicked) */
+    a:active {
+        color: red; /* Active link color (red) */
+    }
+
+    #topContainer {
+        width: 100%;
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 0px;
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+    }
+    #linkContainer {
+	width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 0px;
+	padding-top: 0px;
+        background-color: black;
+        }
+
+    h1 {
+        margin-bottom: 4px;
+        background-color: white;
+        padding: 4px 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        line-height: 1.0; /* Control the line height for better readability */
+        height:20px; /* Set a fixed height for the h1 */
+        overflow: hidden; /* If text is longer, it will be clipped */
+        font-size: 2rem; /* Adjust the font size as needed */
+        background-color: white;
+        color: black;
+	border-radius: 5px;
+    }
+
+    #keywordInput {
+        width: 90%;
+        max-width: 600px;
+        height: auto;
+        margin-bottom: 20px;
+        padding: 8px;
+        resize: none;
+        min-height: 80px;
+    }
+
+    /* Button container sticky behavior for larger screens */
+    #buttonContainer {
+        background-color: black;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        border-bottom: 1px solid #;
+        z-index: 100;
+        background-color: black;
+        color: white;
+    }
+
+    #tableContainer {
+        width: 100%;
+        max-width: 1920px;
+        flex-grow: 1;
+        overflow-x: auto;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+
+    /* Make the table scrollable and sticky on large screens */
+    @media (min-width: 769px) {
+        #buttonContainer {
+            position: sticky;
+            top: 0; /* Stick the buttons to the top */
+        }
+
+        #tableContainer {
+            margin-top: 10px; /* Provide some spacing from the buttons */
+            max-height: 80vh; /* Set max height so that the table scrolls properly on large screens */
+            overflow-y: auto;
+        }
+    }
+
+    /* Responsive behavior for small screens */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        #keywordInput {
+            width: 95%;
+            min-height: 60px;
+        }
+
+        button {
+            font-size: 0.9rem;
+        }
+
+        #buttonContainer {
+            position: fixed;
+            bottom: 0; /* Float the button bar at the bottom on small screens */
+            width: 100%; /* Ensure the button bar spans the entire width */
+            justify-content: space-around;
+            flex-wrap: wrap;
+            background-color: white;
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for visibility */
+        }
+
+        #tableContainer {
+            margin-bottom: 60px; /* Add margin to avoid overlap with the floating button bar */
+            max-height: none; /* Remove the fixed height for small screens so the whole page can scroll */
+            overflow-y: visible; /* Let the whole page scroll naturally */
+            background-color: white;
+            color: black;
+        }
+    }
+
+    /* Table and row styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        color: black;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #add8e6;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    th:nth-child(4) {
+        background-color: #add8e6;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e6f2ff;
+    }
+
+    tr.selected-row {
+        background-color: yellow;
+    }
+
+    tr.new-row {
+        background-color: lightgreen;
+    }
+
+    #loadingIndicator {
+        display: none;
+        margin-left: 10px;
+    }
+
+    #progressMessage {
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    /* Hide the first column initially */
+    td:nth-child(1), th:nth-child(1),
+    td:nth-child(5), th:nth-child(5) {
+        display: none;
+    }
+
+</style>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-81366NTXDQ');
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script> <!-- Added PapaParse -->
+</head>
+<body>
+<!-- Header -->
+<header class="custom-header">
+    <div class="content-container">
+        <div class="image-container" style="display: inline-block; align-items: center; text-align: center;">
+            <a href="https://www.linkedin.com/groups/12741229/">
+                <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo" style="width:10%; height: 10%;">
+                <img src="QARA1.png" alt="QARA Logo" style="width:3%; height: 3%;">
+            </a>
+            <h1 style="font-size: 100%; padding: 0px;">
+                Ask ✅ - Med Minds 🔎 Applicable Standards Selector
+            </h1>
+            <div class="copyright-notice">
+                &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used are protected under copyright law.
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main container with textarea and link -->
+<div id="topContainer" style="display: flex; flex-direction: column; align-items: center;">   
+    <textarea id="keywordInput" rows="6" cols="60" 
+        placeholder=""></textarea>
+    
+    <!-- A link placed below the textarea, aligned center -->
+    <div id="linkContainer" style="margin-top: 0px; text-align: center;">
+
+        <a id="dynamicLink" href="Ask ✅ - Med Minds 🔎 Applicable Standards Selector.pdf" target="_blank">
+           Instructions For Use
+        </a>
+    </div>
+</div>
+        <div id="buttonContainer">
+            <button id="submitContext">Submit Context</button>
+            <button id="clearContext">Clear Context</button>
+            <button id="displaySelected">Display All Selected Rows</button>
+            <button id="export">Export Selected Rows</button>
+            <button id="toggleAbstract">Hide Abstract</button> <!-- New Show Abstract button -->
+            <button id="reset">Reset</button>
+            <span id="loadingIndicator">Loading...</span>
+        </div>
+        <div id="progressMessage"></div>
+    </div>
+    <div id="tableContainer">
+        <table id="dataTable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+<script>
+    const textArea = document.getElementById('keywordInput');
+    const dynamicLink = document.getElementById('dynamicLink');
+    
+    // Function to hide the link when user types
+    textArea.addEventListener('input', function() {
+        if (textArea.value.length > 0) {
+            dynamicLink.style.display = 'none';
+        } else {
+            dynamicLink.style.display = 'block'; // Show the link if the textarea is empty
+        }
+    });
+
+    // Initially show the link if the textarea is empty
+    window.onload = function() {
+        if (textArea.value.length === 0) {
+            dynamicLink.style.display = 'block';
+        } else {
+            dynamicLink.style.display = 'none';
+        }
+    };
+</script>
+
+    <script>
+        $(document).ready(function() {
+            const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
+            let allRows = [];
+            let originalRows = [];
+            let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
+            let newTopRows = new Set();
+            let header = []; // Declare header globally
+            let abstractVisible = true; // Track visibility of column 4 (abstract)
+
+            // Store rows as structured data (not just HTML)
+            let rowData = []; // To store original structured data for resetting
+
+            // Load and parse CSV data with PapaParse
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true, // If your CSV has a header row
+                complete: function(results) {
+                    header = Object.keys(results.data[0]).slice(0, 5); // Get header (first 5 columns)
+                    const rows = results.data.map((row, index) => {
+                        row['id'] = index; // Add a unique identifier (row ID)
+                        return row;
+                    });
+
+                    // Create table header
+                    const headerHtml = header.map(col => `<th>${col}</th>`).join('');
+                    $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
+
+                    // Create table rows and store original data
+                    allRows = rows.map((row, index) => {
+                        const link = row[header[4]]; // Get the link from column 5
+                        if (link && link.trim().startsWith('https://')) {
+                            row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Hyperlink column 2
+                        } else {
+                            row[header[4]] = ''; // Remove invalid links
+                        }
+                        rowData.push({id: row['id'], content: row}); // Store original data for resetting
+                        return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
+                    });
+
+                    originalRows = allRows.slice(); // Store original rows for resetting
+                    $('#dataTable tbody').html(originalRows.join(''));
+
+                    // Add row selection functionality
+                    $('#dataTable tbody').on('click', 'tr', function() {
+                        const rowId = $(this).data('id'); // Use the unique identifier
+                        $(this).toggleClass('selected-row');
+                        $(this).removeClass('new-row'); // Remove the "new-row" class if it's highlighted green
+
+                        // Toggle selection in the selectedRowIds set
+                        if (selectedRowIds.has(rowId)) {
+                            selectedRowIds.delete(rowId); // Remove the row if it's already selected
+                        } else {
+                            selectedRowIds.add(rowId); // Add the row if it's not selected
+                        }
+                    });
+                }
+            });
+
+            // Toggle abstract (column 4) visibility
+            $('#toggleAbstract').click(function() {
+                abstractVisible = !abstractVisible; // Toggle the state
+
+                if (abstractVisible) {
+                    // Show column 4
+                    $('td:nth-child(4), th:nth-child(4)').show();
+                    $('#toggleAbstract').text('Hide Abstract');
+                } else {
+                    // Hide column 4
+                    $('td:nth-child(4), th:nth-child(4)').hide();
+                    $('#toggleAbstract').text('Show Abstract');
+                }
+            });
+
+            // Submit context functionality: search rows based on context input
+            $('#submitContext').click(function() {
+                const context = $('#keywordInput').val(); // Get the context from the textarea
+                $('#loadingIndicator').show(); // Show the loading indicator
+                $('#progressMessage').text('Searching...');
+
+                // Reset the table by reconstructing rows from original structured data
+                const resetHtml = rowData.map(data => {
+                    const rowHtml = `<tr data-id="${data.id}">${header.map(col => `<td>${data.content[col]}</td>`).join('')}</tr>`;
+                    return rowHtml;
+                });
+
+                // Apply the reset HTML back to the table
+                $('#dataTable tbody').html(resetHtml.join(''));
+                $('td:nth-child(4), th:nth-child(4)').hide();
+                $('#toggleAbstract').text('Show Abstract');
+                // Restore selected rows (yellow highlighting)
+                $('#dataTable tbody tr').each(function() {
+                    const rowId = $(this).data('id');
+                    if (selectedRowIds.has(rowId)) {
+                        $(this).addClass('selected-row'); // Restore yellow highlight for selected rows
+                    }
+                });
+
+                const numbers = extractNumbers(context);  // Extract numbers from the context
+                const keywords = extractKeywords(context);  // Extract keywords from the context
+
+                matchAndDisplay(numbers);  // Match and display rows based on numbers
+                matchAndDisplay(keywords);  // Match and display rows based on keywords
+
+                // Perform exact string search
+                performSearch(context); // New: Perform string search
+
+                $('#loadingIndicator').hide(); // Hide the loading indicator
+                $('#progressMessage').text('Search complete.');
+
+                // Scroll to the top of the table
+                $('#tableContainer').scrollTop(0);
+            });
+
+
+            // Function to extract keywords from the context
+            function extractKeywords(context) {
+                return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
+            }
+
+            // Function to extract numbers from the context
+            function extractNumbers(context) {
+                return context.match(/\d+/g) || []; // Extract numbers
+            }
+
+// Function to perform search and highlight matching words with <span>
+function performSearch(searchString) {
+    const lowerCaseSearchString = searchString.trim().toLowerCase();
+    let hasMatch = false;
+
+    // Skip searching if string includes "DOCTYPE html"
+    if (lowerCaseSearchString.includes('doctype html')) {
+        $('#progressMessage').text('No search performed due to "DOCTYPE html" detected.');
+        return;
+    }
+
+    // 1. Perform string search across all rows
+    $('#dataTable tbody tr').each(function() {
+        const row = $(this);
+        let rowText = row.text().toLowerCase();
+
+        // Check if the row contains the exact search string
+        if (rowText.includes(lowerCaseSearchString)) {
+            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matching text with <span>
+            hasMatch = true; // Mark that at least one match was found
+        } else {
+            unhighlightRow(row); // Unhighlight if no match is found
+        }
+    });
+}
+
+// Function to highlight matched words in each <td> element (wrap matching words with <span>)
+// Skip highlighting in the designation column (assumed to be the first column) and cells with hyperlinks
+function highlightWordsInRow(row, searchString) {
+    const regex = new RegExp(`(${searchString})`, 'gi'); // 'gi' for global and case-insensitive search
+
+    // Iterate through each cell (<td>) in the row
+    row.find('td').each(function(index) {
+        // Skip the first column (designation column) and cells with <a> tags (links)
+        if (index === 0 || $(this).find('a').length > 0) {
+            return; // Skip this cell if it's in the first column or contains a link
+        }
+
+        const cellHtml = $(this).html(); // Get the original HTML content of the cell
+
+        // Replace matching text with <span> tag for highlighting
+        if (cellHtml.toLowerCase().includes(searchString.toLowerCase())) {
+            const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
+            $(this).html(highlightedHtml); // Update the cell content
+        }
+    });
+}
+
+// Function to unhighlight a row (remove <span class="highlight"> tags)
+function unhighlightRow(row) {
+    // Iterate through each cell (<td>) in the row to remove <span> tags
+    row.find('td').each(function() {
+        const cellHtml = $(this).html(); // Get the original HTML content
+
+        // Remove <span> tags
+        const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+        $(this).html(unhighlightedHtml); // Restore the original content
+    });
+}
+
+// Function to extract keywords from the context (fallback to keyword search)
+function extractKeywords(context) {
+    return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
+}
+
+            // Function to match and display rows that match the search criteria
+            function matchAndDisplay(matchingItems) {
+                // Reset green highlighting for previously green rows unless they are selected
+                let matchingRows = [];
+                $('#dataTable tbody tr').each(function() {
+                    const rowText = $(this).text().toLowerCase(); // Get text content of the row
+                    let matchFound = false;
+
+                    matchingItems.forEach(item => {
+                        if (rowText.includes(item.trim().toLowerCase())) {
+                            if (!$(this).hasClass('selected-row')) { // Do not overwrite yellow (selected rows)
+                                $(this).addClass('new-row'); // Highlight the row in green
+                            }
+                            matchFound = true;
+                        }
+                    });
+
+                    if (matchFound) {
+                        matchingRows.push(this); // Collect matching rows
+                    } else {
+                        $(this).removeClass('new-row'); // Remove green highlight from non-matching rows
+                    }
+                });
+
+                // Move matching rows to the top of the table
+                $('#dataTable tbody').prepend(matchingRows);
+
+                // Scroll to the top of the table
+                $('#tableContainer').scrollTop(0);
+            }
+
+            // Display only selected rows and scroll to the top
+            $('#displaySelected').click(function() {
+                const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
+                const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
+
+                if (selectedHtml.length === 0) {
+                    $('#dataTable tbody').html(originalRows.join(''));
+                    selectedRowIds.clear();
+                } else {
+                    $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
+                    $('#tableContainer').scrollTop(0); // Scroll to the top of the table
+                }
+            });
+
+            // Reset functionality
+            $('#reset').click(function() {
+                $('#dataTable tbody tr').removeClass('selected-row new-row');
+                selectedRowIds.clear();
+                $('#dataTable tbody').html(originalRows.join(''));
+                newTopRows.clear(); 
+            });
+
+            // Clear context functionality
+            $('#clearContext').click(function() {
+                $('#keywordInput').val(''); // Clear the keyword input
+                $('#dataTable tbody tr').each(function() {
+                    if (!$(this).hasClass('selected-row')) {
+                        $(this).removeClass('new-row');
+                    }
+                });
+            });
+
+            // Export functionality
+            $('#export').click(function() {
+                let csvContent = header.map(col => `"${col}"`).join(',') + '\n'; // Properly quote the headers
+
+                $('#dataTable tbody tr.selected-row').each(function() {
+                    const row = $(this).find('td').map(function() {
+                        let cellText = $(this).text().trim();
+                        // Quote the text to handle commas within cell data
+                        return `"${cellText.replace(/"/g, '""')}"`; // Escape any existing double quotes
+                    }).get();
+
+                    if (row.some(cell => cell.length > 0)) {
+                        csvContent += row.join(',') + '\n'; // Properly format rows
+                    }
+                });
+
+                // Create and trigger the CSV file download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.setAttribute('href', URL.createObjectURL(blob));
+                link.setAttribute('download', 'selected_rows.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
+    </script>
+    
+</body>
+</html>
