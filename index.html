@@ -277,12 +277,14 @@
     
     <!-- A link placed below the textarea, aligned center -->
     <div id="linkContainer" style="margin-top: 0px; text-align: center;">
-
         <a id="dynamicLink" href="Ask ✅ - Med Minds 🔎 Applicable Standards Selector.pdf" target="_blank">
            Instructions For Use
         </a>
+        <!-- New span for the number of entries loaded -->
+        <span id="entriesLoaded" style="margin-left: 10px;">(0 entries loaded)</span>
     </div>
 </div>
+
         <div id="buttonContainer">
             <button id="submitContext">Submit Context</button>
             <button id="clearContext">Clear Context</button>
@@ -367,7 +369,10 @@
                     originalRows = allRows.slice(); // Store original rows for resetting
                     $('#dataTable tbody').html(originalRows.join(''));
 
-                    // Add row selection functionality
+                    // Update the number of entries loaded
+                    $('#entriesLoaded').text(`(${rows.length} entries loaded)`);
+
+                                      // Add row selection functionality
                     $('#dataTable tbody').on('click', 'tr', function() {
                         const rowId = $(this).data('id'); // Use the unique identifier
                         $(this).toggleClass('selected-row');
@@ -438,7 +443,6 @@
                 $('#tableContainer').scrollTop(0);
             });
 
-
             // Function to extract keywords from the context
             function extractKeywords(context) {
                 return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
@@ -449,82 +453,68 @@
                 return context.match(/\d+/g) || []; // Extract numbers
             }
 
-// Function to perform search and highlight matching words with <span>
-function performSearch(searchString) {
-    const lowerCaseSearchString = searchString.trim().toLowerCase();
-    let hasMatch = false;
+            // Function to perform search and highlight matching words with <span>
+            function performSearch(searchString) {
+                const lowerCaseSearchString = searchString.trim().toLowerCase();
+                let hasMatch = false;
 
-    // Skip searching if string includes "DOCTYPE html"
-    if (lowerCaseSearchString.includes('doctype html')) {
-        $('#progressMessage').text('No search performed due to "DOCTYPE html" detected.');
-        return;
-    }
+                // Skip searching if string includes "DOCTYPE html"
+                if (lowerCaseSearchString.includes('doctype html')) {
+                    $('#progressMessage').text('No search performed due to "DOCTYPE html" detected.');
+                    return;
+                }
 
-    // 1. Perform string search across all rows
-    $('#dataTable tbody tr').each(function() {
-        const row = $(this);
-        let rowText = row.text().toLowerCase();
+                // Perform string search across all rows
+                $('#dataTable tbody tr').each(function() {
+                    const row = $(this);
+                    let rowText = row.text().toLowerCase();
 
-        // Check if the row contains the exact search string
-        if (rowText.includes(lowerCaseSearchString)) {
-            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matching text with <span>
-            hasMatch = true; // Mark that at least one match was found
-        } else {
-            unhighlightRow(row); // Unhighlight if no match is found
-        }
-    });
-}
+                    // Check if the row contains the exact search string
+                    if (rowText.includes(lowerCaseSearchString)) {
+                        highlightWordsInRow(row, lowerCaseSearchString); // Highlight matching text with <span>
+                        hasMatch = true; // Mark that at least one match was found
+                    } else {
+                        unhighlightRow(row); // Unhighlight if no match is found
+                    }
+                });
+            }
 
-// Function to highlight matched words in each <td> element (wrap matching words with <span>)
-// Skip highlighting in the designation column (assumed to be the first column) and cells with hyperlinks
-function highlightWordsInRow(row, searchString) {
-    const regex = new RegExp(`(${searchString})`, 'gi'); // 'gi' for global and case-insensitive search
+            // Function to highlight matched words in each <td> element
+            function highlightWordsInRow(row, searchString) {
+                const regex = new RegExp(`(${searchString})`, 'gi'); // 'gi' for global and case-insensitive search
 
-    // Iterate through each cell (<td>) in the row
-    row.find('td').each(function(index) {
-        // Skip the first column (designation column) and cells with <a> tags (links)
-        if (index === 0 || $(this).find('a').length > 0) {
-            return; // Skip this cell if it's in the first column or contains a link
-        }
+                // Iterate through each cell (<td>) in the row
+                row.find('td').each(function(index) {
+                    if (index === 0 || $(this).find('a').length > 0) {
+                        return; // Skip the first column or cells with links
+                    }
+                    const cellHtml = $(this).html();
+                    if (cellHtml.toLowerCase().includes(searchString.toLowerCase())) {
+                        const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
+                        $(this).html(highlightedHtml); // Update the cell content
+                    }
+                });
+            }
 
-        const cellHtml = $(this).html(); // Get the original HTML content of the cell
-
-        // Replace matching text with <span> tag for highlighting
-        if (cellHtml.toLowerCase().includes(searchString.toLowerCase())) {
-            const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
-            $(this).html(highlightedHtml); // Update the cell content
-        }
-    });
-}
-
-// Function to unhighlight a row (remove <span class="highlight"> tags)
-function unhighlightRow(row) {
-    // Iterate through each cell (<td>) in the row to remove <span> tags
-    row.find('td').each(function() {
-        const cellHtml = $(this).html(); // Get the original HTML content
-
-        // Remove <span> tags
-        const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-        $(this).html(unhighlightedHtml); // Restore the original content
-    });
-}
-
-// Function to extract keywords from the context (fallback to keyword search)
-function extractKeywords(context) {
-    return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
-}
+            // Function to unhighlight a row (remove <span class="highlight"> tags)
+            function unhighlightRow(row) {
+                row.find('td').each(function() {
+                    const cellHtml = $(this).html();
+                    const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+                    $(this).html(unhighlightedHtml); // Restore the original content
+                });
+            }
 
             // Function to match and display rows that match the search criteria
             function matchAndDisplay(matchingItems) {
-                // Reset green highlighting for previously green rows unless they are selected
                 let matchingRows = [];
                 $('#dataTable tbody tr').each(function() {
-                    const rowText = $(this).text().toLowerCase(); // Get text content of the row
+                    const rowText = $(this).text().toLowerCase();
                     let matchFound = false;
 
                     matchingItems.forEach(item => {
                         if (rowText.includes(item.trim().toLowerCase())) {
-                            if (!$(this).hasClass('selected-row')) { // Do not overwrite yellow (selected rows)
+                            if (!$(this).hasClass('selected-row')) { // Do not overwrite selected rows
                                 $(this).addClass('new-row'); // Highlight the row in green
                             }
                             matchFound = true;
@@ -540,9 +530,7 @@ function extractKeywords(context) {
 
                 // Move matching rows to the top of the table
                 $('#dataTable tbody').prepend(matchingRows);
-
-                // Scroll to the top of the table
-                $('#tableContainer').scrollTop(0);
+                $('#tableContainer').scrollTop(0); // Scroll to the top of the table
             }
 
             // Display only selected rows and scroll to the top
@@ -564,7 +552,7 @@ function extractKeywords(context) {
                 $('#dataTable tbody tr').removeClass('selected-row new-row');
                 selectedRowIds.clear();
                 $('#dataTable tbody').html(originalRows.join(''));
-                newTopRows.clear(); 
+                newTopRows.clear();
             });
 
             // Clear context functionality
@@ -584,7 +572,6 @@ function extractKeywords(context) {
                 $('#dataTable tbody tr.selected-row').each(function() {
                     const row = $(this).find('td').map(function() {
                         let cellText = $(this).text().trim();
-                        // Quote the text to handle commas within cell data
                         return `"${cellText.replace(/"/g, '""')}"`; // Escape any existing double quotes
                     }).get();
 
@@ -607,3 +594,4 @@ function extractKeywords(context) {
     
 </body>
 </html>
+
