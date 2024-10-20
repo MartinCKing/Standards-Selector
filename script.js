@@ -7,58 +7,56 @@ $(document).ready(function() {
     let header = []; // Declare header globally
     let abstractVisible = true; // Track visibility of column 4 (abstract)
 
-    // Store rows as structured data (not just HTML)
     let rowData = []; // To store original structured data for resetting
 
     // Load and parse CSV data with PapaParse
     Papa.parse(csvUrl, {
-    download: true,
-    header: true, // If your CSV has a header row
-    complete: function(results) {
-        header = Object.keys(results.data[0]).slice(0, 5); // Get header (first 5 columns)
-        const rows = results.data.map((row, index) => {
-            row['id'] = index; // Add a unique identifier (row ID)
-            return row;
-        });
+        download: true,
+        header: true, // If your CSV has a header row
+        complete: function(results) {
+            header = Object.keys(results.data[0]).slice(0, 5); // Get header (first 5 columns)
+            const rows = results.data.map((row, index) => {
+                row['id'] = index; // Add a unique identifier (row ID)
+                return row;
+            });
 
-        // Create table header
-        const headerHtml = header.map(col => `<th>${col}</th>`).join('');
-        $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
+            // Create table header
+            const headerHtml = header.map(col => `<th>${col}</th>`).join('');
+            $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
-        // Create table rows and store original data
-        allRows = rows.map((row, index) => {
-            const link = row[header[4]]; // Get the link from column 5
-            if (link && link.trim().startsWith('https://')) {
-                row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Hyperlink column 2
-            } else {
-                row[header[4]] = ''; // Remove invalid links
-            }
-            rowData.push({ id: row['id'], content: row }); // Store original data for resetting
-            return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
-        });
+            // Create table rows and store original data
+            allRows = rows.map((row, index) => {
+                const link = row[header[4]]; // Get the link from column 5
+                if (link && link.trim().startsWith('https://')) {
+                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Hyperlink column 2 (designation)
+                } else {
+                    row[header[4]] = ''; // Remove invalid links
+                }
+                rowData.push({ id: row['id'], content: row }); // Store original data for resetting
+                return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
+            });
 
-        originalRows = allRows.slice(); // Store original rows for resetting
-        $('#dataTable tbody').html(originalRows.join(''));
+            originalRows = allRows.slice(); // Store original rows for resetting
+            $('#dataTable tbody').html(originalRows.join(''));
 
-        // Update the number of entries loaded
-        $('#entriesLoaded').text(`(${rows.length} entries loaded)`);
+            // Update the number of entries loaded
+            $('#entriesLoaded').text(`(${rows.length} entries loaded)`);
 
-        // Add row selection functionality
-        $('#dataTable tbody').on('click', 'tr', function() {
-            const rowId = $(this).data('id'); // Use the unique identifier
-            $(this).toggleClass('selected-row');
-            $(this).removeClass('new-row'); // Remove the "new-row" class if it's highlighted green
+            // Add row selection functionality
+            $('#dataTable tbody').on('click', 'tr', function() {
+                const rowId = $(this).data('id'); // Use the unique identifier
+                $(this).toggleClass('selected-row');
+                $(this).removeClass('new-row'); // Remove the "new-row" class if it's highlighted green
 
-            // Toggle selection in the selectedRowIds set
-            if (selectedRowIds.has(rowId)) {
-                selectedRowIds.delete(rowId); // Remove the row if it's already selected
-            } else {
-                selectedRowIds.add(rowId); // Add the row if it's not selected
-            }
-        });
-    }
-});
-
+                // Toggle selection in the selectedRowIds set
+                if (selectedRowIds.has(rowId)) {
+                    selectedRowIds.delete(rowId); // Remove the row if it's already selected
+                } else {
+                    selectedRowIds.add(rowId); // Add the row if it's not selected
+                }
+            });
+        }
+    });
 
     // Toggle abstract (column 4) visibility
     $('#toggleAbstract').click(function() {
@@ -104,13 +102,30 @@ $(document).ready(function() {
         matchAndDisplay(numbers);  // Match and display rows based on numbers
         matchAndDisplay(keywords);  // Match and display rows based on keywords
 
-        performSearch(context); // Highlight matching keywords in orange
+        performSearch(context); // Highlight matching keywords and designation in orange
 
         $('#loadingIndicator').hide(); // Hide the loading indicator
         $('#progressMessage').text('Search complete.');
 
         // Scroll to the top of the table
         $('#tableContainer').scrollTop(0);
+    });
+
+    // Clear context functionality (without affecting selected rows)
+    $('#clearContext').click(function() {
+        $('#keywordInput').val(''); // Clear the keyword input
+
+        // Only remove new-row (green) and search highlights (orange) but keep selected rows (yellow)
+        $('#dataTable tbody tr').removeClass('new-row');
+
+        // Remove any orange highlights for search matches
+        $('td span.highlight').each(function() {
+            // Remove highlight spans
+            const unwrapped = $(this).text(); // Get the text inside the span
+            $(this).replaceWith(unwrapped); // Replace the span with plain text
+        });
+
+        $('#progressMessage').text('Context cleared.');
     });
 
     // Function to extract keywords from the context
@@ -150,49 +165,52 @@ $(document).ready(function() {
         $('#tableContainer').scrollTop(0);
     }
 
-    // Function to perform keyword search and highlight them in orange
-   // Perform search and highlight matched keywords in orange
+    // Function to perform keyword search and highlight them in orange (excluding links)
     function performSearch(searchString) {
-    const lowerCaseSearchString = searchString.trim().toLowerCase();
+        const lowerCaseSearchString = searchString.trim().toLowerCase();
+        $('#dataTable tbody tr').each(function() {
+            const row = $(this);
+            const designationCell = row.find('td:nth-child(2)'); // Second column for standard designation
+            const rowText = row.text().toLowerCase();
+            const designationText = designationCell.text().toLowerCase();
 
-    $('#dataTable tbody tr').each(function() {
-        const row = $(this);
-        const designationCell = row.find('td:nth-child(2)'); // First column for standard designation
-        const rowText = row.text().toLowerCase();
-        const designationText = designationCell.text().toLowerCase();
+            // Check if the entire row contains the search string
+            if (rowText.includes(lowerCaseSearchString)) {
+                highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns except links
+            } else {
+                unhighlightRow(row); // Unhighlight if not found
+            }
 
-        // Check if the entire row contains the search string
-        if (rowText.includes(lowerCaseSearchString)) {
-            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns
-        } else {
-            unhighlightRow(row); // Unhighlight if not found
-        }
-
-        // Additionally, check if the designation (first column) matches the search string
-        if (designationText.includes(lowerCaseSearchString)) {
-            highlightDesignation(designationCell, lowerCaseSearchString); // Highlight the designation in orange
-        }
+            // Additionally, check if the designation (second column) matches the search string
+            if (designationText.includes(lowerCaseSearchString)) {
+                highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight the designation in orange (text only)
+            }
         });
     }
 
-    // Highlight matched standard designation
-    function highlightDesignation(cell, searchString) {
-    const regex = new RegExp(`(${searchString})`, 'gi');
-    const cellHtml = cell.html();
-    const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
-    cell.html(highlightedHtml); // Update the cell content
+    // Highlight matched standard designation (text only, excluding links)
+    function highlightDesignationTextOnly(cell, searchString) {
+        const link = cell.find('a'); // Check if there's a link in the cell
+        const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
+        const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
+
+        if (link.length) {
+            // If there's a link, update its inner HTML with highlighted text
+            link.html(highlightedHtml);
+        } else {
+            // If no link, directly update the cell's HTML
+            cell.html(highlightedHtml);
+        }
     }
 
-
-    // Function to highlight matched words in the row
+    // Function to highlight matched words in the row (excluding links)
     function highlightWordsInRow(row, searchString) {
-        const regex = new RegExp(`(${searchString})`, 'gi');
         row.find('td').each(function(index) {
-            if (index === 0 || $(this).find('a').length > 0) {
-                return; // Skip the first column and links
+            if (index === 1 || $(this).find('a').length > 0) {
+                return; // Skip the second column (designation) or cells with links
             }
             const cellHtml = $(this).html();
-            const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
+            const highlightedHtml = cellHtml.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
             $(this).html(highlightedHtml);
         });
     }
@@ -220,31 +238,14 @@ $(document).ready(function() {
         }
     });
 
-    // Reset functionality
-    $('#reset').click(function() {
-        $('#dataTable tbody tr').removeClass('selected-row new-row');
-        selectedRowIds.clear();
-        $('#dataTable tbody').html(originalRows.join(''));
-        newTopRows.clear(); 
-    });
-
-    // Clear context functionality
-    $('#clearContext').click(function() {
-        $('#keywordInput').val(''); // Clear the keyword input
-        $('#dataTable tbody tr').each(function() {
-            if (!$(this).hasClass('selected-row')) {
-                $(this).removeClass('new-row');
-            }
-        });
-    });
-
-    // Export functionality
+    // Export selected rows functionality
     $('#export').click(function() {
         let csvContent = header.map(col => `"${col}"`).join(',') + '\n'; // Properly quote the headers
 
         $('#dataTable tbody tr.selected-row').each(function() {
             const row = $(this).find('td').map(function() {
                 let cellText = $(this).text().trim();
+                // Quote the text to handle commas within cell data
                 return `"${cellText.replace(/"/g, '""')}"`; // Escape any existing double quotes
             }).get();
 
@@ -261,5 +262,13 @@ $(document).ready(function() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    });
+
+    // Reset functionality
+    $('#reset').click(function() {
+        $('#dataTable tbody tr').removeClass('selected-row new-row');
+        selectedRowIds.clear();
+        $('#dataTable tbody').html(originalRows.join(''));
+        newTopRows.clear(); 
     });
 });
