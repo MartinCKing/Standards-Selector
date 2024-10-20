@@ -7,25 +7,17 @@ $(document).ready(function() {
     let rowData = [];
     let selectedRowIds = new Set(); // Track selected rows
     let header = [];
-    let abstractVisible = false;
+    let abstractVisible = false; // Abstract is initially hidden
     let totalEntries = 0; // Store total number of entries
-    let useModel; // Store the Universal Sentence Encoder model for semantic search
-
-    // Load the Universal Sentence Encoder model
-    async function loadUSEModel() {
-        useModel = await use.load();
-        console.log('USE Model Loaded');
-    }
-    loadUSEModel();
 
     // Load and parse CSV data with PapaParse
     Papa.parse(csvUrl, {
         download: true,
         header: true,
         complete: function(results) {
-            header = Object.keys(results.data[0]).slice(0, 5); // Get first 5 columns as header
+            header = Object.keys(results.data[0]).slice(0, 5); // Get header (first 5 columns)
             const rows = results.data.map((row, index) => {
-                row['id'] = index; // Add a unique identifier
+                row['id'] = index; // Add unique identifier
                 return row;
             });
 
@@ -38,7 +30,7 @@ $(document).ready(function() {
             allRows = rows.map((row, index) => {
                 const link = row[header[4]]; // Get the link from column 5
                 if (link && link.trim().startsWith('https://')) {
-                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Link to the title
+                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Link in the title column
                 } else {
                     row[header[4]] = ''; // Remove invalid links
                 }
@@ -46,7 +38,7 @@ $(document).ready(function() {
                 return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
             });
 
-            originalRows = allRows.slice(); // Store the original rows for resetting
+            originalRows = allRows.slice();
             $('#dataTable tbody').html(originalRows.join(''));
 
             // Enable row selection
@@ -55,7 +47,6 @@ $(document).ready(function() {
                 $(this).toggleClass('selected-row'); // Toggle yellow highlight
                 $(this).removeClass('new-row'); // Remove green highlight
 
-                // Toggle selection in the selectedRowIds set
                 if (selectedRowIds.has(rowId)) {
                     selectedRowIds.delete(rowId);
                 } else {
@@ -65,51 +56,19 @@ $(document).ready(function() {
         }
     });
 
-    // Function to run semantic search using Universal Sentence Encoder
-    async function runSemanticSearch(query) {
-        if (!useModel) {
-            console.error('Universal Sentence Encoder model is not loaded yet');
-            return;
+    // Toggle abstract (column 4) visibility
+    $('#toggleAbstract').click(function() {
+        abstractVisible = !abstractVisible; // Toggle the state of abstractVisible
+        if (abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').show(); // Show column 4 (Abstract)
+            $('#toggleAbstract').text('Hide Abstract');
+        } else {
+            $('td:nth-child(4), th:nth-child(4)').hide(); // Hide column 4
+            $('#toggleAbstract').text('Show Abstract');
         }
+    });
 
-        const queryEmbedding = await useModel.embed(query);
-
-        // Generate embeddings for each row's text (abstract and title)
-        let rowEmbeddings = await Promise.all(rowData.map(async row => {
-            const textToSearch = row.content[header[1]] + ' ' + row.content[header[4]];
-            const embedding = await useModel.embed(textToSearch);
-            return { id: row.id, embedding };
-        }));
-
-        // Compute cosine similarity between query and each row's embedding
-        const similarities = rowEmbeddings.map(row => {
-            const similarity = cosineSimilarity(queryEmbedding.arraySync()[0], row.embedding.arraySync()[0]);
-            return { id: row.id, similarity };
-        });
-
-        // Sort rows by similarity and highlight top matching rows
-        similarities.sort((a, b) => b.similarity - a.similarity);
-        highlightTopRows(similarities);
-    }
-
-    // Highlight top rows based on semantic meaning
-    function highlightTopRows(similarities) {
-        $('#dataTable tbody tr').each(function() {
-            const rowId = $(this).data('id');
-            const similarityData = similarities.find(sim => sim.id === rowId);
-
-            if (similarityData && similarityData.similarity > 0.5) { // Threshold for similarity
-                $(this).addClass('new-row'); // Highlight in green
-            } else {
-                $(this).removeClass('new-row');
-            }
-        });
-
-        // Scroll to top
-        $('#tableContainer').scrollTop(0);
-    }
-
-    // Submit context search with semantic meaning
+    // Submit context and search
     $('#submitContext').click(function() {
         const context = $('#keywordInput').val();
         $('#loadingIndicator').show();
@@ -125,7 +84,7 @@ $(document).ready(function() {
         $('#dataTable tbody tr').each(function() {
             const rowId = $(this).data('id');
             if (selectedRowIds.has(rowId)) {
-                $(this).addClass('selected-row'); // Restore yellow highlight
+                $(this).addClass('selected-row');
             }
         });
 
@@ -198,7 +157,7 @@ $(document).ready(function() {
         document.body.removeChild(link);
     });
 
-    // Cosine similarity function
+    // Cosine similarity function for semantic search
     function cosineSimilarity(vecA, vecB) {
         const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
         const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
