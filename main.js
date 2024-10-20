@@ -1,5 +1,3 @@
-import { performSearch, highlightDesignationTextOnly, highlightWordsInRow, unhighlightRow } from './search.js';
-
 $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
@@ -131,11 +129,14 @@ $(document).ready(function() {
         $('#progressMessage').text('Table reset.');
     });
 
-    // Display only selected rows
+    // **Display all selected rows while keeping other rows below**
     $('#displaySelected').click(function() {
         const selectedRowsHtml = $('#dataTable tbody tr.selected-row').clone();
-        $('#dataTable tbody').empty().append(selectedRowsHtml);
-        $('#progressMessage').text(`${selectedRowsHtml.length} selected rows displayed.`);
+        const unselectedRowsHtml = $('#dataTable tbody tr').not('.selected-row').clone();
+
+        // Keep the other rows below the selected rows
+        $('#dataTable tbody').empty().append(selectedRowsHtml).append(unselectedRowsHtml);
+        $('#progressMessage').text(`${selectedRowsHtml.length} selected rows displayed at the top.`);
     });
 
     // Export selected rows functionality
