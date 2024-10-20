@@ -8,6 +8,7 @@ $(document).ready(function() {
     let selectedRowIds = new Set(); // Track selected rows
     let header = [];
     let abstractVisible = false;
+    let totalEntries = 0; // Store total number of entries
     let useModel; // Store the Universal Sentence Encoder model for semantic search
 
     // Load the Universal Sentence Encoder model
@@ -22,11 +23,14 @@ $(document).ready(function() {
         download: true,
         header: true,
         complete: function(results) {
-            header = Object.keys(results.data[0]).slice(0, 5);
+            header = Object.keys(results.data[0]).slice(0, 5); // Get first 5 columns as header
             const rows = results.data.map((row, index) => {
-                row['id'] = index;
+                row['id'] = index; // Add a unique identifier
                 return row;
             });
+
+            totalEntries = rows.length; // Set total number of entries
+            $('#entriesLoaded').text(`(${totalEntries} entries loaded)`); // Display total entries
 
             const headerHtml = header.map(col => `<th>${col}</th>`).join('');
             $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
@@ -34,22 +38,22 @@ $(document).ready(function() {
             allRows = rows.map((row, index) => {
                 const link = row[header[4]]; // Get the link from column 5
                 if (link && link.trim().startsWith('https://')) {
-                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`;
+                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Link to the title
                 } else {
                     row[header[4]] = ''; // Remove invalid links
                 }
-                rowData.push({ id: row['id'], content: row });
+                rowData.push({ id: row['id'], content: row }); // Store original row data
                 return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
             });
 
-            originalRows = allRows.slice();
+            originalRows = allRows.slice(); // Store the original rows for resetting
             $('#dataTable tbody').html(originalRows.join(''));
 
             // Enable row selection
             $('#dataTable tbody').on('click', 'tr', function() {
                 const rowId = $(this).data('id');
-                $(this).toggleClass('selected-row'); // Toggle yellow highlight for selected rows
-                $(this).removeClass('new-row'); // Remove green highlight for searched rows
+                $(this).toggleClass('selected-row'); // Toggle yellow highlight
+                $(this).removeClass('new-row'); // Remove green highlight
 
                 // Toggle selection in the selectedRowIds set
                 if (selectedRowIds.has(rowId)) {
@@ -121,7 +125,7 @@ $(document).ready(function() {
         $('#dataTable tbody tr').each(function() {
             const rowId = $(this).data('id');
             if (selectedRowIds.has(rowId)) {
-                $(this).addClass('selected-row'); // Restore yellow highlight for selected rows
+                $(this).addClass('selected-row'); // Restore yellow highlight
             }
         });
 
@@ -166,6 +170,7 @@ $(document).ready(function() {
         $('#dataTable tbody tr').removeClass('selected-row new-row');
         selectedRowIds.clear();
         $('#progressMessage').text('Reset complete.');
+        $('#entriesLoaded').text(`(${totalEntries} entries loaded)`); // Update total number of entries
     });
 
     // Export functionality
