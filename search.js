@@ -1,55 +1,38 @@
-export function performSearch(searchString, rowData, header, selectedRowIds) {
-    const lowerCaseSearchString = searchString.trim().toLowerCase();
-    $('#dataTable tbody tr').each(function() {
-        const row = $(this);
-        const designationCell = row.find('td:nth-child(2)');
-        const rowText = row.text().toLowerCase();
-        const designationText = designationCell.text().toLowerCase();
+// search.js
 
-        unhighlightRow(row);
-
-        if (rowText.includes(lowerCaseSearchString)) {
-            highlightWordsInRow(row, lowerCaseSearchString);
-        }
-
-        if (designationText.includes(lowerCaseSearchString)) {
-            highlightDesignationTextOnly(designationCell, lowerCaseSearchString);
-        }
-
-        if (selectedRowIds.has(row.data('id'))) {
-            row.addClass('selected-row');
-        }
-    });
+export function extractNumbers(context) {
+    const numberPattern = /\d+/g;
+    return context.match(numberPattern) || [];
 }
 
-export function highlightDesignationTextOnly(cell, searchString) {
-    const link = cell.find('a');
-    const textOnly = link.length ? link.text() : cell.text();
-    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
-
-    if (link.length) {
-        link.html(highlightedHtml);
-    } else {
-        cell.html(highlightedHtml);
-    }
+export function extractKeywords(context) {
+    return context.split(/\s+/).filter(keyword => keyword.length > 2);
 }
 
-export function highlightWordsInRow(row, searchString) {
-    const regex = new RegExp(`(${searchString})`, 'gi');
-    row.find('td').each(function(index) {
-        if (index === 1 || $(this).find('a').length > 0) {
-            return;
+export function performSearch(context, rowData, header, selectedRowIds) {
+    const numbers = extractNumbers(context); // Extract numbers
+    const keywords = extractKeywords(context); // Extract keywords
+
+    $('#dataTable tbody tr').each(function () {
+        const rowId = $(this).data('id');
+        const rowContent = rowData.find(data => data.id === rowId).content;
+
+        const matchedNumbers = numbers.some(number => 
+            Object.values(rowContent).some(value => value.includes(number))
+        );
+        const matchedKeywords = keywords.some(keyword => 
+            Object.values(rowContent).some(value => value.includes(keyword))
+        );
+
+        if (matchedNumbers || matchedKeywords) {
+            $(this).addClass('new-row'); // Highlight matching rows in green
+        } else {
+            $(this).removeClass('new-row');
         }
-        const cellHtml = $(this).html();
-        const highlightedHtml = cellHtml.replace(regex, '<span class="highlight">$1</span>');
-        $(this).html(highlightedHtml);
-    });
-}
 
-export function unhighlightRow(row) {
-    row.find('td').each(function() {
-        const cellHtml = $(this).html();
-        const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-        $(this).html(unhighlightedHtml);
+        // Restore previously selected rows
+        if (selectedRowIds.has(rowId)) {
+            $(this).addClass('selected-row');
+        }
     });
 }
