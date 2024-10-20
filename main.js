@@ -7,6 +7,7 @@ $(document).ready(function() {
     let selectedRowIds = new Set(); // Keep track of selected rows
     let header = []; // Declare header globally
     let rowData = []; // To store original structured data for resetting
+    let abstractVisible = true; // Track visibility of the abstract column (column 4)
 
     // Load and parse CSV data with PapaParse
     Papa.parse(csvUrl, {
@@ -51,6 +52,21 @@ $(document).ready(function() {
                     selectedRowIds.delete(rowId); // Remove row ID from selected set
                 }
             });
+        }
+    });
+
+    // Toggle abstract (column 4) visibility
+    $('#toggleAbstract').click(function() {
+        abstractVisible = !abstractVisible; // Toggle the state
+
+        if (abstractVisible) {
+            // Show column 4
+            $('td:nth-child(4), th:nth-child(4)').show();
+            $('#toggleAbstract').text('Hide Abstract');
+        } else {
+            // Hide column 4
+            $('td:nth-child(4), th:nth-child(4)').hide();
+            $('#toggleAbstract').text('Show Abstract');
         }
     });
 
@@ -114,6 +130,46 @@ $(document).ready(function() {
         });
 
         $('#progressMessage').text('Context cleared.');
+    });
+
+    // Reset functionality
+    $('#reset').click(function() {
+        $('#dataTable tbody').html(originalRows.join('')); // Reset the table to original data
+        $('#dataTable tbody tr').removeClass('selected-row new-row'); // Remove all highlights
+        selectedRowIds.clear(); // Clear all selected rows
+        $('#progressMessage').text('Table reset.');
+    });
+
+    // Display only selected rows
+    $('#displaySelected').click(function() {
+        const selectedRowsHtml = $('#dataTable tbody tr.selected-row').clone();
+        $('#dataTable tbody').empty().append(selectedRowsHtml); // Show only selected rows
+        $('#progressMessage').text(`${selectedRowsHtml.length} selected rows displayed.`);
+    });
+
+    // Export selected rows functionality
+    $('#export').click(function() {
+        let csvContent = header.map(col => `"${col}"`).join(',') + '\n'; // Properly quote the headers
+
+        $('#dataTable tbody tr.selected-row').each(function() {
+            const row = $(this).find('td').map(function() {
+                let cellText = $(this).text().trim();
+                return `"${cellText.replace(/"/g, '""')}"`; // Escape any existing double quotes
+            }).get();
+
+            if (row.some(cell => cell.length > 0)) {
+                csvContent += row.join(',') + '\n'; // Properly format rows
+            }
+        });
+
+        // Create and trigger the CSV file download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.setAttribute('href', URL.createObjectURL(blob));
+        link.setAttribute('download', 'selected_rows.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
 
     // Helper functions (Extracting Numbers, Keywords)
