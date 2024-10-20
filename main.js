@@ -1,30 +1,26 @@
-import { performSearch, highlightDesignationTextOnly, highlightWordsInRow, unhighlightRow } from './search.js';
+import { performSearch, extractKeywords, extractNumbers } from './search.js';
 
-$(document).ready(function() {
+$(document).ready(function () {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
-    let rowData = [];
     let selectedRowIds = new Set(); // Track selected rows
     let header = [];
-    let abstractVisible = false; // Abstract is initially hidden
-    let totalEntries = 0; // Store total number of entries
+    let abstractVisible = true;
+    let rowData = []; // Store original data for resetting
 
-    // Load and parse CSV data with PapaParse
+    // Load and parse CSV data
     Papa.parse(csvUrl, {
         download: true,
         header: true,
-        complete: function(results) {
+        complete: function (results) {
             header = Object.keys(results.data[0]).slice(0, 5); // Get header (first 5 columns)
             const rows = results.data.map((row, index) => {
                 row['id'] = index; // Add unique identifier
                 return row;
             });
 
-            totalEntries = rows.length; // Set total number of entries
-            $('#entriesLoaded').text(`(${totalEntries} entries loaded)`); // Display total entries
-
-            const headerHtml = header.map(col => `<th>${col}</th>`).join('');
+            const headerHtml = header.map((col) => `<th>${col}</th>`).join('');
             $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
             allRows = rows.map((row, index) => {
@@ -35,17 +31,17 @@ $(document).ready(function() {
                     row[header[4]] = ''; // Remove invalid links
                 }
                 rowData.push({ id: row['id'], content: row }); // Store original row data
-                return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
+                return `<tr data-id="${row['id']}">${header.map((col) => `<td>${row[col]}</td>`).join('')}</tr>`;
             });
 
             originalRows = allRows.slice();
             $('#dataTable tbody').html(originalRows.join(''));
 
-            // Enable row selection
-            $('#dataTable tbody').on('click', 'tr', function() {
+            // Row selection functionality
+            $('#dataTable tbody').on('click', 'tr', function () {
                 const rowId = $(this).data('id');
                 $(this).toggleClass('selected-row'); // Toggle yellow highlight
-                $(this).removeClass('new-row'); // Remove green highlight
+                $(this).removeClass('new-row'); // Remove green highlight if selected
 
                 if (selectedRowIds.has(rowId)) {
                     selectedRowIds.delete(rowId);
@@ -56,98 +52,82 @@ $(document).ready(function() {
         }
     });
 
-    // Toggle abstract (column 4) visibility
-    $('#toggleAbstract').click(function() {
-        abstractVisible = !abstractVisible; // Toggle the state of abstractVisible
+    // Toggle abstract column visibility
+    $('#toggleAbstract').click(function () {
+        abstractVisible = !abstractVisible;
         if (abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').show(); // Show column 4 (Abstract)
+            $('td:nth-child(4), th:nth-child(4)').show(); // Show abstract
             $('#toggleAbstract').text('Hide Abstract');
         } else {
-            $('td:nth-child(4), th:nth-child(4)').hide(); // Hide column 4
+            $('td:nth-child(4), th:nth-child(4)').hide(); // Hide abstract
             $('#toggleAbstract').text('Show Abstract');
         }
     });
 
-    // Submit context and search
-    $('#submitContext').click(function() {
-        const context = $('#keywordInput').val();
-        $('#loadingIndicator').show();
+    // Submit context functionality: search based on context input
+    $('#submitContext').click(function () {
+        const context = $('#keywordInput').val(); // Get context input
+        $('#loadingIndicator').show(); // Show loading indicator
         $('#progressMessage').text('Searching...');
 
-        const resetHtml = rowData.map(data => {
-            return `<tr data-id="${data.id}">${header.map(col => `<td>${data.content[col]}</td>`).join('')}</tr>`;
+        // Reset the table
+        const resetHtml = rowData.map((data) => {
+            const rowHtml = `<tr data-id="${data.id}">${header.map((col) => `<td>${data.content[col]}</td>`).join('')}</tr>`;
+            return rowHtml;
         });
-
         $('#dataTable tbody').html(resetHtml.join(''));
 
-        // Restore selected rows (yellow highlighting)
-        $('#dataTable tbody tr').each(function() {
+        // Restore selected rows (yellow highlight)
+        $('#dataTable tbody tr').each(function () {
             const rowId = $(this).data('id');
             if (selectedRowIds.has(rowId)) {
                 $(this).addClass('selected-row');
             }
         });
 
-        performSearch(context, rowData, header, selectedRowIds); // Perform keyword-based search
-        runSemanticSearch(context); // Run the natural language search
+        const numbers = extractNumbers(context); // Extract numbers
+        const keywords = extractKeywords(context); // Extract keywords
 
-        $('#loadingIndicator').hide();
+        performSearch(context, rowData, header, selectedRowIds); // Call search function from search.js
+
+        $('#loadingIndicator').hide(); // Hide loading indicator
         $('#progressMessage').text('Search complete.');
-    });
-
-    // Display only selected rows but keep unselected rows below
-    $('#displaySelected').click(function() {
-        const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
-        const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
-
-        if (selectedHtml.length === 0) {
-            $('#dataTable tbody').html(originalRows.join(''));
-            selectedRowIds.clear();
-        } else {
-            $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
-            $('#tableContainer').scrollTop(0); // Scroll to the top of the table
-        }
-    });
-
-    // Clear context functionality (without affecting selected rows)
-    $('#clearContext').click(function() {
-        $('#keywordInput').val(''); // Clear the keyword input
-        $('#dataTable tbody tr').removeClass('new-row'); // Only clear new-row (green)
-
-        // Unhighlight all orange spans
-        $('td span.highlight').each(function() {
-            const unwrapped = $(this).text(); // Get the text inside the span
-            $(this).replaceWith(unwrapped); // Replace the span with plain text
-        });
-
-        $('#progressMessage').text('Context cleared.');
+        $('#tableContainer').scrollTop(0); // Scroll to top of table
     });
 
     // Reset functionality
-    $('#reset').click(function() {
-        $('#dataTable tbody').html(originalRows.join(''));
+    $('#reset').click(function () {
         $('#dataTable tbody tr').removeClass('selected-row new-row');
         selectedRowIds.clear();
-        $('#progressMessage').text('Reset complete.');
-        $('#entriesLoaded').text(`(${totalEntries} entries loaded)`); // Update total number of entries
+        $('#dataTable tbody').html(originalRows.join(''));
+    });
+
+    // Clear context functionality
+    $('#clearContext').click(function () {
+        $('#keywordInput').val(''); // Clear input
+        $('#dataTable tbody tr').each(function () {
+            if (!$(this).hasClass('selected-row')) {
+                $(this).removeClass('new-row'); // Clear green highlight
+            }
+        });
     });
 
     // Export functionality
-    $('#export').click(function() {
-        let csvContent = header.map(col => `"${col}"`).join(',') + '\n';
+    $('#export').click(function () {
+        let csvContent = header.map((col) => `"${col}"`).join(',') + '\n'; // Quote headers
 
-        $('#dataTable tbody tr.selected-row').each(function() {
-            const row = $(this).find('td').map(function() {
+        $('#dataTable tbody tr.selected-row').each(function () {
+            const row = $(this).find('td').map(function () {
                 let cellText = $(this).text().trim();
                 return `"${cellText.replace(/"/g, '""')}"`; // Escape double quotes
             }).get();
 
-            if (row.some(cell => cell.length > 0)) {
-                csvContent += row.join(',') + '\n';
+            if (row.some((cell) => cell.length > 0)) {
+                csvContent += row.join(',') + '\n'; // Format rows
             }
         });
 
-        // Create and trigger the CSV file download
+        // Trigger CSV download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.setAttribute('href', URL.createObjectURL(blob));
@@ -157,11 +137,17 @@ $(document).ready(function() {
         document.body.removeChild(link);
     });
 
-    // Cosine similarity function for semantic search
-    function cosineSimilarity(vecA, vecB) {
-        const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-        const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-        const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-        return dotProduct / (magnitudeA * magnitudeB);
-    }
+    // Display only selected rows
+    $('#displaySelected').click(function () {
+        const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
+        const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
+
+        if (selectedHtml.length === 0) {
+            $('#dataTable tbody').html(originalRows.join(''));
+            selectedRowIds.clear();
+        } else {
+            $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
+            $('#tableContainer').scrollTop(0); // Scroll to top of table
+        }
+    });
 });
