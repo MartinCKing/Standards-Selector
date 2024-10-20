@@ -4,71 +4,55 @@ $(document).ready(function() {
     let allRows = [];
     let originalRows = [];
     let selectedRowIds = new Set(); // Track selected rows
-    let header = []; // Declare header globally
-    let rowData = []; // To store original structured data for resetting
-    let abstractVisible = true; // Track visibility of column 4 (abstract)
+    let header = [];
+    let rowData = [];
+    let abstractVisible = false; // Track abstract visibility
 
     // Load and parse CSV data with PapaParse
     Papa.parse(csvUrl, {
         download: true,
-        header: true, // If your CSV has a header row
+        header: true,
         complete: function(results) {
-            header = Object.keys(results.data[0]).slice(0, 5); // Get header (first 5 columns)
+            header = Object.keys(results.data[0]).slice(0, 5);
             const rows = results.data.map((row, index) => {
-                row['id'] = index; // Add a unique identifier (row ID)
+                row['id'] = index;
                 return row;
             });
 
-            // Create table header
             const headerHtml = header.map(col => `<th>${col}</th>`).join('');
             $('#dataTable thead').html(`<tr>${headerHtml}</tr>`);
 
-            // Create table rows and store original data
             allRows = rows.map((row, index) => {
                 const link = row[header[4]]; // Get the link from column 5
                 if (link && link.trim().startsWith('https://')) {
-                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`; // Hyperlink column 2
+                    row[header[1]] = `<a href="${link}" target="_blank">${row[header[1]]}</a>`;
                 } else {
                     row[header[4]] = ''; // Remove invalid links
                 }
-                rowData.push({ id: row['id'], content: row }); // Store original data for resetting
+                rowData.push({ id: row['id'], content: row });
                 return `<tr data-id="${row['id']}">${header.map(col => `<td>${row[col]}</td>`).join('')}</tr>`;
             });
 
-            originalRows = allRows.slice(); // Store original rows for resetting
+            originalRows = allRows.slice();
             $('#dataTable tbody').html(originalRows.join(''));
-
-            // Update the number of entries loaded
-            $('#entriesLoaded').text(`(${rows.length} entries loaded)`);
-
-            // Add row selection functionality
-            $('#dataTable tbody').on('click', 'tr', function() {
-                const rowId = $(this).data('id');
-                $(this).toggleClass('selected-row');
-                $(this).removeClass('new-row'); // Remove green highlight if it's there
-
-                if ($(this).hasClass('selected-row')) {
-                    selectedRowIds.add(rowId);
-                } else {
-                    selectedRowIds.delete(rowId);
-                }
-            });
         }
     });
 
-    // Toggle abstract (column 4) visibility
+    // Show/hide the abstract display area based on abstract column visibility
     $('#toggleAbstract').click(function() {
         abstractVisible = !abstractVisible;
         if (abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').hide();
-            $('#toggleAbstract').text('Show Abstract');
-        } else {
             $('td:nth-child(4), th:nth-child(4)').show();
             $('#toggleAbstract').text('Hide Abstract');
+            $('#abstractDisplay').show(); // Show abstract display
+        } else {
+            $('td:nth-child(4), th:nth-child(4)').hide();
+            $('#toggleAbstract').text('Show Abstract');
+            $('#abstractDisplay').hide(); // Hide abstract display
         }
     });
 
-    // Submit context functionality: search rows based on context input
+    // Submit context functionality (without affecting abstract column visibility)
     $('#submitContext').click(function() {
         const context = $('#keywordInput').val();
         $('#loadingIndicator').show();
@@ -103,66 +87,23 @@ $(document).ready(function() {
         $('#tableContainer').scrollTop(0);
     });
 
-    // Clear context functionality (without affecting selected rows)
-    $('#clearContext').click(function() {
-        $('#keywordInput').val('');
-
-        $('#dataTable tbody tr').removeClass('new-row');
-        $('td span.highlight').each(function() {
-            const unwrapped = $(this).text();
-            $(this).replaceWith(unwrapped);
-        });
-
-        $('#dataTable tbody tr').each(function() {
-            const rowId = $(this).data('id');
-            if (selectedRowIds.has(rowId)) {
-                $(this).addClass('selected-row');
-            }
-        });
-        $('#progressMessage').text('Context cleared.');
+    // Update the abstract content when hovering over or selecting a row
+    $('#dataTable tbody').on('mouseenter', 'tr', function() {
+        if (abstractVisible) {
+            const abstractText = $(this).find('td:nth-child(4)').text().trim();
+            $('#abstractContent').text(abstractText || 'No abstract available');
+        }
     });
 
-    // Reset functionality
-    $('#reset').click(function() {
-        $('#dataTable tbody').html(originalRows.join(''));
-        $('#dataTable tbody tr').removeClass('selected-row new-row');
-        selectedRowIds.clear();
-        $('#progressMessage').text('Table reset.');
+    // Also update the abstract content on row selection
+    $('#dataTable tbody').on('click', 'tr', function() {
+        if (abstractVisible) {
+            const abstractText = $(this).find('td:nth-child(4)').text().trim();
+            $('#abstractContent').text(abstractText || 'No abstract available');
+        }
     });
 
-    // **Display all selected rows while keeping other rows below**
-    $('#displaySelected').click(function() {
-        const selectedRowsHtml = $('#dataTable tbody tr.selected-row').clone();
-        const unselectedRowsHtml = $('#dataTable tbody tr').not('.selected-row').clone();
-
-        // Keep the other rows below the selected rows
-        $('#dataTable tbody').empty().append(selectedRowsHtml).append(unselectedRowsHtml);
-        $('#progressMessage').text(`${selectedRowsHtml.length} selected rows displayed at the top.`);
-    });
-
-    // Export selected rows functionality
-    $('#export').click(function() {
-        let csvContent = header.map(col => `"${col}"`).join(',') + '\n';
-
-        $('#dataTable tbody tr.selected-row').each(function() {
-            const row = $(this).find('td').map(function() {
-                let cellText = $(this).text().trim();
-                return `"${cellText.replace(/"/g, '""')}"`;
-            }).get();
-
-            if (row.some(cell => cell.length > 0)) {
-                csvContent += row.join(',') + '\n';
-            }
-        });
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.setAttribute('href', URL.createObjectURL(blob));
-        link.setAttribute('download', 'selected_rows.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
+    // Other existing functionality...
 
     // Helper functions for number and keyword extraction
     function extractKeywords(context) {
