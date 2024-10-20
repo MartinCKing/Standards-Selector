@@ -4,10 +4,8 @@ $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
-    let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
-    let newTopRows = new Set();
+    let selectedRowIds = new Set(); // Keep track of selected rows
     let header = []; // Declare header globally
-    let abstractVisible = true; // Track visibility of column 4 (abstract)
     let rowData = []; // To store original structured data for resetting
 
     // Load and parse CSV data with PapaParse
@@ -45,15 +43,12 @@ $(document).ready(function() {
 
             // Add row selection functionality
             $('#dataTable tbody').on('click', 'tr', function() {
-                const rowId = $(this).data('id'); // Use the unique identifier
+                const rowId = $(this).data('id');
                 $(this).toggleClass('selected-row');
-                $(this).removeClass('new-row'); // Remove the "new-row" class if it's highlighted green
-
-                // Toggle selection in the selectedRowIds set
-                if (selectedRowIds.has(rowId)) {
-                    selectedRowIds.delete(rowId); // Remove the row if it's already selected
+                if ($(this).hasClass('selected-row')) {
+                    selectedRowIds.add(rowId); // Add row ID to selected set
                 } else {
-                    selectedRowIds.add(rowId); // Add the row if it's not selected
+                    selectedRowIds.delete(rowId); // Remove row ID from selected set
                 }
             });
         }
@@ -88,7 +83,7 @@ $(document).ready(function() {
         matchAndDisplay(numbers);  // Match and display rows based on numbers
         matchAndDisplay(keywords);  // Match and display rows based on keywords
 
-        performSearch(context, rowData, header); // Call the separated search function
+        performSearch(context, rowData, header, selectedRowIds); // Call the separated search function
 
         $('#loadingIndicator').hide(); // Hide the loading indicator
         $('#progressMessage').text('Search complete.');
@@ -106,9 +101,16 @@ $(document).ready(function() {
 
         // Remove any orange highlights for search matches
         $('td span.highlight').each(function() {
-            // Remove highlight spans
-            const unwrapped = $(this).text(); // Get the text inside the span
+            const unwrapped = $(this).text();
             $(this).replaceWith(unwrapped); // Replace the span with plain text
+        });
+
+        // Keep selected rows intact (yellow highlighting should remain)
+        $('#dataTable tbody tr').each(function() {
+            const rowId = $(this).data('id');
+            if (selectedRowIds.has(rowId)) {
+                $(this).addClass('selected-row'); // Reapply yellow highlight
+            }
         });
 
         $('#progressMessage').text('Context cleared.');

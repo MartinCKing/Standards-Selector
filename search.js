@@ -1,6 +1,4 @@
-// search.js
-
-export function performSearch(searchString, rowData, header) {
+export function performSearch(searchString, rowData, header, selectedRowIds) {
     const lowerCaseSearchString = searchString.trim().toLowerCase();
     $('#dataTable tbody tr').each(function() {
         const row = $(this);
@@ -8,16 +6,22 @@ export function performSearch(searchString, rowData, header) {
         const rowText = row.text().toLowerCase();
         const designationText = designationCell.text().toLowerCase();
 
+        // Unhighlight the row first
+        unhighlightRow(row);
+
         // Check if the entire row contains the search string
         if (rowText.includes(lowerCaseSearchString)) {
             highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns
-        } else {
-            unhighlightRow(row); // Unhighlight if not found
         }
 
         // Additionally, check if the designation (second column) matches the search string
         if (designationText.includes(lowerCaseSearchString)) {
             highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight the designation in orange (text only)
+        }
+
+        // Restore the yellow highlight for previously selected rows
+        if (selectedRowIds.has(row.data('id'))) {
+            row.addClass('selected-row');
         }
     });
 }
@@ -54,4 +58,9 @@ export function unhighlightRow(row) {
         const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
         $(this).html(unhighlightedHtml); // Restore the original content
     });
+    
+    // Keep the selected rows (yellow) persistent
+    if (!row.hasClass('selected-row')) {
+        row.removeClass('new-row'); // Remove the green highlight from non-matching rows
+    }
 }
