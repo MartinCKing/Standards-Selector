@@ -6,7 +6,7 @@ $(document).ready(function () {
     let originalRows = [];
     let selectedRowIds = new Set(); // Track selected rows
     let header = [];
-    let abstractVisible = true;
+    let abstractVisible = false; // Set abstract visibility to false initially
     let rowData = []; // Store original data for resetting
 
     // Load and parse CSV data
@@ -36,6 +36,11 @@ $(document).ready(function () {
 
             originalRows = allRows.slice();
             $('#dataTable tbody').html(originalRows.join(''));
+
+            // Initially hide the abstract column
+            if (!abstractVisible) {
+                $('td:nth-child(4), th:nth-child(4)').hide(); // Hide abstract
+            }
 
             // Row selection functionality
             $('#dataTable tbody').on('click', 'tr', function () {
@@ -100,6 +105,11 @@ $(document).ready(function () {
         $('#dataTable tbody tr').removeClass('selected-row new-row');
         selectedRowIds.clear();
         $('#dataTable tbody').html(originalRows.join(''));
+
+        // Ensure abstract stays hidden if not visible
+        if (!abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').hide();
+        }
     });
 
     // Clear context functionality
@@ -148,6 +158,11 @@ $(document).ready(function () {
         } else {
             $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
             $('#tableContainer').scrollTop(0); // Scroll to top of table
+        }
+
+        // Ensure abstract stays hidden if not visible
+        if (!abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').hide();
         }
     });
 });
