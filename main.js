@@ -1,3 +1,4 @@
+// main.js
 import { performSearch, extractKeywords, extractNumbers } from './search.js';
 
 $(document).ready(function () {
@@ -73,9 +74,6 @@ $(document).ready(function () {
             }
         });
 
-        const numbers = extractNumbers(context); // Extract numbers
-        const keywords = extractKeywords(context); // Extract keywords
-
         // Perform search and highlight matching rows in green
         performSearch(context, rowData, header, selectedRowIds); // Call search function from search.js
 
@@ -118,4 +116,9 @@ $(document).ready(function () {
 
         // Trigger CSV download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.create
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'export.csv';
+        link.click();
+    });
+});
