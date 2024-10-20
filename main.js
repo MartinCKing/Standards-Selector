@@ -6,7 +6,7 @@ $(document).ready(function () {
     let originalRows = [];
     let selectedRowIds = new Set(); // Track selected rows
     let header = [];
-    let abstractVisible = false; // Set abstract visibility to false initially
+    let abstractVisible = true;
     let rowData = []; // Store original data for resetting
 
     // Load and parse CSV data
@@ -37,11 +37,6 @@ $(document).ready(function () {
             originalRows = allRows.slice();
             $('#dataTable tbody').html(originalRows.join(''));
 
-            // Initially hide the abstract column
-            if (!abstractVisible) {
-                $('td:nth-child(4), th:nth-child(4)').hide(); // Hide abstract
-            }
-
             // Row selection functionality
             $('#dataTable tbody').on('click', 'tr', function () {
                 const rowId = $(this).data('id');
@@ -54,18 +49,6 @@ $(document).ready(function () {
                     selectedRowIds.add(rowId);
                 }
             });
-        }
-    });
-
-    // Toggle abstract column visibility
-    $('#toggleAbstract').click(function () {
-        abstractVisible = !abstractVisible;
-        if (abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').show(); // Show abstract
-            $('#toggleAbstract').text('Hide Abstract');
-        } else {
-            $('td:nth-child(4), th:nth-child(4)').hide(); // Hide abstract
-            $('#toggleAbstract').text('Show Abstract');
         }
     });
 
@@ -93,6 +76,7 @@ $(document).ready(function () {
         const numbers = extractNumbers(context); // Extract numbers
         const keywords = extractKeywords(context); // Extract keywords
 
+        // Perform search and highlight matching rows in green
         performSearch(context, rowData, header, selectedRowIds); // Call search function from search.js
 
         $('#loadingIndicator').hide(); // Hide loading indicator
@@ -105,11 +89,6 @@ $(document).ready(function () {
         $('#dataTable tbody tr').removeClass('selected-row new-row');
         selectedRowIds.clear();
         $('#dataTable tbody').html(originalRows.join(''));
-
-        // Ensure abstract stays hidden if not visible
-        if (!abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').hide();
-        }
     });
 
     // Clear context functionality
@@ -139,30 +118,4 @@ $(document).ready(function () {
 
         // Trigger CSV download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.setAttribute('href', URL.createObjectURL(blob));
-        link.setAttribute('download', 'selected_rows.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
-
-    // Display only selected rows
-    $('#displaySelected').click(function () {
-        const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
-        const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
-
-        if (selectedHtml.length === 0) {
-            $('#dataTable tbody').html(originalRows.join(''));
-            selectedRowIds.clear();
-        } else {
-            $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
-            $('#tableContainer').scrollTop(0); // Scroll to top of table
-        }
-
-        // Ensure abstract stays hidden if not visible
-        if (!abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').hide();
-        }
-    });
-});
+        const link = document.create
