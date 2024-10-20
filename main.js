@@ -1,23 +1,23 @@
 import { performSearch, highlightDesignationTextOnly, highlightWordsInRow, unhighlightRow } from './search.js';
 
-// Function to compute cosine similarity between two vectors
-function cosineSimilarity(vecA, vecB) {
-    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
-}
-
 $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
     let rowData = [];
-    let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
+    let selectedRowIds = new Set(); // Track selected rows
     let header = [];
     let abstractVisible = false;
+    let useModel; // Store the Universal Sentence Encoder model for semantic search
 
-    // Load and parse CSV data
+    // Load the Universal Sentence Encoder model
+    async function loadUSEModel() {
+        useModel = await use.load();
+        console.log('USE Model Loaded');
+    }
+    loadUSEModel();
+
+    // Load and parse CSV data with PapaParse
     Papa.parse(csvUrl, {
         download: true,
         header: true,
@@ -61,15 +61,7 @@ $(document).ready(function() {
         }
     });
 
-    // Load the Universal Sentence Encoder model
-    let useModel;
-    async function loadUSEModel() {
-        useModel = await use.load();
-        console.log('USE Model Loaded');
-    }
-    loadUSEModel();
-
-    // Function to run semantic search
+    // Function to run semantic search using Universal Sentence Encoder
     async function runSemanticSearch(query) {
         if (!useModel) {
             console.error('Universal Sentence Encoder model is not loaded yet');
@@ -91,10 +83,8 @@ $(document).ready(function() {
             return { id: row.id, similarity };
         });
 
-        // Sort rows by similarity
+        // Sort rows by similarity and highlight top matching rows
         similarities.sort((a, b) => b.similarity - a.similarity);
-
-        // Highlight top matching rows based on similarity
         highlightTopRows(similarities);
     }
 
@@ -135,14 +125,14 @@ $(document).ready(function() {
             }
         });
 
-        performSearch(context, rowData, header, selectedRowIds);
+        performSearch(context, rowData, header, selectedRowIds); // Perform keyword-based search
         runSemanticSearch(context); // Run the natural language search
 
         $('#loadingIndicator').hide();
         $('#progressMessage').text('Search complete.');
     });
 
-    // Display only selected rows and scroll to the top
+    // Display only selected rows but keep unselected rows below
     $('#displaySelected').click(function() {
         const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
         const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
@@ -170,6 +160,14 @@ $(document).ready(function() {
         $('#progressMessage').text('Context cleared.');
     });
 
+    // Reset functionality
+    $('#reset').click(function() {
+        $('#dataTable tbody').html(originalRows.join(''));
+        $('#dataTable tbody tr').removeClass('selected-row new-row');
+        selectedRowIds.clear();
+        $('#progressMessage').text('Reset complete.');
+    });
+
     // Export functionality
     $('#export').click(function() {
         let csvContent = header.map(col => `"${col}"`).join(',') + '\n';
@@ -195,5 +193,11 @@ $(document).ready(function() {
         document.body.removeChild(link);
     });
 
-    // Other functionality...
+    // Cosine similarity function
+    function cosineSimilarity(vecA, vecB) {
+        const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+        const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+        const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+        return dotProduct / (magnitudeA * magnitudeB);
+    }
 });
