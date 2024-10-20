@@ -1,14 +1,23 @@
 import { performSearch, highlightDesignationTextOnly, highlightWordsInRow, unhighlightRow } from './search.js';
+
+// Function to compute cosine similarity between two vectors
+function cosineSimilarity(vecA, vecB) {
+    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+}
+
 $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
-    let selectedRowIds = new Set(); // Track selected rows
-    let header = [];
     let rowData = [];
-    let abstractVisible = false; // Track abstract visibility
+    let selectedRowIds = new Set();
+    let header = [];
+    let abstractVisible = false;
 
-    // Load and parse CSV data with PapaParse
+    // Load and parse CSV data
     Papa.parse(csvUrl, {
         download: true,
         header: true,
@@ -38,105 +47,78 @@ $(document).ready(function() {
         }
     });
 
-    // Show/hide the abstract display area based on abstract column visibility
-    $('#toggleAbstract').click(function() {
-        abstractVisible = !abstractVisible;
-        if (abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').show();
-            $('#toggleAbstract').text('Hide Abstract');
-            $('#abstractDisplay').show(); // Show abstract display
-        } else {
-            $('td:nth-child(4), th:nth-child(4)').hide();
-            $('#toggleAbstract').text('Show Abstract');
-            $('#abstractDisplay').hide(); // Hide abstract display
+    // Load the Universal Sentence Encoder model
+    let useModel;
+    async function loadUSEModel() {
+        useModel = await use.load();
+        console.log('USE Model Loaded');
+    }
+    loadUSEModel();
+
+    // Function to run semantic search
+    async function runSemanticSearch(query) {
+        if (!useModel) {
+            console.error('Universal Sentence Encoder model is not loaded yet');
+            return;
         }
-    });
 
-    // Submit context functionality (without affecting abstract column visibility)
-    $('#submitContext').click(function() {
-        const context = $('#keywordInput').val();
-        $('#loadingIndicator').show();
-        $('#progressMessage').text('Searching...');
+        const queryEmbedding = await useModel.embed(query);
 
-        // Reset the table by reconstructing rows from original structured data
-        const resetHtml = rowData.map(data => {
-            const rowHtml = `<tr data-id="${data.id}">${header.map(col => `<td>${data.content[col]}</td>`).join('')}</tr>`;
-            return rowHtml;
+        // Generate embeddings for each row's text (abstract and title)
+        let rowEmbeddings = await Promise.all(rowData.map(async row => {
+            const textToSearch = row.content[header[1]] + ' ' + row.content[header[4]];
+            const embedding = await useModel.embed(textToSearch);
+            return { id: row.id, embedding };
+        }));
+
+        // Compute cosine similarity between query and each row's embedding
+        const similarities = rowEmbeddings.map(row => {
+            const similarity = cosineSimilarity(queryEmbedding.arraySync()[0], row.embedding.arraySync()[0]);
+            return { id: row.id, similarity };
         });
 
-        $('#dataTable tbody').html(resetHtml.join(''));
+        // Sort rows by similarity
+        similarities.sort((a, b) => b.similarity - a.similarity);
 
-        // Restore selected rows (yellow highlighting)
+        // Highlight top matching rows based on similarity
+        highlightTopRows(similarities);
+    }
+
+    // Highlight top rows based on semantic meaning
+    function highlightTopRows(similarities) {
         $('#dataTable tbody tr').each(function() {
             const rowId = $(this).data('id');
-            if (selectedRowIds.has(rowId)) {
-                $(this).addClass('selected-row');
-            }
-        });
+            const similarityData = similarities.find(sim => sim.id === rowId);
 
-        const numbers = extractNumbers(context);
-        const keywords = extractKeywords(context);
-
-        matchAndDisplay(numbers);
-        matchAndDisplay(keywords);
-
-        performSearch(context, rowData, header, selectedRowIds);
-
-        $('#loadingIndicator').hide();
-        $('#progressMessage').text('Search complete.');
-        $('#tableContainer').scrollTop(0);
-    });
-
-    // Update the abstract content when hovering over or selecting a row
-    $('#dataTable tbody').on('mouseenter', 'tr', function() {
-        if (abstractVisible) {
-            const abstractText = $(this).find('td:nth-child(4)').text().trim();
-            $('#abstractContent').text(abstractText || 'No abstract available');
-        }
-    });
-
-    // Also update the abstract content on row selection
-    $('#dataTable tbody').on('click', 'tr', function() {
-        if (abstractVisible) {
-            const abstractText = $(this).find('td:nth-child(4)').text().trim();
-            $('#abstractContent').text(abstractText || 'No abstract available');
-        }
-    });
-
-    // Other existing functionality...
-
-    // Helper functions for number and keyword extraction
-    function extractKeywords(context) {
-        return context.match(/(?:\w+\s+){0,2}\w+/g) || [];
-    }
-
-    function extractNumbers(context) {
-        return context.match(/\d+/g) || [];
-    }
-
-    function matchAndDisplay(matchingItems) {
-        let matchingRows = [];
-        $('#dataTable tbody tr').each(function() {
-            const rowText = $(this).text().toLowerCase();
-            let matchFound = false;
-
-            matchingItems.forEach(item => {
-                if (rowText.includes(item.trim().toLowerCase())) {
-                    if (!$(this).hasClass('selected-row')) {
-                        $(this).addClass('new-row');
-                    }
-                    matchFound = true;
-                }
-            });
-
-            if (matchFound) {
-                matchingRows.push(this);
+            if (similarityData && similarityData.similarity > 0.5) { // Threshold for similarity
+                $(this).addClass('new-row'); // Highlight in green
             } else {
                 $(this).removeClass('new-row');
             }
         });
 
-        $('#dataTable tbody').prepend(matchingRows);
+        // Scroll to top
         $('#tableContainer').scrollTop(0);
     }
+
+    // Submit context search with semantic meaning
+    $('#submitContext').click(function() {
+        const context = $('#keywordInput').val();
+        $('#loadingIndicator').show();
+        $('#progressMessage').text('Searching...');
+
+        const resetHtml = rowData.map(data => {
+            return `<tr data-id="${data.id}">${header.map(col => `<td>${data.content[col]}</td>`).join('')}</tr>`;
+        });
+
+        $('#dataTable tbody').html(resetHtml.join(''));
+
+        performSearch(context, rowData, header, selectedRowIds);
+        runSemanticSearch(context); // Run the natural language search
+
+        $('#loadingIndicator').hide();
+        $('#progressMessage').text('Search complete.');
+    });
+
+    // Other functionality remains unchanged...
 });
