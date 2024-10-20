@@ -13,7 +13,7 @@ $(document).ready(function() {
     let allRows = [];
     let originalRows = [];
     let rowData = [];
-    let selectedRowIds = new Set();
+    let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
     let header = [];
     let abstractVisible = false;
 
@@ -44,6 +44,20 @@ $(document).ready(function() {
 
             originalRows = allRows.slice();
             $('#dataTable tbody').html(originalRows.join(''));
+
+            // Enable row selection
+            $('#dataTable tbody').on('click', 'tr', function() {
+                const rowId = $(this).data('id');
+                $(this).toggleClass('selected-row'); // Toggle yellow highlight for selected rows
+                $(this).removeClass('new-row'); // Remove green highlight for searched rows
+
+                // Toggle selection in the selectedRowIds set
+                if (selectedRowIds.has(rowId)) {
+                    selectedRowIds.delete(rowId);
+                } else {
+                    selectedRowIds.add(rowId);
+                }
+            });
         }
     });
 
@@ -113,6 +127,14 @@ $(document).ready(function() {
 
         $('#dataTable tbody').html(resetHtml.join(''));
 
+        // Restore selected rows (yellow highlighting)
+        $('#dataTable tbody tr').each(function() {
+            const rowId = $(this).data('id');
+            if (selectedRowIds.has(rowId)) {
+                $(this).addClass('selected-row'); // Restore yellow highlight for selected rows
+            }
+        });
+
         performSearch(context, rowData, header, selectedRowIds);
         runSemanticSearch(context); // Run the natural language search
 
@@ -120,5 +142,58 @@ $(document).ready(function() {
         $('#progressMessage').text('Search complete.');
     });
 
-    // Other functionality remains unchanged...
+    // Display only selected rows and scroll to the top
+    $('#displaySelected').click(function() {
+        const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
+        const unselectedHtml = $('#dataTable tbody tr').not('.selected-row').clone();
+
+        if (selectedHtml.length === 0) {
+            $('#dataTable tbody').html(originalRows.join(''));
+            selectedRowIds.clear();
+        } else {
+            $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
+            $('#tableContainer').scrollTop(0); // Scroll to the top of the table
+        }
+    });
+
+    // Clear context functionality (without affecting selected rows)
+    $('#clearContext').click(function() {
+        $('#keywordInput').val(''); // Clear the keyword input
+        $('#dataTable tbody tr').removeClass('new-row'); // Only clear new-row (green)
+
+        // Unhighlight all orange spans
+        $('td span.highlight').each(function() {
+            const unwrapped = $(this).text(); // Get the text inside the span
+            $(this).replaceWith(unwrapped); // Replace the span with plain text
+        });
+
+        $('#progressMessage').text('Context cleared.');
+    });
+
+    // Export functionality
+    $('#export').click(function() {
+        let csvContent = header.map(col => `"${col}"`).join(',') + '\n';
+
+        $('#dataTable tbody tr.selected-row').each(function() {
+            const row = $(this).find('td').map(function() {
+                let cellText = $(this).text().trim();
+                return `"${cellText.replace(/"/g, '""')}"`; // Escape double quotes
+            }).get();
+
+            if (row.some(cell => cell.length > 0)) {
+                csvContent += row.join(',') + '\n';
+            }
+        });
+
+        // Create and trigger the CSV file download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.setAttribute('href', URL.createObjectURL(blob));
+        link.setAttribute('download', 'selected_rows.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    // Other functionality...
 });
