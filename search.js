@@ -1,10 +1,10 @@
 // Function to extract keywords from the context
-function extractKeywords(context) {
+export function extractKeywords(context) {
     return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
 }
 
 // Function to extract numbers from the context
-function extractNumbers(context) {
+export function extractNumbers(context) {
     return context.match(/\d+/g) || []; // Extract numbers
 }
 
@@ -36,7 +36,7 @@ function matchAndDisplay(matchingItems) {
 }
 
 // Function to perform keyword search and highlight them in orange (excluding links)
-function performSearch(searchString) {
+export function performSearch(searchString) {
     const lowerCaseSearchString = searchString.trim().toLowerCase();
     $('#dataTable tbody tr').each(function() {
         const row = $(this);
@@ -95,7 +95,7 @@ function unhighlightRow(row) {
 }
 
 // Main search function that integrates keyword extraction, matching, and display
-function searchRows(context) {
+export function searchRows(context) {
     const numbers = extractNumbers(context);  // Extract numbers from the context
     const keywords = extractKeywords(context);  // Extract keywords from the context
 
