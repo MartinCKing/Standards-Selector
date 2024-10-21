@@ -54,39 +54,41 @@ $(document).ready(function () {
         }
     });
 
-    // Submit context functionality: search based on context input
-    $('#submitContext').click(function () {
-        const context = $('#keywordInput').val(); // Get context input
-        $('#loadingIndicator').show(); // Show loading indicator
-        $('#progressMessage').text('Searching...');
+// Submit context functionality: search based on context input
+$('#submitContext').click(function () {
+    const context = $('#keywordInput').val(); // Get context input
+    $('#loadingIndicator').show(); // Show loading indicator
+    $('#progressMessage').text('Searching...');
 
-        // Reset the table
-        const resetHtml = rowData.map((data) => {
-            const rowHtml = `<tr data-id="${data.id}">${header.map((col) => `<td>${data.content[col]}</td>`).join('')}</tr>`;
-            return rowHtml;
-        });
-        $('#dataTable tbody').html(resetHtml.join(''));
-
-        // Restore selected rows (yellow highlight)
-        $('#dataTable tbody tr').each(function () {
-            const rowId = $(this).data('id');
-            if (selectedRowIds.has(rowId)) {
-                $(this).addClass('selected-row');
-            }
-
-            // Open the abstract if it is already marked as visible
-            if (abstractVisibilityMap[rowId]) {
-                $(this).find('.abstract').show(); // Assuming '.abstract' contains the abstract
-            }
-        });
-
-        // Perform search and highlight matching rows in green
-        performSearch(context, rowData, header, selectedRowIds); // Call search function from search.js
-
-        $('#loadingIndicator').hide(); // Hide loading indicator
-        $('#progressMessage').text('Search complete.');
-        $('#tableContainer').scrollTop(0); // Scroll to top of table
+    // Reset the table
+    const resetHtml = rowData.map((data) => {
+        const rowHtml = `<tr data-id="${data.id}">${header.map((col) => `<td>${data.content[col]}</td>`).join('')}</tr>`;
+        return rowHtml;
     });
+    $('#dataTable tbody').html(resetHtml.join(''));
+
+    // Restore selected rows (yellow highlight) and abstract visibility
+    $('#dataTable tbody tr').each(function () {
+        const rowId = $(this).data('id');
+        if (selectedRowIds.has(rowId)) {
+            $(this).addClass('selected-row');
+        }
+
+        // Control abstract visibility based on the existing visibility map
+        if (abstractVisibilityMap[rowId]) {
+            $(this).find('.abstract').show(); // Assuming '.abstract' contains the abstract
+        } else {
+            $(this).find('.abstract').hide(); // Ensure abstract stays hidden if not marked as visible
+        }
+    });
+
+    // Perform search and highlight matching rows in green
+    performSearch(context, rowData, header, selectedRowIds); // Call search function from search.js
+
+    $('#loadingIndicator').hide(); // Hide loading indicator
+    $('#progressMessage').text('Search complete.');
+    $('#tableContainer').scrollTop(0); // Scroll to top of table
+});
 
     // Reset functionality
     $('#reset').click(function () {
