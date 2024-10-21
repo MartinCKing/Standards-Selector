@@ -83,7 +83,7 @@ $('#submitContext').click(function () {
     });
 
     // Perform search and highlight matching rows in green
-    performSearch(context, rowData, header, selectedRowIds); // Call search function from search.js
+	performSearch(context, rowData, header, selectedRowIds, abstractVisibilityMap);
 
     $('#loadingIndicator').hide(); // Hide loading indicator
     $('#progressMessage').text('Search complete.');

@@ -24,7 +24,7 @@ export function fuzzyMatch(query, text) {
 }
 
 // Perform search with fuzzy and NLP-based matching for title and abstract
-export function performSearch(context, rowData, header, selectedRowIds) {
+export function performSearch(context, rowData, header, selectedRowIds, abstractVisibilityMap) {
     const numbers = extractNumbers(context); // Extract numbers
     const refinedKeywords = extractKeywordsWithNLP(context); // Use NLP for keyword extraction
     const sentences = extractSentences(context); // Extract sentences
@@ -62,6 +62,13 @@ export function performSearch(context, rowData, header, selectedRowIds) {
         // Restore previously selected rows
         if (selectedRowIds.has(rowId)) {
             $(this).addClass('selected-row');
+        }
+
+        // Ensure abstracts are only visible based on the abstractVisibilityMap
+        if (abstractVisibilityMap[rowId]) {
+            $(this).find('.abstract').show(); // Show abstract if previously marked as visible
+        } else {
+            $(this).find('.abstract').hide(); // Hide abstract if not marked visible
         }
     });
 }
