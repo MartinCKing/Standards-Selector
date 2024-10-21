@@ -45,17 +45,19 @@ export function performSearch(context, rowData, header, selectedRowIds, abstract
 
         // Perform number matching across all columns
         const matchedNumbers = numbers.some(number => 
-            Object.values(rowContent).some(value => value.includes(number))
+            Object.values(rowContent).some(value => 
+                String(value).includes(number) // Convert value to a string
+            )
         );
 
         // Perform fuzzy matching on title and abstract for sentences
         const matchedSentences = sentences.some(sentence => 
-            fuzzyMatch(sentence, title) || fuzzyMatch(sentence, abstract)
+            fuzzyMatch(sentence, String(title)) || fuzzyMatch(sentence, String(abstract))
         );
 
         // Perform fuzzy matching on title and abstract for refined keywords
         const matchedKeywords = refinedKeywords.some(keyword => 
-            fuzzyMatch(keyword, title) || fuzzyMatch(keyword, abstract)
+            fuzzyMatch(keyword, String(title)) || fuzzyMatch(keyword, String(abstract))
         );
 
         // Highlight the row if any match criteria is satisfied
@@ -78,3 +80,4 @@ export function performSearch(context, rowData, header, selectedRowIds, abstract
         }
     });
 }
+
