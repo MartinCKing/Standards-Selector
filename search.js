@@ -1,111 +1,83 @@
-// Use the global nlp object (which is available after including the CDN link)
-export function extractKeywordsWithNLP(context) {
-    const doc = nlp(context);
-    const refinedKeywords = doc.nouns().out('array'); // Extract nouns as refined keywords
-    return refinedKeywords.filter(keyword => keyword.length > 2);
-}
+export function performSearch(searchString) {
+    const lowerCaseSearchString = searchString.trim().toLowerCase();
+    $('#dataTable tbody tr').each(function() {
+        const row = $(this);
+        const designationCell = row.find('td:nth-child(2)'); // Second column for standard designation
+        const rowText = row.text().toLowerCase();
+        const designationText = designationCell.text().toLowerCase();
 
-// Extract sentences using NLP
-export function extractSentences(context) {
-    const doc = nlp(context);
-    return doc.sentences().out('array'); // Extract sentences
-}
+        // Check if the entire row contains the search string
+        if (rowText.includes(lowerCaseSearchString)) {
+            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns except links
+        } else {
+            unhighlightRow(row); // Unhighlight if not found
+        }
 
-// Perform fuzzy matching using Fuse.js
-export function fuzzyMatch(query, text) {
-    const fuse = new Fuse([text], {
-        includeScore: true,
-        threshold: 0.3, // Adjust threshold for fuzziness
+        // Additionally, check if the designation (second column) matches the search string
+        if (designationText.includes(lowerCaseSearchString)) {
+            highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight the designation in orange (text only)
+        }
     });
-    return fuse.search(query).length > 0; // Return true if there's a match
 }
 
-// Define extractNumbers function if needed
-export function extractNumbers(context) {
-    const numberPattern = /\d+/g;
-    return context.match(numberPattern) || [];
-}
-
-// Function to highlight matching words in any text
-function highlightWords(text, words) {
-    let highlightedText = text;
-    words.forEach(word => {
-        const wordRegex = new RegExp(`(${word})`, 'gi'); // Case-insensitive match
-        highlightedText = highlightedText.replace(wordRegex, '<span class="highlight">$1</span>'); // Add a class to highlight
-    });
-    return highlightedText;
-}
-
-// Perform search with fuzzy and NLP-based matching for all columns except URLs
-export function performSearch(context, rowData, header, selectedRowIds, abstractVisibilityMap) {
-    const numbers = extractNumbers(context); // Extract numbers
-    const refinedKeywords = extractKeywordsWithNLP(context); // Use NLP for keyword extraction
-    const sentences = extractSentences(context); // Extract sentences
-
+export function matchAndDisplay(matchingItems) {
     let matchingRows = [];
-    let nonMatchingRows = [];
+    $('#dataTable tbody tr').each(function() {
+        const rowText = $(this).text().toLowerCase();
+        let matchFound = false;
 
-    $('#dataTable tbody tr').each(function () {
-        const rowId = $(this).data('id');
-        const rowContent = rowData.find(data => data.id === rowId).content;
-
-        // Iterate through each column except for links to apply text highlighting
-        $(this).find('td').each(function(index) {
-            const cell = $(this);
-            const cellContent = cell.html();
-            const hasLink = cell.find('a').length > 0; // Check if there's a link
-
-            if (!hasLink) {
-                let newContent = cellContent;
-
-                // Highlight based on keywords and numbers
-                newContent = highlightWords(newContent, refinedKeywords);
-                newContent = highlightWords(newContent, numbers);
-
-                // Update the cell with the highlighted content
-                cell.html(newContent);
+        matchingItems.forEach(item => {
+            if (rowText.includes(item.trim().toLowerCase())) {
+                if (!$(this).hasClass('selected-row')) { // Do not overwrite yellow (selected rows)
+                    $(this).addClass('new-row'); // Highlight the row in green
+                }
+                matchFound = true;
             }
         });
 
-        // Perform number matching across all columns
-        const matchedNumbers = numbers.some(number => 
-            Object.values(rowContent).some(value => 
-                String(value).includes(number) // Convert value to a string
-            )
-        );
-
-        // Perform fuzzy matching on all text columns for sentences and keywords
-        const matchedSentences = sentences.some(sentence => 
-            fuzzyMatch(sentence, Object.values(rowContent).join(' '))
-        );
-        const matchedKeywords = refinedKeywords.some(keyword => 
-            fuzzyMatch(keyword, Object.values(rowContent).join(' '))
-        );
-
-        // Highlight the row if any match criteria is satisfied
-        if (matchedNumbers || matchedKeywords || matchedSentences) {
-            $(this).addClass('new-row'); // Highlight matching rows in green
+        if (matchFound) {
             matchingRows.push(this); // Collect matching rows
         } else {
-            $(this).removeClass('new-row');
-            nonMatchingRows.push(this); // Collect non-matching rows
-        }
-
-        // Restore previously selected rows
-        if (selectedRowIds.has(rowId)) {
-            $(this).addClass('selected-row');
-        }
-
-        // Ensure abstracts are only visible based on the abstractVisibilityMap
-        if (abstractVisibilityMap[rowId]) {
-            $(this).find('.abstract').show(); // Show abstract if previously marked as visible
-        } else {
-            $(this).find('.abstract').hide(); // Hide abstract if not marked visible
+            $(this).removeClass('new-row'); // Remove green highlight from non-matching rows
         }
     });
 
-    // Move matching rows to the top of the table
-    $('#dataTable tbody').empty(); // Clear the current table body
-    $('#dataTable tbody').append(matchingRows); // Append matching rows at the top
-    $('#dataTable tbody').append(nonMatchingRows); // Append non-matching rows at the bottom
+    $('#dataTable tbody').prepend(matchingRows);
+    $('#tableContainer').scrollTop(0);
+}
+
+// Function to highlight matched standard designation (text only, excluding links)
+export function highlightDesignationTextOnly(cell, searchString) {
+    const link = cell.find('a'); // Check if there's a link in the cell
+    const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
+    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
+
+    if (link.length) {
+        // If there's a link, update its inner HTML with highlighted text
+        link.html(highlightedHtml);
+    } else {
+        // If no link, directly update the cell's HTML
+        cell.html(highlightedHtml);
+    }
+}
+
+// Function to highlight matched words in the row (excluding links)
+export function highlightWordsInRow(row, searchString) {
+    row.find('td').each(function(index) {
+        if (index === 1 || $(this).find('a').length > 0) {
+            return; // Skip the second column (designation) or cells with links
+        }
+        const cellHtml = $(this).html();
+        const highlightedHtml = cellHtml.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
+        $(this).html(highlightedHtml);
+    });
+}
+
+// Function to unhighlight a row (remove <span> tags)
+export function unhighlightRow(row) {
+    row.find('td').each(function() {
+        const cellHtml = $(this).html();
+        const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
+        $(this).html(unhighlightedHtml); // Restore the original content
+    });
 }
