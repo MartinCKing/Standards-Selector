@@ -1,14 +1,15 @@
-import nlp from 'compromise';
-import Fuse from 'fuse.js'; // Fuzzy matching library
+// Remove the import statement for compromise
+// import nlp from 'compromise';
 
-// Extract refined keywords using NLP
+// Use the global nlp object (which is available after including the CDN link)
 export function extractKeywordsWithNLP(context) {
     const doc = nlp(context);
     const refinedKeywords = doc.nouns().out('array'); // Extract nouns as refined keywords
     return refinedKeywords.filter(keyword => keyword.length > 2);
 }
 
-// Extract sentences using NLP
+// The rest of your search.js code remains the same
+
 export function extractSentences(context) {
     const doc = nlp(context);
     return doc.sentences().out('array'); // Extract sentences
