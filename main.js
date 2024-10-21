@@ -1,4 +1,4 @@
-import { performSearch, extractKeywords, extractNumbers } from './search.js';
+import { searchRows, performSearch, extractKeywords, extractNumbers } from './search.js';
 
 $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
