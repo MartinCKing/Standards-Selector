@@ -8,20 +8,25 @@ export function extractKeywordsWithNLP(context) {
     return refinedKeywords.filter(keyword => keyword.length > 2);
 }
 
-// The rest of your search.js code remains the same
-
+// Extract sentences using NLP
 export function extractSentences(context) {
     const doc = nlp(context);
     return doc.sentences().out('array'); // Extract sentences
 }
 
-// Perform fuzzy matching
+// Perform fuzzy matching using Fuse.js
 export function fuzzyMatch(query, text) {
     const fuse = new Fuse([text], {
         includeScore: true,
         threshold: 0.3, // Adjust threshold for fuzziness
     });
     return fuse.search(query).length > 0; // Return true if there's a match
+}
+
+// Define extractNumbers function if needed
+export function extractNumbers(context) {
+    const numberPattern = /\d+/g;
+    return context.match(numberPattern) || [];
 }
 
 // Perform search with fuzzy and NLP-based matching for title and abstract
