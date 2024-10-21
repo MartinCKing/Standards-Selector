@@ -7,8 +7,8 @@ $(document).ready(function () {
     let originalRows = [];
     let selectedRowIds = new Set(); // Track selected rows
     let header = [];
-    let abstractVisible = true;
     let rowData = []; // Store original data for resetting
+    let abstractVisibilityMap = {}; // Track the visibility of abstracts by row id
 
     // Load and parse CSV data
     Papa.parse(csvUrl, {
@@ -32,6 +32,7 @@ $(document).ready(function () {
                     row[header[4]] = ''; // Remove invalid links
                 }
                 rowData.push({ id: row['id'], content: row }); // Store original row data
+                abstractVisibilityMap[row['id']] = false; // Set initial abstract visibility to false
                 return `<tr data-id="${row['id']}">${header.map((col) => `<td>${row[col]}</td>`).join('')}</tr>`;
             });
 
@@ -72,6 +73,11 @@ $(document).ready(function () {
             if (selectedRowIds.has(rowId)) {
                 $(this).addClass('selected-row');
             }
+
+            // Open the abstract if it is already marked as visible
+            if (abstractVisibilityMap[rowId]) {
+                $(this).find('.abstract').show(); // Assuming '.abstract' contains the abstract
+            }
         });
 
         // Perform search and highlight matching rows in green
@@ -87,6 +93,8 @@ $(document).ready(function () {
         $('#dataTable tbody tr').removeClass('selected-row new-row');
         selectedRowIds.clear();
         $('#dataTable tbody').html(originalRows.join(''));
+        // Reset abstract visibility map
+        Object.keys(abstractVisibilityMap).forEach(id => abstractVisibilityMap[id] = false);
     });
 
     // Clear context functionality
