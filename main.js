@@ -113,15 +113,24 @@ $(document).ready(function() {
         newTopRows.clear(); 
     });
 
-    // Clear context functionality
-    $('#clearContext').click(function() {
-        $('#keywordInput').val(''); // Clear the keyword input
-        $('#dataTable tbody tr').each(function() {
-            if (!$(this).hasClass('selected-row')) {
-                $(this).removeClass('new-row');
-            }
-        });
+// Clear context functionality (without affecting selected rows)
+$('#clearContext').click(function() {
+    $('#keywordInput').val(''); // Clear the keyword input
+
+    // Remove new-row (green) highlights
+    $('#dataTable tbody tr').removeClass('new-row'); // This ensures green rows are reset
+
+    // Remove any orange highlights for search matches (spans inside the cells)
+    $('td span.highlight').each(function() {
+        // Remove highlight spans
+        const unwrapped = $(this).text(); // Get the text inside the span
+        $(this).replaceWith(unwrapped); // Replace the span with plain text
     });
+
+    // Ensure the progress message reflects that the context was cleared
+    $('#progressMessage').text('Context cleared.');
+});
+
 
     // Export functionality
     $('#export').click(function() {
