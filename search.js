@@ -1,25 +1,33 @@
-import nlp from 'compromise'; // Example NLP library
+import nlp from 'compromise';
+import Fuse from 'fuse.js'; // Fuzzy matching library
 
-export function extractNumbers(context) {
-    const numberPattern = /\d+/g;
-    return context.match(numberPattern) || [];
-}
-
+// Extract refined keywords using NLP
 export function extractKeywordsWithNLP(context) {
     const doc = nlp(context);
-    const refinedKeywords = doc.nouns().out('array'); // Extract refined keywords like nouns
+    const refinedKeywords = doc.nouns().out('array'); // Extract nouns as refined keywords
     return refinedKeywords.filter(keyword => keyword.length > 2);
 }
 
+// Extract sentences using NLP
 export function extractSentences(context) {
     const doc = nlp(context);
-    return doc.sentences().out('array'); // Extracts all sentences from the context
+    return doc.sentences().out('array'); // Extract sentences
 }
 
+// Perform fuzzy matching
+export function fuzzyMatch(query, text) {
+    const fuse = new Fuse([text], {
+        includeScore: true,
+        threshold: 0.3, // Adjust threshold for fuzziness
+    });
+    return fuse.search(query).length > 0; // Return true if there's a match
+}
+
+// Perform search with fuzzy and NLP-based matching for title and abstract
 export function performSearch(context, rowData, header, selectedRowIds) {
-    const numbers = extractNumbers(context); // Keep number extraction as is
-    const refinedKeywords = extractKeywordsWithNLP(context); // Use NLP for keywords
-    const sentences = extractSentences(context); // Use NLP for sentences
+    const numbers = extractNumbers(context); // Extract numbers
+    const refinedKeywords = extractKeywordsWithNLP(context); // Use NLP for keyword extraction
+    const sentences = extractSentences(context); // Extract sentences
 
     $('#dataTable tbody tr').each(function () {
         const rowId = $(this).data('id');
@@ -34,17 +42,17 @@ export function performSearch(context, rowData, header, selectedRowIds) {
             Object.values(rowContent).some(value => value.includes(number))
         );
 
-        // Perform refined NLP-based keyword matching only on title and abstract
-        const matchedKeywords = refinedKeywords.some(keyword => 
-            title.includes(keyword) || abstract.includes(keyword)
-        );
-
-        // Perform NLP-based sentence matching only on title and abstract
+        // Perform fuzzy matching on title and abstract for sentences
         const matchedSentences = sentences.some(sentence => 
-            title.includes(sentence) || abstract.includes(sentence)
+            fuzzyMatch(sentence, title) || fuzzyMatch(sentence, abstract)
         );
 
-        // Highlight the row if any of the matching criteria are satisfied
+        // Perform fuzzy matching on title and abstract for refined keywords
+        const matchedKeywords = refinedKeywords.some(keyword => 
+            fuzzyMatch(keyword, title) || fuzzyMatch(keyword, abstract)
+        );
+
+        // Highlight the row if any match criteria is satisfied
         if (matchedNumbers || matchedKeywords || matchedSentences) {
             $(this).addClass('new-row'); // Highlight matching rows in green
         } else {
