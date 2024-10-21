@@ -42,7 +42,7 @@ $(document).ready(function() {
             $('#dataTable tbody').html(originalRows.join(''));
 
             // Update the number of entries loaded
-            $('#entriesLoaded').text(`(${rows.length} entries loaded)`);
+            $('#entriesLoaded').text(`(${rows.length - 1} entries loaded)`);
 
             // Add row selection functionality
             $('#dataTable tbody').on('click', 'tr', function() {
