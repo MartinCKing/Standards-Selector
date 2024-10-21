@@ -106,13 +106,7 @@ $(document).ready(function() {
             $('td:nth-child(4), th:nth-child(4)').hide();
         }
 
-        const numbers = extractNumbers(context);  // Extract numbers from the context
-        const keywords = extractKeywords(context);  // Extract keywords from the context
-
-        matchAndDisplay(numbers);  // Match and display rows based on numbers
-        matchAndDisplay(keywords);  // Match and display rows based on keywords
-
-        performSearch(context); // Highlight matching keywords and designation in orange
+        searchRows(context); // Delegate search functionality to search.js
 
         $('#loadingIndicator').hide(); // Hide the loading indicator
         $('#progressMessage').text('Search complete.');
@@ -143,7 +137,6 @@ $(document).ready(function() {
         }
     });
 
-    
     // Display only selected rows and scroll to the top
     $('#displaySelected').click(function() {
         const selectedHtml = $('#dataTable tbody tr.selected-row').clone();
