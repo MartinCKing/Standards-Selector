@@ -1,6 +1,3 @@
-// Remove the import statement for compromise
-// import nlp from 'compromise';
-
 // Use the global nlp object (which is available after including the CDN link)
 export function extractKeywordsWithNLP(context) {
     const doc = nlp(context);
@@ -29,19 +26,32 @@ export function extractNumbers(context) {
     return context.match(numberPattern) || [];
 }
 
+// Function to highlight matching words in the title/abstract
+function highlightWords(text, words) {
+    let highlightedText = text;
+    words.forEach(word => {
+        const wordRegex = new RegExp(`(${word})`, 'gi'); // Case-insensitive match
+        highlightedText = highlightedText.replace(wordRegex, '<span class="highlight">$1</span>'); // Add a class to highlight
+    });
+    return highlightedText;
+}
+
 // Perform search with fuzzy and NLP-based matching for title and abstract
 export function performSearch(context, rowData, header, selectedRowIds, abstractVisibilityMap) {
     const numbers = extractNumbers(context); // Extract numbers
     const refinedKeywords = extractKeywordsWithNLP(context); // Use NLP for keyword extraction
     const sentences = extractSentences(context); // Extract sentences
 
+    let matchingRows = [];
+    let nonMatchingRows = [];
+
     $('#dataTable tbody tr').each(function () {
         const rowId = $(this).data('id');
         const rowContent = rowData.find(data => data.id === rowId).content;
 
         // Extract title and abstract columns (assuming column indexes 1 and 3 are title and abstract)
-        const title = rowContent[header[1]] || ''; // Title column
-        const abstract = rowContent[header[3]] || ''; // Abstract column
+        let title = rowContent[header[1]] || ''; // Title column
+        let abstract = rowContent[header[3]] || ''; // Abstract column
 
         // Perform number matching across all columns
         const matchedNumbers = numbers.some(number => 
@@ -60,11 +70,21 @@ export function performSearch(context, rowData, header, selectedRowIds, abstract
             fuzzyMatch(keyword, String(title)) || fuzzyMatch(keyword, String(abstract))
         );
 
+        // Highlight matching words in the title and abstract
+        if (matchedKeywords || matchedSentences) {
+            title = highlightWords(title, refinedKeywords);
+            abstract = highlightWords(abstract, refinedKeywords);
+            $(this).find('td').eq(1).html(title); // Update title column with highlighted text
+            $(this).find('td').eq(3).html(abstract); // Update abstract column with highlighted text
+        }
+
         // Highlight the row if any match criteria is satisfied
         if (matchedNumbers || matchedKeywords || matchedSentences) {
             $(this).addClass('new-row'); // Highlight matching rows in green
+            matchingRows.push(this); // Collect matching rows
         } else {
             $(this).removeClass('new-row');
+            nonMatchingRows.push(this); // Collect non-matching rows
         }
 
         // Restore previously selected rows
@@ -79,5 +99,9 @@ export function performSearch(context, rowData, header, selectedRowIds, abstract
             $(this).find('.abstract').hide(); // Hide abstract if not marked visible
         }
     });
-}
 
+    // Move matching rows to the top of the table
+    $('#dataTable tbody').empty(); // Clear the current table body
+    $('#dataTable tbody').append(matchingRows); // Append matching rows at the top
+    $('#dataTable tbody').append(nonMatchingRows); // Append non-matching rows at the bottom
+}
