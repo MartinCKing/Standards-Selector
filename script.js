@@ -2,10 +2,11 @@ $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
-    let selectedRowIds = new Set(); // Track selected rows
+    let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
     let newTopRows = new Set();
     let header = []; // Declare header globally
     let abstractVisible = true; // Track visibility of column 4 (abstract)
+
     let rowData = []; // To store original structured data for resetting
 
     // Load and parse CSV data with PapaParse
@@ -54,6 +55,11 @@ $(document).ready(function() {
                     selectedRowIds.add(rowId); // Add the row if it's not selected
                 }
             });
+
+            // Handle initial abstract visibility
+            if (!abstractVisible) {
+                $('td:nth-child(4), th:nth-child(4)').hide();
+            }
         }
     });
 
@@ -95,9 +101,9 @@ $(document).ready(function() {
             }
         });
 
-        // Ensure abstract visibility is maintained after reset
+        // Maintain abstract visibility after search
         if (!abstractVisible) {
-            $('td:nth-child(4), th:nth-child(4)').hide(); // Hide the abstract column if it's hidden
+            $('td:nth-child(4), th:nth-child(4)').hide();
         }
 
         const numbers = extractNumbers(context);  // Extract numbers from the context
@@ -130,18 +136,24 @@ $(document).ready(function() {
         });
 
         $('#progressMessage').text('Context cleared.');
+
+        // Maintain abstract visibility after clearing the context
+        if (!abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').hide();
+        }
     });
 
-    // Helper functions (Extracting Numbers, Keywords)
+    // Function to extract keywords from the context
     function extractKeywords(context) {
         return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
     }
 
+    // Function to extract numbers from the context
     function extractNumbers(context) {
         return context.match(/\d+/g) || []; // Extract numbers
     }
 
-    // Function to match and display rows based on search criteria
+    // Function to match and display rows that match the search criteria
     function matchAndDisplay(matchingItems) {
         let matchingRows = [];
         $('#dataTable tbody tr').each(function() {
@@ -239,6 +251,11 @@ $(document).ready(function() {
             $('#dataTable tbody').empty().append(selectedHtml).append(unselectedHtml);
             $('#tableContainer').scrollTop(0); // Scroll to the top of the table
         }
+
+        // Maintain abstract visibility after displaying selected rows
+        if (!abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').hide();
+        }
     });
 
     // Export selected rows functionality
@@ -273,5 +290,10 @@ $(document).ready(function() {
         selectedRowIds.clear();
         $('#dataTable tbody').html(originalRows.join(''));
         newTopRows.clear(); 
+
+        // Maintain abstract visibility after reset
+        if (!abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').hide();
+        }
     });
 });
