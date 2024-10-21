@@ -2,11 +2,10 @@ $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
-    let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
+    let selectedRowIds = new Set(); // Track selected rows
     let newTopRows = new Set();
     let header = []; // Declare header globally
     let abstractVisible = true; // Track visibility of column 4 (abstract)
-
     let rowData = []; // To store original structured data for resetting
 
     // Load and parse CSV data with PapaParse
@@ -96,6 +95,11 @@ $(document).ready(function() {
             }
         });
 
+        // Ensure abstract visibility is maintained after reset
+        if (!abstractVisible) {
+            $('td:nth-child(4), th:nth-child(4)').hide(); // Hide the abstract column if it's hidden
+        }
+
         const numbers = extractNumbers(context);  // Extract numbers from the context
         const keywords = extractKeywords(context);  // Extract keywords from the context
 
@@ -128,17 +132,16 @@ $(document).ready(function() {
         $('#progressMessage').text('Context cleared.');
     });
 
-    // Function to extract keywords from the context
+    // Helper functions (Extracting Numbers, Keywords)
     function extractKeywords(context) {
         return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
     }
 
-    // Function to extract numbers from the context
     function extractNumbers(context) {
         return context.match(/\d+/g) || []; // Extract numbers
     }
 
-    // Function to match and display rows that match the search criteria
+    // Function to match and display rows based on search criteria
     function matchAndDisplay(matchingItems) {
         let matchingRows = [];
         $('#dataTable tbody tr').each(function() {
