@@ -63,13 +63,11 @@ $(document).ready(function() {
         abstractVisible = !abstractVisible; // Toggle the state
 
         if (abstractVisible) {
-            // Show column 4
-            $('td:nth-child(4), th:nth-child(4)').hide();
-            $('#toggleAbstract').text('Show Abstract');
-        } else {
-            // Hide column 4
             $('td:nth-child(4), th:nth-child(4)').show();
             $('#toggleAbstract').text('Hide Abstract');
+        } else {
+            $('td:nth-child(4), th:nth-child(4)').hide();
+            $('#toggleAbstract').text('Show Abstract');
         }
     });
 
@@ -132,7 +130,6 @@ $(document).ready(function() {
         $('#dataTable tbody tr.selected-row').each(function() {
             const row = $(this).find('td').map(function() {
                 let cellText = $(this).text().trim();
-                // Quote the text to handle commas within cell data
                 return `"${cellText.replace(/"/g, '""')}"`; // Escape any existing double quotes
             }).get();
 
