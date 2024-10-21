@@ -1,3 +1,14 @@
+// Extract keywords from context
+export function extractKeywords(context) {
+    return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
+}
+
+// Extract numbers from context
+export function extractNumbers(context) {
+    return context.match(/\d+/g) || []; // Extract numbers
+}
+
+// Perform search with keyword matching and highlighting
 export function performSearch(searchString) {
     const lowerCaseSearchString = searchString.trim().toLowerCase();
     $('#dataTable tbody tr').each(function() {
@@ -20,6 +31,7 @@ export function performSearch(searchString) {
     });
 }
 
+// Match and display rows based on search criteria
 export function matchAndDisplay(matchingItems) {
     let matchingRows = [];
     $('#dataTable tbody tr').each(function() {
