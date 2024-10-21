@@ -26,7 +26,7 @@ export function extractNumbers(context) {
     return context.match(numberPattern) || [];
 }
 
-// Function to highlight matching words in the title/abstract
+// Function to highlight matching words in any text
 function highlightWords(text, words) {
     let highlightedText = text;
     words.forEach(word => {
@@ -36,7 +36,7 @@ function highlightWords(text, words) {
     return highlightedText;
 }
 
-// Perform search with fuzzy and NLP-based matching for title and abstract
+// Perform search with fuzzy and NLP-based matching for all columns except URLs
 export function performSearch(context, rowData, header, selectedRowIds, abstractVisibilityMap) {
     const numbers = extractNumbers(context); // Extract numbers
     const refinedKeywords = extractKeywordsWithNLP(context); // Use NLP for keyword extraction
@@ -49,9 +49,23 @@ export function performSearch(context, rowData, header, selectedRowIds, abstract
         const rowId = $(this).data('id');
         const rowContent = rowData.find(data => data.id === rowId).content;
 
-        // Extract title and abstract columns (assuming column indexes 1 and 3 are title and abstract)
-        let title = rowContent[header[1]] || ''; // Title column
-        let abstract = rowContent[header[3]] || ''; // Abstract column
+        // Iterate through each column except for links to apply text highlighting
+        $(this).find('td').each(function(index) {
+            const cell = $(this);
+            const cellContent = cell.html();
+            const hasLink = cell.find('a').length > 0; // Check if there's a link
+
+            if (!hasLink) {
+                let newContent = cellContent;
+
+                // Highlight based on keywords and numbers
+                newContent = highlightWords(newContent, refinedKeywords);
+                newContent = highlightWords(newContent, numbers);
+
+                // Update the cell with the highlighted content
+                cell.html(newContent);
+            }
+        });
 
         // Perform number matching across all columns
         const matchedNumbers = numbers.some(number => 
@@ -60,23 +74,13 @@ export function performSearch(context, rowData, header, selectedRowIds, abstract
             )
         );
 
-        // Perform fuzzy matching on title and abstract for sentences
+        // Perform fuzzy matching on all text columns for sentences and keywords
         const matchedSentences = sentences.some(sentence => 
-            fuzzyMatch(sentence, String(title)) || fuzzyMatch(sentence, String(abstract))
+            fuzzyMatch(sentence, Object.values(rowContent).join(' '))
         );
-
-        // Perform fuzzy matching on title and abstract for refined keywords
         const matchedKeywords = refinedKeywords.some(keyword => 
-            fuzzyMatch(keyword, String(title)) || fuzzyMatch(keyword, String(abstract))
+            fuzzyMatch(keyword, Object.values(rowContent).join(' '))
         );
-
-        // Highlight matching words in the title and abstract
-        if (matchedKeywords || matchedSentences) {
-            title = highlightWords(title, refinedKeywords);
-            abstract = highlightWords(abstract, refinedKeywords);
-            $(this).find('td').eq(1).html(title); // Update title column with highlighted text
-            $(this).find('td').eq(3).html(abstract); // Update abstract column with highlighted text
-        }
 
         // Highlight the row if any match criteria is satisfied
         if (matchedNumbers || matchedKeywords || matchedSentences) {
