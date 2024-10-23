@@ -1,7 +1,7 @@
 import { searchRows, performSearch, extractKeywords, extractNumbers } from './search.js';
 
 $(document).ready(function() {
-    const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards.csv';
+    const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards_iso.csv';
     let allRows = [];
     let originalRows = [];
     let selectedRowIds = new Set(); // Use unique identifiers to track selected rows
