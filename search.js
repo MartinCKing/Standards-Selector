@@ -5,7 +5,7 @@ export function extractKeywords(context) {
 
 // Function to extract complex designations like "BS EN ISO 10993-18:2020+A1:2023"
 export function extractNumbers(context) {
-    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\+\s?[A-Z]*\d*(:\d+)?)?/gi) || [];
+    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\+\s?[A-Z]+\d*:\d{4})?/gi) || [];
 }
 
 // Function to match and display rows that match the search criteria
