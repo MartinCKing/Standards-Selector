@@ -1,16 +1,14 @@
-// Function to extract keywords from the context (allowing alphanumeric with prefixes, suffixes, and symbols)
+// Function to extract keywords from the context
 export function extractKeywords(context) {
-    // Capture complex alphanumeric patterns with optional prefixes/suffixes and symbols
-    return context.match(/(?:[A-Z]{2,}\s+)?[\w\/\-:+]+(?:\s+[\w\/\-:+]+){0,2}(?:\s+\+\s+[A-Z]+)?/g) || [];
+    return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
 }
 
-// Function to extract complex designations with multi-part prefixes, suffixes, and specific symbols
+// Function to extract numbers from the context
 export function extractNumbers(context) {
-    // Match complex designations like "BS EN ISO 10993-18:2020+A1:2023"
-    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\s+[A-Z]+\d*)?(?:\s*\+\s*[A-Z]\d*:\d+)?/gi) || [];
+    return context.match(/\d+/g) || []; // Extract numbers
 }
 
-// Function to match and display rows based on extracted items
+// Function to match and display rows that match the search criteria
 function matchAndDisplay(matchingItems) {
     let matchingRows = [];
     $('#dataTable tbody tr').each(function() {
@@ -19,8 +17,8 @@ function matchAndDisplay(matchingItems) {
 
         matchingItems.forEach(item => {
             if (rowText.includes(item.trim().toLowerCase())) {
-                if (!$(this).hasClass('selected-row')) {
-                    $(this).addClass('new-row'); // Highlight row in green
+                if (!$(this).hasClass('selected-row')) { // Do not overwrite yellow (selected rows)
+                    $(this).addClass('new-row'); // Highlight the row in green
                 }
                 matchFound = true;
             }
@@ -29,7 +27,7 @@ function matchAndDisplay(matchingItems) {
         if (matchFound) {
             matchingRows.push(this); // Collect matching rows
         } else {
-            $(this).removeClass('new-row'); // Remove highlight if no match
+            $(this).removeClass('new-row'); // Remove green highlight from non-matching rows
         }
     });
 
@@ -37,47 +35,49 @@ function matchAndDisplay(matchingItems) {
     $('#tableContainer').scrollTop(0);
 }
 
-// Function to highlight search terms and designations in rows
+// Function to perform keyword search and highlight them in orange (excluding links)
 export function performSearch(searchString) {
     const lowerCaseSearchString = searchString.trim().toLowerCase();
     $('#dataTable tbody tr').each(function() {
         const row = $(this);
-        const designationCell = row.find('td:nth-child(2)'); // Explicitly target second column for designation
+        const designationCell = row.find('td:nth-child(2)'); // Second column for standard designation
         const rowText = row.text().toLowerCase();
         const designationText = designationCell.text().toLowerCase();
 
+        // Check if the entire row contains the search string
         if (rowText.includes(lowerCaseSearchString)) {
-            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches
+            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns except links
         } else {
-            unhighlightRow(row); // Remove highlight if no match
+            unhighlightRow(row); // Unhighlight if not found
         }
 
-        // Check designation specifically and apply orange highlight if found
+        // Additionally, check if the designation (second column) matches the search string
         if (designationText.includes(lowerCaseSearchString)) {
-            highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight in orange for the designation column
+            highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight the designation in orange (text only)
         }
     });
 }
 
-// Function to highlight matched designation in orange (excluding links)
+// Highlight matched standard designation (text only, excluding links)
 function highlightDesignationTextOnly(cell, searchString) {
-    const link = cell.find('a');
-    const textOnly = link.length ? link.text() : cell.text();
-    const originalText = textOnly.replace(/<span class="orange-highlight">(.*?)<\/span>/g, '$1');
-    const highlightedHtml = originalText.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="orange-highlight">$1</span>');
+    const link = cell.find('a'); // Check if there's a link in the cell
+    const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
+    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
 
     if (link.length) {
-        link.html(highlightedHtml); // Update inner HTML if a link is present
+        // If there's a link, update its inner HTML with highlighted text
+        link.html(highlightedHtml);
     } else {
-        cell.html(highlightedHtml); // Directly update cell HTML otherwise
+        // If no link, directly update the cell's HTML
+        cell.html(highlightedHtml);
     }
 }
 
-// Function to highlight matched words in row (excluding links)
+// Function to highlight matched words in the row (excluding links)
 function highlightWordsInRow(row, searchString) {
     row.find('td').each(function(index) {
         if (index === 1 || $(this).find('a').length > 0) {
-            return; // Skip designation or cells with links
+            return; // Skip the second column (designation) or cells with links
         }
         const cellHtml = $(this).html();
         const highlightedHtml = cellHtml.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
@@ -85,22 +85,22 @@ function highlightWordsInRow(row, searchString) {
     });
 }
 
-// Function to remove highlights
+// Function to unhighlight a row (remove <span> tags)
 function unhighlightRow(row) {
     row.find('td').each(function() {
         const cellHtml = $(this).html();
         const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-        $(this).html(unhighlightedHtml);
+        $(this).html(unhighlightedHtml); // Restore the original content
     });
 }
 
-// Main search function
+// Main search function that integrates keyword extraction, matching, and display
 export function searchRows(context) {
-    const numbers = extractNumbers(context);  // Extract complex designations
-    const keywords = extractKeywords(context);  // Extract keywords
+    const numbers = extractNumbers(context);  // Extract numbers from the context
+    const keywords = extractKeywords(context);  // Extract keywords from the context
 
-    matchAndDisplay(numbers);  // Match and display rows based on designations
+    matchAndDisplay(numbers);  // Match and display rows based on numbers
     matchAndDisplay(keywords);  // Match and display rows based on keywords
 
-    performSearch(context); // Highlight keywords and designations in orange
+    performSearch(context); // Highlight matching keywords and designation in orange
 }
