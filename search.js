@@ -1,11 +1,11 @@
-// Function to extract keywords from the context (allow alphanumeric with symbols)
+// Function to extract keywords from the context (allowing alphanumeric with prefixes and suffixes)
 export function extractKeywords(context) {
-    return context.match(/[\w\/\-:]+(?:\s+[\w\/\-:]+){0,2}/g) || []; // Capture groups with alphanumeric, '/', '-', ':'
+    return context.match(/(?:[A-Z]{2,}\s+)?[\w\/\-:]+(?:\s+[\w\/\-:]+){0,2}(?:\s+-\s+[A-Z]+)?/g) || []; // Capture complex alphanumeric patterns with optional prefixes/suffixes
 }
 
-// Function to extract complex designations including alphanumeric characters and symbols
+// Function to extract designations with potential multi-part prefixes and suffixes
 export function extractNumbers(context) {
-    return context.match(/[A-Z]{2,}\s?[A-Z]*\d+(?:[-\/:]?\d+)*(?:\s?[A-Z]*)?/gi) || []; // Match complex designation patterns
+    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:]?\d+)*(?:\s+[A-Z]+)?(?:\s+-\s+[A-Z]+)?/gi) || []; // Match complex designation patterns like "BS EN ISO 80601-2-80:2024 - TC"
 }
 
 // Function to match and display rows based on extracted items
