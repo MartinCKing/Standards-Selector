@@ -5,7 +5,7 @@ export function extractKeywords(context) {
 
 // Function to extract complex designations like "BS EN ISO 10993-18:2020+A1:2023"
 export function extractNumbers(context) {
-    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\+\s?[A-Z]?\d*(:\d{4})?)?/gi) || [];
+    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\s+\+\s+[A-Z]\d*:\d+)?/gi) || []; // Match complex designations
 }
 
 // Function to match and display rows that match the search criteria
@@ -58,11 +58,19 @@ export function performSearch(searchString) {
     });
 }
 
-// Highlight matched standard designation (text only, excluding links)
+// Function to escape special characters in the search string
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters for use in regex
+}
+
+// Function to highlight matched designation in orange (excluding links)
 function highlightDesignationTextOnly(cell, searchString) {
     const link = cell.find('a'); // Check if there's a link in the cell
     const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
-    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight orange-highlight">$1</span>');
+
+    // Escape special characters in the search string
+    const escapedSearchString = escapeRegExp(searchString);
+    const highlightedHtml = textOnly.replace(new RegExp(`(${escapedSearchString})`, 'gi'), '<span class="highlight orange-highlight">$1</span>');
 
     if (link.length) {
         // If there's a link, update its inner HTML with highlighted text
