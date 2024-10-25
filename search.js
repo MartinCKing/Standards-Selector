@@ -1,11 +1,11 @@
-// Function to extract keywords from the context (allowing alphanumeric with prefixes and suffixes)
+// Function to extract keywords from the context (allowing alphanumeric with prefixes, suffixes, and +)
 export function extractKeywords(context) {
-    return context.match(/(?:[A-Z]{2,}\s+)?[\w\/\-:]+(?:\s+[\w\/\-:]+){0,2}(?:\s+-\s+[A-Z]+)?/g) || []; // Capture complex alphanumeric patterns with optional prefixes/suffixes
+    return context.match(/(?:[A-Z]{2,}\s+)?[\w\/\-:+]+(?:\s+[\w\/\-:+]+){0,2}(?:\s+-\s+[A-Z]+)?/g) || []; // Capture complex alphanumeric patterns with optional prefixes/suffixes and "+"
 }
 
-// Function to extract designations with potential multi-part prefixes and suffixes
+// Function to extract designations with multi-part prefixes, suffixes, and + symbol
 export function extractNumbers(context) {
-    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:]?\d+)*(?:\s+[A-Z]+)?(?:\s+-\s+[A-Z]+)?/gi) || []; // Match complex designation patterns like "BS EN ISO 80601-2-80:2024 - TC"
+    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\s+[A-Z]+)?(?:\s+-\s+[A-Z]+)?/gi) || []; // Match complex designations like "BS EN ISO 10993-18:2020+A1:2023"
 }
 
 // Function to match and display rows based on extracted items
