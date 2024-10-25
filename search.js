@@ -8,8 +8,6 @@ export function extractNumbers(context) {
     return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\+\s?[A-Z]*\d*(:\d+)?)?/gi) || [];
 }
 
-}
-
 // Function to match and display rows that match the search criteria
 function matchAndDisplay(matchingItems) {
     let matchingRows = [];
