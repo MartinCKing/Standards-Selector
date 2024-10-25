@@ -50,18 +50,18 @@ export function performSearch(searchString) {
             unhighlightRow(row); // Remove highlight if no match
         }
 
-        // Check designation specifically
+        // Check designation specifically and highlight in orange
         if (designationText.includes(lowerCaseSearchString)) {
             highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight in orange
         }
     });
 }
 
-// Function to highlight matched designation (excluding links)
+// Function to highlight matched designation in orange (excluding links)
 function highlightDesignationTextOnly(cell, searchString) {
     const link = cell.find('a');
     const textOnly = link.length ? link.text() : cell.text();
-    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
+    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="orange-highlight">$1</span>');
 
     if (link.length) {
         link.html(highlightedHtml);
