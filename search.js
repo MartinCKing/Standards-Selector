@@ -1,11 +1,11 @@
-// Function to extract keywords from the context
+// Function to extract keywords from the context (for general text searches)
 export function extractKeywords(context) {
     return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
 }
 
-// Function to extract numbers from the context
+// Function to extract complex designations like "BS EN ISO 10993-18:2020+A1:2023"
 export function extractNumbers(context) {
-    return context.match(/\d+/g) || []; // Extract numbers
+    return context.match(/(?:[A-Z]{2,}\s+)?[A-Z]*\s?ISO\s?\d+(?:[-\/:+]?\d+)*(?:\s+\+\s+[A-Z]\d*:\d+)?/gi) || []; // Match complex designations
 }
 
 // Function to match and display rows that match the search criteria
@@ -62,7 +62,7 @@ export function performSearch(searchString) {
 function highlightDesignationTextOnly(cell, searchString) {
     const link = cell.find('a'); // Check if there's a link in the cell
     const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
-    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
+    const highlightedHtml = textOnly.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight orange-highlight">$1</span>');
 
     if (link.length) {
         // If there's a link, update its inner HTML with highlighted text
@@ -96,8 +96,8 @@ function unhighlightRow(row) {
 
 // Main search function that integrates keyword extraction, matching, and display
 export function searchRows(context) {
-    const numbers = extractNumbers(context);  // Extract numbers from the context
-    const keywords = extractKeywords(context);  // Extract keywords from the context
+    const numbers = extractNumbers(context);  // Extract complex designations
+    const keywords = extractKeywords(context);  // Extract keywords
 
     matchAndDisplay(numbers);  // Match and display rows based on numbers
     matchAndDisplay(keywords);  // Match and display rows based on keywords
