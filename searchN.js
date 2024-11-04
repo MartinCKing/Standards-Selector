@@ -1,3 +1,7 @@
+import { extractKeywords, extractNumbers, searchRows, performSearch } from './similaritySearch.js';
+export { extractKeywords, extractNumbers, searchRows, performSearch };
+
+
 // Function to extract keywords from the context (for general text searches)
 export function extractKeywords(context) {
     return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
