@@ -3,36 +3,11 @@ export function extractKeywords(context) {
     return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
 }
 
-
 // Function to extract complex designations like "BS EN ISO 10993-18:2020+A1:2023"
 export function extractNumbers(context) {
     return context.match(/\b(?:[A-Z]{2,}\s+)?(?:ISO|IEC|EN|MDCG|IAF|ICH|NEMA|GB\/T|ASTM|DS|AAMI|NITA|NIST|BS|CSA|CEN|TC|TR|TIR|CLC|JTC)?\s?\d{4}(?:[-\/:+]\d{1,4})*(?:\s+\+\s+[A-Z]\d*:\d+)?\b/gi) || [];
 }
 
-// Function to calculate cosine similarity based on term frequency
-function cosineSimilarity(text1, text2) {
-    const words1 = text1.toLowerCase().split(/\s+/);
-    const words2 = text2.toLowerCase().split(/\s+/);
-    
-    const wordSet = new Set([...words1, ...words2]);
-    const vector1 = Array.from(wordSet).map(word => words1.filter(w => w === word).length);
-    const vector2 = Array.from(wordSet).map(word => words2.filter(w => w === word).length);
-
-    const dotProduct = vector1.reduce((sum, val, i) => sum + val * vector2[i], 0);
-    const mag1 = Math.sqrt(vector1.reduce((sum, val) => sum + val ** 2, 0));
-    const mag2 = Math.sqrt(vector2.reduce((sum, val) => sum + val ** 2, 0));
-
-    return mag1 && mag2 ? dotProduct / (mag1 * mag2) : 0;
-}
-
-// Function to highlight semantically matched words in orange in a given cell
-function highlightSemanticMatches(cell, context) {
-    const words = context.split(/\s+/);
-    words.forEach(word => {
-        const regex = new RegExp(`(${escapeRegExp(word)})`, 'gi');
-        cell.html(cell.html().replace(regex, '<span class="highlight orange-highlight">$1</span>'));
-    });
-}
 
 // Function to match and display rows that match the search criteria
 function matchAndDisplay(matchingItems) {
@@ -43,7 +18,7 @@ function matchAndDisplay(matchingItems) {
 
         matchingItems.forEach(item => {
             if (rowText.includes(item.trim().toLowerCase())) {
-                if (!$(this).hasClass('selected-row')) {
+                if (!$(this).hasClass('selected-row')) { // Do not overwrite yellow (selected rows)
                     $(this).addClass('new-row'); // Highlight the row in green
                 }
                 matchFound = true;
@@ -70,34 +45,39 @@ export function performSearch(searchString) {
         const rowText = row.text().toLowerCase();
         const designationText = designationCell.text().toLowerCase();
 
+        // Check if the entire row contains the search string
         if (rowText.includes(lowerCaseSearchString)) {
-            highlightWordsInRow(row, lowerCaseSearchString);
+            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns except links
         } else {
-            unhighlightRow(row);
+            unhighlightRow(row); // Unhighlight if not found
         }
 
+        // Additionally, check if the designation (second column) matches the search string
         if (designationText.includes(lowerCaseSearchString)) {
-            highlightDesignationTextOnly(designationCell, lowerCaseSearchString);
+            highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight the designation in orange (text only)
         }
     });
 }
 
 // Function to escape special characters in the search string
 function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters for use in regex
 }
 
 // Function to highlight matched designation in orange (excluding links)
 function highlightDesignationTextOnly(cell, searchString) {
-    const link = cell.find('a');
-    const textOnly = link.length ? link.text() : cell.text();
+    const link = cell.find('a'); // Check if there's a link in the cell
+    const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
 
+    // Escape special characters in the search string
     const escapedSearchString = escapeRegExp(searchString);
     const highlightedHtml = textOnly.replace(new RegExp(`(${escapedSearchString})`, 'gi'), '<span class="highlight orange-highlight">$1</span>');
 
     if (link.length) {
+        // If there's a link, update its inner HTML with highlighted text
         link.html(highlightedHtml);
     } else {
+        // If no link, directly update the cell's HTML
         cell.html(highlightedHtml);
     }
 }
@@ -106,7 +86,7 @@ function highlightDesignationTextOnly(cell, searchString) {
 function highlightWordsInRow(row, searchString) {
     row.find('td').each(function(index) {
         if (index === 1 || $(this).find('a').length > 0) {
-            return;
+            return; // Skip the second column (designation) or cells with links
         }
         const cellHtml = $(this).html();
         const highlightedHtml = cellHtml.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
@@ -119,9 +99,10 @@ function unhighlightRow(row) {
     row.find('td').each(function() {
         const cellHtml = $(this).html();
         const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-        $(this).html(unhighlightedHtml);
+        $(this).html(unhighlightedHtml); // Restore the original content
     });
 }
+
 
 // Main search function that integrates keyword extraction, matching, and semantic display
 export function searchRows(context) {
