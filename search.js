@@ -4,7 +4,7 @@ export function extractKeywords(context) {
 }
 
 // Function to extract complex designations like "BS EN ISO 10993-18:2020+A1:2023"
-    export function extractNumbers(context) {
+export function extractNumbers(context) {
     return context.match(/\b(?:[A-Z]{2,}\s+)?(?:ISO|IEC|EN|MDCG|IAF|ICH|NEMA|GB\/T|ASTM|DS|AAMI|NITA|NIST|BS|CSA|CEN|TC|TR|TIR|CLC|JTC)?\s?\d{4}(?:[-\/:+]\d{1,4})*(?:\s+\+\s+[A-Z]\d*:\d+)?\b/gi) || [];
 }
 
