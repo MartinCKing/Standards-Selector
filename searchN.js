@@ -8,8 +8,7 @@ export function extractNumbers(context) {
     return context.match(/\b(?:[A-Z]{2,}\s+)?(?:ISO|IEC|EN|MDCG|IAF|ICH|NEMA|GB\/T|ASTM|DS|AAMI|NITA|NIST|BS|CSA|CEN|TC|TR|TIR|CLC|JTC)?\s?\d{4}(?:[-\/:+]\d{1,4})*(?:\s+\+\s+[A-Z]\d*:\d+)?\b/gi) || [];
 }
 
-
-// Function to match and display rows that match the search criteria
+// Function to match and display rows that match the search criteria with word count threshold
 function matchAndDisplay(matchingItems) {
     let matchingRows = [];
     $('#dataTable tbody tr').each(function() {
@@ -34,6 +33,30 @@ function matchAndDisplay(matchingItems) {
 
     $('#dataTable tbody').prepend(matchingRows);
     $('#tableContainer').scrollTop(0);
+}
+
+// Function to count matched keywords in title and abstract and highlight based on count
+function countAndHighlightMatches(row, keywords) {
+    const titleText = row.find('td:nth-child(1)').text().toLowerCase(); // Assuming title is in the first column
+    const abstractText = row.find('td:nth-child(4)').text().toLowerCase(); // Assuming abstract is in the fourth column
+
+    let titleMatchCount = 0;
+    let abstractMatchCount = 0;
+
+    // Count keyword matches in title and abstract
+    keywords.forEach(keyword => {
+        const regex = new RegExp(`\\b${escapeRegExp(keyword.trim())}\\b`, 'gi');
+        titleMatchCount += (titleText.match(regex) || []).length;
+        abstractMatchCount += (abstractText.match(regex) || []).length;
+    });
+
+    // Highlight based on word count
+    if (titleMatchCount > 1) {
+        row.addClass('title-match'); // Highlight if title has more than one keyword match
+    }
+    if (abstractMatchCount > 1) {
+        row.addClass('abstract-match'); // Highlight if abstract has more than one keyword match
+    }
 }
 
 // Function to perform keyword search and highlight them in orange (excluding links)
@@ -103,8 +126,7 @@ function unhighlightRow(row) {
     });
 }
 
-
-// Main search function that integrates keyword extraction, matching, and semantic display
+// Main search function that integrates keyword extraction and word count matching
 export function searchRows(context) {
     const numbers = extractNumbers(context); // Extract complex designations
     const keywords = extractKeywords(context); // Extract keywords
@@ -113,26 +135,10 @@ export function searchRows(context) {
     matchAndDisplay(numbers);
     matchAndDisplay(keywords);
 
-    // Perform semantic matching and highlight relevant phrases in orange
+    // Count and highlight keyword matches in title and abstract
     $('#dataTable tbody tr').each(function() {
         const row = $(this);
-        const titleText = row.find('td:nth-child(1)').text(); // Assuming title is in the first column
-        const abstractText = row.find('td:nth-child(4)').text(); // Assuming abstract is in the fourth column
-
-        // Calculate cosine similarity between the context and the title/abstract
-        const titleScore = cosineSimilarity(titleText, context);
-        const abstractScore = cosineSimilarity(abstractText, context);
-
-        // Check if row should be highlighted based on semantic similarity
-        if (titleScore > 0.5 || abstractScore > 0.5) { 
-            row.addClass('new-row'); // Apply green highlight if semantically similar
-
-            // Highlight matching words or phrases in the title and abstract
-            highlightSemanticMatches(row.find('td:nth-child(1)'), context); // Title
-            highlightSemanticMatches(row.find('td:nth-child(4)'), context); // Abstract
-        } else {
-            row.removeClass('new-row'); // Remove green highlight if not a match
-        }
+        countAndHighlightMatches(row, keywords); // Apply count-based highlighting
     });
 
     // Additional keyword search for orange highlights on exact matches
