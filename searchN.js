@@ -8,6 +8,69 @@ export function extractNumbers(context) {
     return context.match(/\b(?:[A-Z]{2,}\s+)?(?:ISO|IEC|EN|MDCG|IAF|ICH|NEMA|GB\/T|ASTM|DS|AAMI|NITA|NIST|BS|CSA|CEN|TC|TR|TIR|CLC|JTC)?\s?\d{4}(?:[-\/:+]\d{1,4})*(?:\s+\+\s+[A-Z]\d*:\d+)?\b/gi) || [];
 }
 
+// Function to calculate cosine similarity between two text strings
+function cosineSimilarity(text1, text2) {
+    const words1 = text1.toLowerCase().split(/\s+/);
+    const words2 = text2.toLowerCase().split(/\s+/);
+
+    const wordSet = new Set([...words1, ...words2]);
+    const wordMap1 = Array.from(wordSet).map(word => words1.filter(w => w === word).length);
+    const wordMap2 = Array.from(wordSet).map(word => words2.filter(w => w === word).length);
+
+    const dotProduct = wordMap1.reduce((sum, val, i) => sum + val * wordMap2[i], 0);
+    const mag1 = Math.sqrt(wordMap1.reduce((sum, val) => sum + val ** 2, 0));
+    const mag2 = Math.sqrt(wordMap2.reduce((sum, val) => sum + val ** 2, 0));
+
+    return mag1 && mag2 ? dotProduct / (mag1 * mag2) : 0;
+}
+
+// Main function to match rows based on semantic similarity and highlight
+export function searchRows(context) {
+    const numbers = extractNumbers(context);
+    const keywords = extractKeywords(context);
+
+    // Highlight rows based on exact number and keyword matches
+    matchAndDisplay(numbers);
+    matchAndDisplay(keywords);
+
+    // Perform semantic matching and highlight relevant words in orange
+    $('#dataTable tbody tr').each(function() {
+        const row = $(this);
+        const titleText = row.find('td:nth-child(1)').text(); // Assume title is in the first column
+        const abstractText = row.find('td:nth-child(4)').text(); // Assume abstract is in the fourth column
+
+        // Calculate cosine similarity between the context and the title/abstract
+        const titleScore = cosineSimilarity(titleText, context);
+        const abstractScore = cosineSimilarity(abstractText, context);
+
+        if (titleScore > 0.5 || abstractScore > 0.5) { // Adjust threshold as needed
+            row.addClass('new-row'); // Highlight row in green if it's semantically similar
+
+            // Highlight words in the title and abstract that contribute to the similarity
+            highlightSemanticMatches(row.find('td:nth-child(1)'), context); // Title
+            highlightSemanticMatches(row.find('td:nth-child(4)'), context); // Abstract
+        } else {
+            row.removeClass('new-row');
+        }
+    });
+
+    // Additional keyword search for orange highlights on exact matches
+    performSearch(context);
+}
+
+// Function to highlight semantic matches in orange in a given cell
+function highlightSemanticMatches(cell, context) {
+    const words = context.split(/\s+/);
+    words.forEach(word => {
+        const regex = new RegExp(`(${escapeRegExp(word)})`, 'gi');
+        cell.html(cell.html().replace(regex, '<span class="highlight orange-highlight">$1</span>'));
+    });
+}
+
+// Function to escape special characters in a search string
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // Function to match and display rows that match the search criteria
 function matchAndDisplay(matchingItems) {
@@ -18,7 +81,7 @@ function matchAndDisplay(matchingItems) {
 
         matchingItems.forEach(item => {
             if (rowText.includes(item.trim().toLowerCase())) {
-                if (!$(this).hasClass('selected-row')) { // Do not overwrite yellow (selected rows)
+                if (!$(this).hasClass('selected-row')) {
                     $(this).addClass('new-row'); // Highlight the row in green
                 }
                 matchFound = true;
@@ -26,9 +89,9 @@ function matchAndDisplay(matchingItems) {
         });
 
         if (matchFound) {
-            matchingRows.push(this); // Collect matching rows
+            matchingRows.push(this);
         } else {
-            $(this).removeClass('new-row'); // Remove green highlight from non-matching rows
+            $(this).removeClass('new-row');
         }
     });
 
@@ -36,48 +99,37 @@ function matchAndDisplay(matchingItems) {
     $('#tableContainer').scrollTop(0);
 }
 
-// Function to perform keyword search and highlight them in orange (excluding links)
+// Function to highlight exact keyword matches in orange
 export function performSearch(searchString) {
     const lowerCaseSearchString = searchString.trim().toLowerCase();
     $('#dataTable tbody tr').each(function() {
         const row = $(this);
-        const designationCell = row.find('td:nth-child(2)'); // Second column for standard designation
+        const designationCell = row.find('td:nth-child(2)'); // Assume designation is in the second column
         const rowText = row.text().toLowerCase();
         const designationText = designationCell.text().toLowerCase();
 
-        // Check if the entire row contains the search string
         if (rowText.includes(lowerCaseSearchString)) {
-            highlightWordsInRow(row, lowerCaseSearchString); // Highlight matches in all columns except links
+            highlightWordsInRow(row, lowerCaseSearchString);
         } else {
-            unhighlightRow(row); // Unhighlight if not found
+            unhighlightRow(row);
         }
 
-        // Additionally, check if the designation (second column) matches the search string
         if (designationText.includes(lowerCaseSearchString)) {
-            highlightDesignationTextOnly(designationCell, lowerCaseSearchString); // Highlight the designation in orange (text only)
+            highlightDesignationTextOnly(designationCell, lowerCaseSearchString);
         }
     });
 }
 
-// Function to escape special characters in the search string
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters for use in regex
-}
-
 // Function to highlight matched designation in orange (excluding links)
 function highlightDesignationTextOnly(cell, searchString) {
-    const link = cell.find('a'); // Check if there's a link in the cell
-    const textOnly = link.length ? link.text() : cell.text(); // Get only the text, excluding the link
-
-    // Escape special characters in the search string
+    const link = cell.find('a');
+    const textOnly = link.length ? link.text() : cell.text();
     const escapedSearchString = escapeRegExp(searchString);
     const highlightedHtml = textOnly.replace(new RegExp(`(${escapedSearchString})`, 'gi'), '<span class="highlight orange-highlight">$1</span>');
 
     if (link.length) {
-        // If there's a link, update its inner HTML with highlighted text
         link.html(highlightedHtml);
     } else {
-        // If no link, directly update the cell's HTML
         cell.html(highlightedHtml);
     }
 }
@@ -86,7 +138,7 @@ function highlightDesignationTextOnly(cell, searchString) {
 function highlightWordsInRow(row, searchString) {
     row.find('td').each(function(index) {
         if (index === 1 || $(this).find('a').length > 0) {
-            return; // Skip the second column (designation) or cells with links
+            return;
         }
         const cellHtml = $(this).html();
         const highlightedHtml = cellHtml.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
@@ -99,17 +151,6 @@ function unhighlightRow(row) {
     row.find('td').each(function() {
         const cellHtml = $(this).html();
         const unhighlightedHtml = cellHtml.replace(/<span class="highlight">(.*?)<\/span>/g, '$1');
-        $(this).html(unhighlightedHtml); // Restore the original content
+        $(this).html(unhighlightedHtml);
     });
-}
-
-// Main search function that integrates keyword extraction, matching, and display
-export function searchRows(context) {
-    const numbers = extractNumbers(context);  // Extract complex designations
-    const keywords = extractKeywords(context);  // Extract keywords
-
-    matchAndDisplay(numbers);  // Match and display rows based on numbers
-    matchAndDisplay(keywords);  // Match and display rows based on keywords
-
-    performSearch(context); // Highlight matching keywords and designation in orange
 }
