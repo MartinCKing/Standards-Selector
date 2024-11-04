@@ -1,5 +1,6 @@
 import { searchRows, performSearch, extractKeywords, extractNumbers } from './searchN.js';
 
+
 $(document).ready(function() {
     const csvUrl = 'https://martincking.github.io/Standards-Selector/Standards.csv';
     let allRows = [];
@@ -80,17 +81,32 @@ $(document).ready(function() {
         }
     });
 
-    // Submit context functionality: search rows based on context input
-    $('#submitContext').click(function() {
-        const context = $('#keywordInput').val(); // Get the context from the textarea
-        $('#loadingIndicator').show(); // Show the loading indicator
-        $('#progressMessage').text('Searching...');
+// Submit context functionality: search rows based on context input
+$('#submitContext').click(function() {
+    const context = $('#keywordInput').val(); // Get the context from the textarea
+    $('#loadingIndicator').show(); // Show the loading indicator
+    $('#progressMessage').text('Searching...');
 
-        // Reset the table by reconstructing rows from original structured data
-        const resetHtml = rowData.map(data => {
-            const rowHtml = `<tr data-id="${data.id}">${header.map(col => `<td>${data.content[col]}</td>`).join('')}</tr>`;
-            return rowHtml;
-        });
+    // Reset the table by reconstructing rows from original structured data
+    const resetHtml = rowData.map(data => {
+        const rowHtml = `<tr data-id="${data.id}">${header.map(col => `<td>${data.content[col]}</td>`).join('')}</tr>`;
+        return rowHtml;
+    });
+    $('#dataTable tbody').html(resetHtml.join('')); // Replace table body with reset rows
+
+    // Call searchRows to execute the search functionality
+    searchRows(context); // searchRows will handle similarity matching, highlighting, and reordering
+
+    // Optionally, you can use performSearch, extractKeywords, and extractNumbers if needed for additional processing.
+    // For example:
+    // const keywords = extractKeywords(context);
+    // const numbers = extractNumbers(context);
+    // performSearch(context);
+
+    // Hide loading indicator and update progress message after search is complete
+    $('#loadingIndicator').hide();
+    $('#progressMessage').text('Search complete');
+});
 
         // Apply the reset HTML back to the table
         $('#dataTable tbody').html(resetHtml.join(''));
