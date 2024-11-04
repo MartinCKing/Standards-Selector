@@ -3,6 +3,7 @@ export function extractKeywords(context) {
     return context.match(/(?:\w+\s+){0,2}\w+/g) || []; // Extract groups of 1-3 words
 }
 
+
 // Function to extract complex designations like "BS EN ISO 10993-18:2020+A1:2023"
 export function extractNumbers(context) {
     return context.match(/\b(?:[A-Z]{2,}\s+)?(?:ISO|IEC|EN|MDCG|IAF|ICH|NEMA|GB\/T|ASTM|DS|AAMI|NITA|NIST|BS|CSA|CEN|TC|TR|TIR|CLC|JTC)?\s?\d{4}(?:[-\/:+]\d{1,4})*(?:\s+\+\s+[A-Z]\d*:\d+)?\b/gi) || [];
@@ -127,8 +128,9 @@ export function searchRows(context) {
     const numbers = extractNumbers(context); // Extract complex designations
     const keywords = extractKeywords(context); // Extract keywords
 
-    matchAndDisplay(numbers); // Match and display rows based on numbers
-    matchAndDisplay(keywords); // Match and display rows based on keywords
+    // Highlight rows based on exact number and keyword matches
+    matchAndDisplay(numbers);
+    matchAndDisplay(keywords);
 
     // Perform semantic matching and highlight relevant phrases in orange
     $('#dataTable tbody tr').each(function() {
@@ -140,15 +142,15 @@ export function searchRows(context) {
         const titleScore = cosineSimilarity(titleText, context);
         const abstractScore = cosineSimilarity(abstractText, context);
 
-        // Highlight row in green if either title or abstract is semantically similar
-        if (titleScore > 0.5 || abstractScore > 0.5) {
-            row.addClass('new-row'); // Apply green highlight
+        // Check if row should be highlighted based on semantic similarity
+        if (titleScore > 0.5 || abstractScore > 0.5) { 
+            row.addClass('new-row'); // Apply green highlight if semantically similar
 
             // Highlight matching words or phrases in the title and abstract
             highlightSemanticMatches(row.find('td:nth-child(1)'), context); // Title
             highlightSemanticMatches(row.find('td:nth-child(4)'), context); // Abstract
         } else {
-            row.removeClass('new-row');
+            row.removeClass('new-row'); // Remove green highlight if not a match
         }
     });
 
