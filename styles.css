@@ -20,22 +20,9 @@ body {
 #tableContainer {
     width: 100%;
     max-width: 1920px;
-    flex-grow: 1;
-    overflow-x: auto;
-    overflow-y: auto;
+    height: calc(100vh - 250px); /* Adjusts dynamically to viewport height */
+    overflow-y: auto; /* Enable vertical scrolling */
     border: 1px solid #ccc;
-}
-
-h1 {
-    margin-bottom: 4px;
-    background-color: white;
-    padding: 0;
-    text-align: center;
-    line-height: 1.0;
-    height: 15px;
-    font-size: 2rem;
-    color: black;
-    border-radius: 0px;
 }
 
 table {
@@ -59,7 +46,7 @@ th, td {
 th {
     background-color: #add8e6;
     font-weight: bold;
-    position: sticky;
+    position: sticky; /* Sticky headers */
     top: 0;
     z-index: 10;
 }
@@ -74,6 +61,21 @@ tr.selected-row {
 
 tr.match-row {
     background-color: lightgreen;
+}
+
+h1 {
+    margin-bottom: 4px;
+    background-color: white;
+    padding: 0px 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    line-height: 1.0;
+    height: 15px;
+    overflow: hidden;
+    font-size: 2rem;
+    background-color: white;
+    color: black;
+    border-radius: 0px;
 }
 
 .copyright-notice {
