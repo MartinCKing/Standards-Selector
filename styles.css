@@ -17,6 +17,16 @@ body {
     font-weight: bold;
 }
 
+#dynamicLink {
+    color: yellow;
+    text-decoration: none; /* Remove underline */
+}
+
+#dynamicLink:hover {
+    color: orange; /* Optional: Change color on hover for effect */
+    text-decoration: underline; /* Add underline on hover */
+}
+
 #tableContainer {
     width: 100%;
     max-width: 1920px;
