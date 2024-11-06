@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standards Data Viewer</title>
+
+    <!-- Link to External CSS and JavaScript -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>   
+    <script src="globals.js" defer></script> <!-- Load shared globals first -->
+    <script src="dataLoader.js" defer></script>
+    <script src="filterAndHighlight.js" defer></script>
+    <script src="rowSelection.js" defer></script>
+    <script src="uiControls.js" defer></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
+</head>
+<body>
+<!-- Header -->
+<header class="custom-header">
+    <div class="content-container">
+        <div class="image-container" style="display: inline-block; align-items: center; text-align: center;">
+            <a href="https://www.linkedin.com/groups/12741229/">
+                <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo" style="width:10%; height: 10%;">
+                <img src="QARA1.png" alt="QARA Logo" style="width:3%; height: 3%;">
+            </a>          
+            <h1 style="font-size: 100%; align-items: center; padding: 0px;">
+                Ask ✅ - Med Minds 🔎 Applicable Standards & Guidance Selector
+            </h1>
+            <div class="copyright-notice">
+                &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used are protected under copyright law.
+            </div>
+        </div>
+    </div>
+</header>
+   <!-- A link placed below the textarea, aligned center -->
+    <div id="linkContainer" style="margin-top: 0px; text-align: center;">
+        <a id="dynamicLink" href="Ask ✅ - Med Minds 🔎 Applicable Standards Selector.pdf" target="_blank">
+           Instructions For Use
+        </a>
+
+        <!-- New span for the number of entries loaded -->
+        <span id="entriesLoaded" style="margin-left: 10px;">(0 entries loaded)</span>
+       
+    <div class="options-container">
+        <button id="displaySelected">Show Selected</button>
+        <button id="clearSelections">Clear Selections</button>
+        <button id="export">Export Selected</button>
+        <button id="hideAbstract">Hide Abstract</button>
+        <button id="reset">Reset</button>
+    </div>
+    
+    <!-- Table for CSV Data with Column Search Inputs -->
+    <div id="tableContainer">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>
+                        Designation
+                        <input type="text" id="designationSearch" placeholder="Search Designation" onkeyup="debouncedFilter()">
+                    </th>
+                    <th>
+                        Title of Standard
+                        <input type="text" id="titleSearch" placeholder="Search Title" onkeyup="debouncedFilter()">
+                    </th>
+                    <th>
+                        Abstract
+                        <input type="text" id="abstractSearch" placeholder="Search Abstract" onkeyup="debouncedFilter()">
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</body>
+</html>

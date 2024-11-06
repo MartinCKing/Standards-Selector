@@ -1,0 +1,99 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    background-color: black;
+    color: white;
+}
+
+.highlight {
+    background-color: orange;
+    color: black;
+    font-weight: bold;
+}
+
+#tableContainer {
+    width: 100%;
+    max-width: 1920px;
+    flex-grow: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+}
+
+h1 {
+    margin-bottom: 4px;
+    background-color: white;
+    padding: 0;
+    text-align: center;
+    line-height: 1.0;
+    height: 15px;
+    font-size: 2rem;
+    color: black;
+    border-radius: 0px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    color: black;
+}
+
+table th input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #add8e6;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+tr:nth-child(even) {
+    background-color: #e6f2ff;
+}
+
+tr.selected-row {
+    background-color: yellow;
+}
+
+tr.match-row {
+    background-color: lightgreen;
+}
+
+.copyright-notice {
+    font-size: 0.6em;
+    top: 0px;
+    center: 0px;
+    padding: 0px;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+}
+
+/* Image Container */
+.image-container {
+    background-color: white;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0px;
+    border-radius: 10px;
+    width: 100%;
+}
