@@ -1,43 +1,47 @@
 // display.js
-import { isPartialMatch, startsWithValidPrefix, designationsList } from './search.js';
+import { designationsList, isPartialMatch, startsWithValidPrefix } from './search.js';
 
-const pdfDocs = {};
-let pageTextData = [];
+console.log(designationsList);  // Check if designationsList is available
 
-function updateProgress(current, total) {
-  document.getElementById('progress-indicator').textContent = `${current} files of ${total} files read`;
+// Example function to display standards, just for demonstration
+export function displayExtractedStandards(fileName, standardsForFile) {
+  const sidebar = document.getElementById('sidebar');
+  const fileHeader = document.createElement('h3');
+  fileHeader.textContent = `Extracted Standards for ${fileName}`;
+  fileHeader.style.cursor = 'pointer';
+  sidebar.appendChild(fileHeader);
+
+  standardsForFile.forEach(standard => {
+    const entryDiv = document.createElement('div');
+    entryDiv.className = 'standard-entry';
+
+    const pageLink = document.createElement('a');
+    pageLink.href = '#';
+    pageLink.textContent = `Page ${standard.page}`;
+    pageLink.addEventListener('click', () => goToPage(standard.page, fileName));
+
+    entryDiv.appendChild(pageLink);
+    entryDiv.appendChild(document.createTextNode(`: ${standard.text}`));
+    sidebar.appendChild(entryDiv);
+  });
 }
 
-async function loadAndDisplayAllPages(pdfDoc) {
-  const pdfViewer = document.getElementById('pdf-viewer');
-  pdfViewer.innerHTML = '';
-  pageTextData = [];
+// Example function for navigating to a specific page in the PDF viewer
+export function goToPage(pageNumber, fileName) {
+  const pdfDoc = pdfDocs[fileName];
+  pdfDoc.getPage(pageNumber).then((page) => {
+    const viewport = page.getViewport({ scale: 1.5 });
+    const pdfViewer = document.getElementById('pdf-viewer');
+    
+    pdfViewer.innerHTML = ''; // Clear the viewer and render the selected page only
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    pdfViewer.appendChild(canvas);
 
-  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-    const pageContainer = document.createElement('div');
-    pageContainer.classList.add('page-container');
-    pageContainer.dataset.pageNumber = pageNum;
-    pdfViewer.appendChild(pageContainer);
-
-    const { textContent, viewport } = await renderPage(pageNum, pageContainer, pdfDoc);
-    pageTextData.push({ pageNum, textContent, viewport });
-  }
+    const context = canvas.getContext('2d');
+    page.render({ canvasContext: context, viewport: viewport }).promise;
+  }).catch(error => {
+    console.error(`Error navigating to page ${pageNumber} in ${fileName}:`, error);
+  });
 }
-
-async function renderPage(pageNum, pageContainer, pdfDoc) {
-  const page = await pdfDoc.getPage(pageNum);
-  const viewport = page.getViewport({ scale: 1.5 });
-
-  const canvas = document.createElement('canvas');
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-  pageContainer.appendChild(canvas);
-
-  const context = canvas.getContext('2d');
-  await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-  const textContent = await page.getTextContent();
-  return { textContent, viewport };
-}
-
-export { pdfDocs, loadAndDisplayAllPages, updateProgress };

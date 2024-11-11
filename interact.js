@@ -1,15 +1,18 @@
 // interact.js
 import { loadCSV } from './search.js';
-import { pdfDocs, loadAndDisplayAllPages, updateProgress } from './display.js';
+import { displayExtractedStandards, goToPage } from './display.js';
 
 const extractedStandardsPerFile = {};
 const unmatchedStandardsPerFile = {};
 
-async function handleFileUpload(event) {
+document.getElementById('pdfUpload').addEventListener('change', async (event) => {
   const files = Array.from(event.target.files);
   extractedStandardsPerFile = {};
   unmatchedStandardsPerFile = {};
 
+  const progressIndicator = document.createElement('div');
+  progressIndicator.id = 'progress-indicator';
+  document.getElementById('top-bar').appendChild(progressIndicator);
   updateProgress(0, files.length);
 
   for (const [index, file] of files.entries()) {
@@ -24,33 +27,71 @@ async function handleFileUpload(event) {
 
     updateProgress(index + 1, files.length);
   }
+});
+
+function updateProgress(current, total) {
+  const progressIndicator = document.getElementById('progress-indicator');
+  progressIndicator.textContent = `${current} files of ${total} files read`;
 }
 
-function exportToCSV() {
-  const header = "Document,Page Number,Identified Standard,Matched Standard,Title of Standard,Link\n";
-  const matchedContent = Object.keys(extractedStandardsPerFile).map(fileName =>
-    extractedStandardsPerFile[fileName].map(entry =>
-      `${entry.fileName},${entry.page},${entry.text},"${entry.matchedStandard}","${entry.title}","${entry.link}"`
-    ).join("\n")
-  ).join("\n");
+async function extractStandardsFromPDF(fileName) {
+  const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA)(?:[\/\s]?(?:T[IR]|TS|AAMI|ANSI|EN|IEC))*\s*[-/\\]*\s*[DFE]?\d+(?:\s*[-–]?\s*\d+)*(?::\s*\d{4})?(?:\+AMD\d+:\d{4})?(?:[-–\w]*\d*[a-z]*)?\b/gi;
 
-  const unmatchedHeader = "\n\nUnmatched Standards\nDocument,Page Number,Text\n";
-  const unmatchedContent = Object.keys(unmatchedStandardsPerFile).map(fileName =>
-    unmatchedStandardsPerFile[fileName].map(entry =>
-      `${entry.fileName},${entry.page},"${entry.text}"`
-    ).join("\n")
-  ).join("\n");
+  let standardsForCurrentFile = [];
+  let unmatchedForCurrentFile = [];
 
-  const fullContent = "data:text/csv;charset=utf-8," + header + matchedContent + unmatchedHeader + unmatchedContent;
-  const encodedUri = encodeURI(fullContent);
+  for (let { pageNum, textContent } of pageTextData) {
+    const pageText = textContent.items.map(item => item.str).join(' ');
+    let match;
 
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `extracted_standards.csv`);
-  link.click();
+    while ((match = standardPattern.exec(pageText)) !== null) {
+      const matchedText = match[0];
+
+      const foundDesignation = designationsList.find(d => 
+        isPartialMatch(matchedText, d.designation) && startsWithValidPrefix(d.designation)
+      );
+
+      if (foundDesignation) {
+        const standardEntry = {
+          fileName,
+          page: pageNum,
+          text: matchedText,
+          matchedStandard: foundDesignation.designation,
+          title: foundDesignation.title,
+          link: foundDesignation.url
+        };
+
+        standardsForCurrentFile.push(standardEntry);
+      } else if (startsWithValidPrefix(matchedText)) {
+        unmatchedForCurrentFile.push({ fileName, page: pageNum, text: matchedText });
+      }
+    }
+  }
+
+  extractedStandardsPerFile[fileName] = standardsForCurrentFile;
+  unmatchedStandardsPerFile[fileName] = unmatchedForCurrentFile;
+  displayExtractedStandards(fileName, standardsForCurrentFile);
+  displayUnmatchedStandards(fileName);
 }
 
-document.getElementById('pdfUpload').addEventListener('change', handleFileUpload);
-document.getElementById('exportButton').addEventListener('click', exportToCSV);
+function displayUnmatchedStandards(fileName) {
+  const sidebar = document.getElementById('sidebar');
+  const unmatchedHeader = document.createElement('h3');
+  unmatchedHeader.textContent = `Unmatched Standards for ${fileName} (Valid Prefixes)`;
+  sidebar.appendChild(unmatchedHeader);
 
-loadCSV();
+  unmatchedStandardsPerFile[fileName].forEach(standard => {
+    const entryDiv = document.createElement('div');
+    entryDiv.className = 'unmatched-standard-entry';
+
+    const pageLink = document.createElement('a');
+    pageLink.href = '#';
+    pageLink.textContent = `Page ${standard.page}`;
+    pageLink.addEventListener('click', () => goToPage(standard.page, fileName));
+
+    entryDiv.appendChild(pageLink);
+    entryDiv.appendChild(document.createTextNode(`: ${standard.text}`));
+
+    sidebar.appendChild(entryDiv);
+  });
+}
