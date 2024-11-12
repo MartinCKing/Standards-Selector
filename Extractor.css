@@ -1,0 +1,132 @@
+/* General container styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    background-color: black;
+    color: white;
+}
+
+/* Header copyright notice */
+.copyright-notice {
+    font-size: 0.6em;
+    padding: 0px;
+    border-radius: 10px;
+    background-color: black;
+    color: white;
+}
+
+/* Top bar container styling */
+#top-bar {
+    display: flex;  
+    align-items: center; /* Centers items vertically */
+    justify-content: 10px; /* Distribute space for elements */
+    gap: 10px;
+    padding: 10px;
+    background-color: #000000;
+    box-sizing: border-box;
+    position: sticky; /* Fix at top if needed */
+    top: 0;
+    z-index: 100; /* Ensures it appears above other content */
+}
+
+/* Custom file upload button styling */
+.custom-file-upload {
+    color: black;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    text-align: center;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Style for general buttons */
+button {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Hover effect for buttons */
+button:hover, .custom-file-upload:hover {
+    background-color: #d4d4d4;
+    border-color: #bbb;
+}
+
+/* Style the image container in header */
+.image-container {
+    background-color: white;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0px;
+    border-radius: 10px;
+    width: 100%;
+}
+
+/* Main title styling */
+h1 {
+    margin-bottom: 4px;
+    background-color: white;
+    padding: 0px 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    line-height: 1.0;
+    height: 15px;
+    overflow: hidden;
+    font-size: 2rem;
+    background-color: white;
+    color: black;
+    border-radius: 0px;
+}
+
+
+/* Main container for sidebar and PDF viewer */
+#container {
+    display: flex;
+    align-items: flex-start; /* Align sidebar and pdf-viewer to the top */
+    width: 100%;
+    height: calc(100vh - 60px); /* Adjust height to fit the viewport minus the top bar height */
+}
+
+/* Sidebar styling - aligns to the left edge */
+#sidebar {
+    width: 400px; /* Adjust width as needed */
+    padding: 10px;
+    overflow-y: auto;
+    height: 100%; /* Full height of #container */
+    background-color: white;
+    color: black;
+    box-sizing: border-box;
+}
+
+/* PDF viewer styling */
+#pdf-viewer {
+    flex-grow: 1; /* Takes up remaining width */
+    overflow-x: auto;
+    height: 100%; /* Full height of #container */
+    padding: 10px;
+    background-color: #f0f0f0; /* Optional background color for pdf-viewer */
+}
+
+/* Ensure canvas in viewer takes full width */
+#pdf-viewer canvas {
+    width: 100% !important;
+    height: auto;
+}
+
+/* Remove extra margin and padding */
+#pdf-viewer .page-container {
+    margin: 0;
+    padding: 0;
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF Standards Extractor with Links to Pages</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <link rel="stylesheet" href="Extractor.css">
+</head>
+<body>
+<!-- Header -->
+<header class="custom-header">
+    <div class="content-container">
+        <div class="image-container" style="display: inline-block; align-items: center; text-align: center;">
+            <a href="https://www.linkedin.com/groups/12741229/">
+                <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo" style="width:10%; height: 10%;">
+                <img src="QARA1.png" alt="QARA Logo" style="width:3%; height: 3%;">
+            </a>          
+            <h1 style="font-size: 100%; align-items: center; padding: 0px;">
+                Ask ✅ - Med Minds 🔎 Applicable Standards Checker
+            </h1>
+            <div class="copyright-notice">
+                &copy;2024 Martin King. All rights reserved. The HTML, CSS, and JavaScript code used are protected under copyright law.
+            </div>
+        </div>
+    </div>
+</header>
+  
+<!-- Top Bar -->
+<div id="top-bar">
+    <label for="pdfUpload" class="custom-file-upload">Choose Files</label>
+    <input type="file" id="pdfUpload" accept=".pdf" multiple style="display: none;" />
+    <button id="exportButton">Export to CSV</button>
+    <button id="standardsSelectorButton">Standards Selector</button>
+    
+</div>
+
+
+<div id="container">
+    <div id="sidebar"></div>
+    <div id="pdf-viewer"></div>
+</div>
+
+<!-- JavaScript for redirecting the "Standards Selector" button -->
+<script>
+    document.getElementById("standardsSelectorButton").addEventListener("click", function() {
+        window.location.href = "index.html";
+    });
+</script>
+
+<!-- Link to the external JavaScript file -->
+<script src="script.js"></script>
+</body>
+</html>

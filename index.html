@@ -9,9 +9,10 @@
     <!-- Link to External CSS and JavaScript -->
     <link rel="stylesheet" href="styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <script src="globals.js" defer></script> <!-- Load shared globals first -->
-    <script src="dataLoader.js" defer></script>
+    <script src="dataLoader.js" defer></script> <!-- Loads CSV data and populates table -->
     <script src="filterAndHighlight.js" defer></script>
     <script src="rowSelection.js" defer></script>
     <script src="uiControls.js" defer></script>
@@ -37,44 +38,65 @@
         </div>
     </div>
 </header>
-   <!-- A link placed below the textarea, aligned center -->
-    <div id="linkContainer" style="margin-top: 0px; text-align: center;">
-        <a id="dynamicLink" href="Ask ✅ - Med Minds 🔎 Applicable Standards Selector.pdf" target="_blank">
-           Instructions For Use
-        </a>
 
-        <!-- New span for the number of entries loaded -->
-        <span id="entriesLoaded" style="margin-left: 10px;">(0 entries loaded)</span>
-       
+<!-- A link placed below the textarea, aligned center -->
+<div id="linkContainer" style="margin-top: 0px; text-align: center;">
+    <a id="dynamicLink" href="Ask ✅ - Med Minds 🔎 Applicable Standards Selector.pdf" target="_blank">
+       Instructions For Use
+    </a>
+
+    <span id="entriesLoaded" style="margin-left: 10px;">(0 entries loaded)</span>
+
     <div class="options-container">
         <button id="displaySelected">Show Selected</button>
         <button id="clearSelections">Clear Selections</button>
         <button id="export">Export Selected</button>
         <button id="hideAbstract">Hide Abstract</button>
         <button id="reset">Reset</button>
+        <button id="pdfUploadButton">Check PDF Files</button>
     </div>
-    
-    <!-- Table for CSV Data with Column Search Inputs -->
-    <div id="tableContainer">
-        <table id="dataTable">
-            <thead>
-                <tr>
-                    <th>
-                        Designation
-                        <input type="text" id="designationSearch" placeholder="Search Designation" onkeyup="debouncedFilter()">
-                    </th>
-                    <th>
-                        Title of Standard
-                        <input type="text" id="titleSearch" placeholder="Search Title" onkeyup="debouncedFilter()">
-                    </th>
-                    <th>
-                        Abstract
-                        <input type="text" id="abstractSearch" placeholder="Search Abstract" onkeyup="debouncedFilter()">
-                    </th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+</div>
+
+<!-- Table for CSV Data with Column Search Inputs -->
+<div id="tableContainer">
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>
+                    Designation
+                    <input type="text" id="designationSearch" placeholder="Search Designation" onkeyup="debouncedFilter()">
+                </th>
+                <th>
+                    Title of Standard
+                    <input type="text" id="titleSearch" placeholder="Search Title" onkeyup="debouncedFilter()">
+                </th>
+                <th>
+                    Abstract
+                    <input type="text" id="abstractSearch" placeholder="Search Abstract" onkeyup="debouncedFilter()">
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table body content goes here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Container for displaying the PDF content -->
+<div id="pdf-viewer" class="pdf-viewer"></div>
+
+<!-- Sidebar for displaying extracted standards information -->
+<div id="sidebar" class="sidebar"></div>
+
+<!-- Top bar for displaying progress indicator during file processing -->
+<div id="top-bar"></div>
+
+<script>
+// JavaScript for redirecting the "Check PDF Files" button to load Extractor.html in the same window
+document.getElementById("pdfUploadButton").addEventListener("click", function() {
+    window.location.href = "Extractor.html";
+});
+</script>
+
 </body>
 </html>
