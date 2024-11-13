@@ -7,7 +7,7 @@ let pageTextData = [];
 let designationsList = [];
 
 // Define valid prefixes for standards
-const validPrefixes = ["ISO", "IEC", "IEEE", "ANSI", "BS", "DIN", "ASTM", "JIS", "AAMI", "ISTA"];
+const validPrefixes = ["ISO", "IEC", "IEEE", "ANSI", "AAMI", "BS", "DIN", "ASTM", "JIS", "ISTA", "IAF", "ICH", "CEN"];
 
 // Function to verify if a matched standard starts with a valid prefix
 function startsWithValidPrefix(text) {
@@ -136,7 +136,7 @@ async function renderPage(pageNum, pageContainer, pdfDoc) {
 
 // Extract standards from the PDF and add valid entries to extractedStandardsPerFile
 async function extractStandardsFromPDF(fileName) {
-  const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA)(?:[\/\s]?(?:T[IR]|TS|AAMI|ANSI|EN|IEC))*\s*[-/\\]*\s*[DFE]?\d+(?:\s*[-–]?\s*\d+)*(?::\s*\d{4})?(?:\+AMD\d+:\d{4})?(?:[-–\w]*\d*[a-z]*)?\b/gi;
+  const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA|IAF|ICH|CEN)(?:[\/\s-]?(?:T[IR]|TS|EN|AAMI|ANSI|IEC|BS|CEN))?\s*[-/\\]*\s*[DFE]?\d+(?:[-–]\d+)*(?:[-–]\d+)*(?:\s*:\s*\d{4})?(?:\s*(?:\/|\+)?Amd\s*\d+:\d{4})?(?:[-–\w]*\d*[a-z]*)?\b/gi;
 
   let standardsForCurrentFile = []; // Temporarily store standards for the current file
   let unmatchedForCurrentFile = []; // Temporarily store unmatched standards for the current file
