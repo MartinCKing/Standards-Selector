@@ -136,7 +136,7 @@ async function renderPage(pageNum, pageContainer, pdfDoc) {
 
 // Extract standards from the PDF and add valid entries to extractedStandardsPerFile
 async function extractStandardsFromPDF(fileName) {
-  const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA|IAF|ICH|CEN)(?:[\/\s-]?(?:T[IR]|TS|EN|AAMI|ANSI|IEC|BS|CEN))?\s*[-/\\]*\s*[DFE]?\d+(?:[-–]\d+)*(?:[-–]\d+)*(?:\s*:\s*\d{4})?(?:\s*(?:\/|\+)?Amd\s*\d+:\d{4})?(?:[-–\w]*\d*[a-z]*)?\b/gi;
+  const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA|IAF|ICH|CEN)(?:\/(?:TS|TR))?\s*[-/\\]*\s*[DFE]?\d+(?:[-–]\d+)*(?::\d{4})?(?:\+\s?AMD\d+:\d{4})?(?:[-–\w]*\d*[a-z]*)?\b/gi;
 
   let standardsForCurrentFile = []; // Temporarily store standards for the current file
   let unmatchedForCurrentFile = []; // Temporarily store unmatched standards for the current file
