@@ -1,20 +1,17 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
-let pdfDocs = {};  // Store references to each loaded PDF by filename
-let extractedStandardsPerFile = {}; // Object to store standards for each file by filename
-let unmatchedStandardsPerFile = {}; // Object to store unmatched standards for each file
+let pdfDocs = {};
+let extractedStandardsPerFile = {};
+let unmatchedStandardsPerFile = {};
 let pageTextData = [];
-let designationsList = [];
+let standardPatterns = [];
 
-// Define valid prefixes for standards
-const validPrefixes = ["ISO", "IEC", "IEEE", "ANSI", "AAMI", "BS", "DIN", "ASTM", "JIS", "ISTA", "IAF", "ICH", "CEN"];
+// Improved Regex for Matching Full Designations
+// This regex captures the standard number with optional suffixes like /Amd, /DAmd, etc.
+const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA|IAF|ICH|CEN)(?:\/(?:TS|TR))?\s*[-/]?\s*\d+(?:[-–]\d+)*(?::\d{4})?(?:\s*\/\s*(?:Amd|DAmd|PRV|RLV)\s*\d+)?\b/gi;
 
-// Function to verify if a matched standard starts with a valid prefix
-function startsWithValidPrefix(text) {
-    return validPrefixes.some(prefix => text.startsWith(prefix));
-}
 
-// Load and parse Standards.csv
+// Load and parse Standards.csv to build dynamic regex patterns from the designation column only
 async function loadCSV() {
   try {
     const response = await fetch('https://martincking.github.io/Standards-Selector/Standards.csv');
@@ -23,56 +20,68 @@ async function loadCSV() {
     }
     const csvText = await response.text();
     parseCSVData(csvText);
-    console.log("Standards CSV loaded successfully.");
+    console.log("Standards CSV loaded and patterns generated successfully.");
   } catch (error) {
     console.error("Error loading Standards.csv:", error);
   }
 }
 
-// Parse CSV data into an array of objects with designation, URL, and title
+// Parse CSV data and build regex patterns only for valid designations
 function parseCSVData(csvText) {
   const lines = csvText.split('\n');
-  designationsList = lines.slice(1).map(line => {
-    const columns = line.split(',');
-    const designation = columns[1]?.trim();
-    const urlColumn = columns.find(column => column.trim().startsWith('http'));
-    const url = urlColumn ? urlColumn.trim() : null;
-    const title = columns[2]?.trim();
 
-    if (designation && url) {
-      return { designation, url, title };
+  standardPatterns = lines.slice(1).map(line => {
+    const columns = line.split(',');
+    const designation = columns[1]?.trim();  // Column 2: Designation
+    const title = columns[2]?.trim();        // Column 3: Title
+    const url = columns[4]?.trim();          // Column 5: Link
+    
+    if (isValidDesignation(designation)) {
+      const sanitizedDesignation = sanitizeDesignation(designation);
+      const pattern = buildDesignationPattern(sanitizedDesignation);
+      return { pattern: new RegExp(pattern, 'gi'), designation, title, url };
     } else {
-      console.warn("Skipping line due to missing designation or URL:", line);
+      console.warn("Skipping invalid designation:", designation);
       return null;
     }
-  }).filter(entry => entry);
+  }).filter(Boolean);  // Remove null entries
 }
 
-// Normalize designations for consistent comparison
-function normalizeDesignation(text) {
-    return text
-        .replace(/\s*[-–]\s*/g, '-')  // Convert spaces around hyphens to a single hyphen
-        .replace(/\s+/g, ' ')         // Collapse multiple spaces to a single space
-        .replace(/\s*:\s*/, ':')      // Remove spaces around colons for years
-        .replace(/\(R\)/g, '')        // Remove (R) as it may vary in inclusion
-        .replace(/\bAmd\b/gi, 'AMD')  // Standardize Amd to AMD for consistency
-        .replace(/\bAMD\b/g, '+AMD')  // Standardize to "+AMD" to match ISO formatting
-        .replace(/\b\+?\s*AMD\d+:\d{4}\b/g, '') // Remove AMD annotations if not needed
-        .toUpperCase();               // Convert to uppercase for consistent comparison
+// Function to check if a designation is valid (e.g., ISO 12345:2020, IEC 67890)
+function isValidDesignation(designation) {
+  const validDesignationPattern = /^(ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA|IAF|ICH|CEN)[\s-]*\d+.*$/;
+  return validDesignationPattern.test(designation);
 }
 
-// Check if two designations are partial matches
-function isPartialMatch(extractedText, csvText) {
-    const normalizedExtracted = normalizeDesignation(extractedText);
-    const normalizedCSV = normalizeDesignation(csvText);
-    return normalizedExtracted.includes(normalizedCSV) || normalizedCSV.includes(normalizedExtracted);
+// Function to sanitize designations by removing problematic characters
+function sanitizeDesignation(designation) {
+  return designation.replace(/[^A-Za-z0-9\s-:]/g, ''); // Remove special characters except hyphens and colons
 }
+
+// Build a regex pattern for an individual designation, capturing suffixes, amendments, and years
+function buildDesignationPattern(designation) {
+  // Split the designation into prefix, number, and suffixes
+  const parts = designation.split(/[-\s/]+/).filter(part => /\d|^\D+$/g.test(part));
+  const prefix = parts[0];  // Prefix (ISO, IEEE, etc.)
+  const number = parts[1];  // Main number (e.g., 8536, 80369, etc.)
+  const suffixes = parts.slice(2);  // Any suffixes or amendments after the number
+
+  // Handle suffixes like Amd1, Amd 1, /DAmd 1, etc.
+  const suffixPattern = suffixes.length > 0 ? `(?:[-/\\s]?${suffixes.join('[-/\\s]?')})?` : '';
+
+  // Adjust regex to properly capture suffixes and amendments after the main number
+  const fullPattern = `\\b(?:${prefix}|ISO|IEEE)\\s*${number}(?:[-/\\s]*\\d+)*(?:[-/\\s]*[A-Za-z0-9]+)?(?:${suffixPattern})(?::\\d{4})?(?:[-/\\s]?Amd[-/\\s]?\\d+)?\\b`;
+
+  return fullPattern; // Return the full regex pattern to capture the standard number, including suffixes and amendments
+}
+
+
 
 // Handle file upload and initiate extraction
 document.getElementById('pdfUpload').addEventListener('change', async (event) => {
   const files = Array.from(event.target.files);
-  extractedStandardsPerFile = {}; // Clear previous data
-  unmatchedStandardsPerFile = {}; // Clear previous unmatched standards
+  extractedStandardsPerFile = {};
+  unmatchedStandardsPerFile = {};
   const progressIndicator = document.createElement('div');
   progressIndicator.id = 'progress-indicator';
   document.getElementById('top-bar').appendChild(progressIndicator);
@@ -83,7 +92,7 @@ document.getElementById('pdfUpload').addEventListener('change', async (event) =>
     const pdfData = new Uint8Array(await file.arrayBuffer());
 
     const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    pdfDocs[fileName] = pdfDoc; // Store PDF reference by filename
+    pdfDocs[fileName] = pdfDoc;
 
     pageTextData = [];
     await loadAndDisplayAllPages(pdfDoc);
@@ -92,7 +101,7 @@ document.getElementById('pdfUpload').addEventListener('change', async (event) =>
     updateProgress(index + 1, files.length);
   }
 
-  console.log("Final unmatched standards:", unmatchedStandardsPerFile); // Log unmatched standards
+  console.log("Final unmatched standards:", unmatchedStandardsPerFile);
 });
 
 function updateProgress(current, total) {
@@ -100,7 +109,7 @@ function updateProgress(current, total) {
   progressIndicator.textContent = `${current} files of ${total} files read`;
 }
 
-// Load and display all pages of the PDF
+// Load and display all pages of the PDF, cleaning up the text
 async function loadAndDisplayAllPages(pdfDoc) {
   const pdfViewer = document.getElementById('pdf-viewer');
   pdfViewer.innerHTML = '';
@@ -112,10 +121,17 @@ async function loadAndDisplayAllPages(pdfDoc) {
     pageContainer.dataset.pageNumber = pageNum;
     pdfViewer.appendChild(pageContainer);
 
+    // Extract and clean up text content for the page
     const { textContent, viewport } = await renderPage(pageNum, pageContainer, pdfDoc);
-    pageTextData.push({ pageNum, textContent, viewport });
+    let fullText = textContent.items.map(item => item.str).join(' ');
+
+    // Handle line breaks and hyphens at the end of lines
+    fullText = fullText.replace(/-\s*\n/g, '').replace(/\s+/g, ' ').trim();
+
+    pageTextData.push({ pageNum, fullText, viewport });
   }
 }
+
 
 // Render each page of the PDF
 async function renderPage(pageNum, pageContainer, pdfDoc) {
@@ -134,43 +150,41 @@ async function renderPage(pageNum, pageContainer, pdfDoc) {
   return { textContent, viewport };
 }
 
-// Extract standards from the PDF and add valid entries to extractedStandardsPerFile
+// Extract standards from the PDF and handle duplicates effectively
 async function extractStandardsFromPDF(fileName) {
-  const standardPattern = /\b(?:ISO|IEC|IEEE|ANSI|AAMI|BS|DIN|ASTM|JIS|ISTA|IAF|ICH|CEN)(?:\/(?:TS|TR))?\s*[-/\\]*\s*[DFE]?\d+(?:[-–]\d+)*(?::\d{4})?(?:\+\s?AMD\d+:\d{4})?(?:[-–\w]*\d*[a-z]*)?\b/gi;
+  let standardsForCurrentFile = [];
+  let unmatchedForCurrentFile = [];
+  let uniqueMatches = new Set(); // Set to keep track of unique matches per page
 
-  let standardsForCurrentFile = []; // Temporarily store standards for the current file
-  let unmatchedForCurrentFile = []; // Temporarily store unmatched standards for the current file
+  for (let { pageNum, fullText } of pageTextData) {
+    standardPatterns.forEach(({ pattern, designation, title, url }) => {
+      const regex = new RegExp(pattern, 'gi');
+      let match;
 
-  for (let { pageNum, textContent } of pageTextData) {
-    const pageText = textContent.items.map(item => item.str).join(' ');
-    let match;
+      while ((match = regex.exec(fullText)) !== null) {
+        const matchedText = match[0];
 
-    while ((match = standardPattern.exec(pageText)) !== null) {
-      const matchedText = match[0];
+        // Avoid duplicate matches using Set
+        if (!uniqueMatches.has(matchedText)) {
+          uniqueMatches.add(matchedText);
 
-      const foundDesignation = designationsList.find(d => 
-        isPartialMatch(matchedText, d.designation) && startsWithValidPrefix(d.designation)
-      );
-
-      if (foundDesignation) {
-        const standardEntry = {
-          fileName,
-          page: pageNum,
-          text: matchedText,
-          matchedStandard: foundDesignation.designation,
-          title: foundDesignation.title,
-          link: foundDesignation.url
-        };
-
-        standardsForCurrentFile.push(standardEntry);
-      } else if (startsWithValidPrefix(matchedText)) {
-        unmatchedForCurrentFile.push({ fileName, page: pageNum, text: matchedText });
+          // Store matched standard with relevant information
+          standardsForCurrentFile.push({
+            fileName,
+            page: pageNum,
+            text: matchedText,
+            matchedStandard: designation,
+            title: title || '',
+            link: url || ''
+          });
+        }
       }
-    }
+    });
   }
 
   extractedStandardsPerFile[fileName] = standardsForCurrentFile;
   unmatchedStandardsPerFile[fileName] = unmatchedForCurrentFile;
+
   displayExtractedStandards(fileName, standardsForCurrentFile);
   displayUnmatchedStandards(fileName);
 }
@@ -178,6 +192,8 @@ async function extractStandardsFromPDF(fileName) {
 // Display extracted standards in the sidebar
 function displayExtractedStandards(fileName, standardsForFile) {
   const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = ''; // Clear the sidebar
+
   const fileHeader = document.createElement('h3');
   fileHeader.textContent = `Extracted Standards for ${fileName}`;
   sidebar.appendChild(fileHeader);
@@ -186,110 +202,41 @@ function displayExtractedStandards(fileName, standardsForFile) {
     const entryDiv = document.createElement('div');
     entryDiv.className = 'standard-entry';
 
-    // Create a link for the page number
     const pageLink = document.createElement('a');
     pageLink.href = '#';
     pageLink.textContent = `Page ${standard.page}`;
     pageLink.addEventListener('click', () => goToPage(standard.page, fileName));
 
-    // Append the page link and the identified standard text
     entryDiv.appendChild(pageLink);
     entryDiv.appendChild(document.createTextNode(`: ${standard.text}`));
 
-    // Add the "Current" link below the identified standard (on a new line)
-    if (standard.matchedStandard !== "No match found") {
-      const currentLabel = document.createElement("span");
-      currentLabel.textContent = "Matched:";
-      currentLabel.style.fontWeight = "bold";  // Make "Current:" bold
-      
+    if (standard.link) {
       const link = document.createElement('a');
-      link.className = 'current-standard';
       link.href = standard.link;
       link.target = '_blank';
-      link.textContent = standard.matchedStandard;
-
-      // Create a div to ensure "Current" is on a new line
-      const currentDiv = document.createElement("div");
-      currentDiv.appendChild(currentLabel);
-      currentDiv.appendChild(link);
-      
-      // Append the div with the "Current" info to the entryDiv
-      entryDiv.appendChild(currentDiv);
+      link.textContent = ` - ${standard.matchedStandard}`;
+      entryDiv.appendChild(link);
     } else {
-      // If no match is found, display "No current standard found"
-      const noCurrent = document.createElement('div');
-      noCurrent.className = 'no-current-standard';
-      noCurrent.textContent = "No current standard found";
-
-      entryDiv.appendChild(document.createElement("br"));
-      entryDiv.appendChild(noCurrent);
+      entryDiv.appendChild(document.createTextNode(` - ${standard.matchedStandard}`));
     }
 
-    // Append the entry to the sidebar
     sidebar.appendChild(entryDiv);
   });
 }
 
-// Display unmatched standards in the sidebar
-function displayUnmatchedStandards(fileName) {
-  const sidebar = document.getElementById('sidebar');
-  const unmatchedHeader = document.createElement('h3');
-  unmatchedHeader.textContent = `Unmatched Standards for ${fileName} (Valid Prefixes)`;
-  unmatchedHeader.style.cursor = 'pointer';
-  sidebar.appendChild(unmatchedHeader);
-
-  unmatchedStandardsPerFile[fileName].forEach(standard => {
-    const entryDiv = document.createElement('div');
-    entryDiv.className = 'unmatched-standard-entry';
-
-    const pageLink = document.createElement('a');
-    pageLink.href = '#';
-    pageLink.textContent = `Page ${standard.page}`;
-    pageLink.addEventListener('click', () => goToPage(standard.page, fileName));
-
-    entryDiv.appendChild(pageLink);
-    entryDiv.appendChild(document.createTextNode(`: ${standard.text}`));
-
-    sidebar.appendChild(entryDiv);
-  });
-}
-
-// Function to navigate to a specific page in the PDF viewer based on file context
-function goToPage(pageNumber, fileName) {
-  const pdfDoc = pdfDocs[fileName]; // Retrieve the correct pdfDoc for the specified file
-
-  pdfDoc.getPage(pageNumber).then((page) => {
-    const viewport = page.getViewport({ scale: 1.5 });
-    const pdfViewer = document.getElementById('pdf-viewer');
-    
-    pdfViewer.innerHTML = ''; // Clear the viewer and render the selected page only
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    pdfViewer.appendChild(canvas);
-
-    const context = canvas.getContext('2d');
-    page.render({ canvasContext: context, viewport: viewport }).promise;
-  }).catch(error => {
-    console.error(`Error navigating to page ${pageNumber} in ${fileName}:`, error);
-  });
-}
-
-// CSV Export Function
-document.getElementById('exportButton').addEventListener('click', exportToCSV);
-
+// Update CSV Export function to avoid including duplicates and handle links correctly
 function exportToCSV() {
   const header = "Document,Page Number,Identified Standard,Matched Standard,Title of Standard,Link\n";
-  
-  const matchedContent = Object.keys(extractedStandardsPerFile).map(fileName => 
-    extractedStandardsPerFile[fileName].map(entry => 
+
+  const matchedContent = Object.keys(extractedStandardsPerFile).map(fileName =>
+    extractedStandardsPerFile[fileName].map(entry =>
       `${entry.fileName},${entry.page},${entry.text},"${entry.matchedStandard}","${entry.title}","${entry.link}"`
     ).join("\n")
   ).join("\n");
 
   const unmatchedHeader = "\n\nUnmatched Standards with Valid Prefixes\nDocument,Page Number,Text\n";
-  const unmatchedContent = Object.keys(unmatchedStandardsPerFile).map(fileName => 
-    unmatchedStandardsPerFile[fileName].map(entry => 
+  const unmatchedContent = Object.keys(unmatchedStandardsPerFile).map(fileName =>
+    unmatchedStandardsPerFile[fileName].map(entry =>
       `${entry.fileName},${entry.page},"${entry.text}"`
     ).join("\n")
   ).join("\n");
@@ -300,7 +247,7 @@ function exportToCSV() {
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
   link.setAttribute("download", `extracted_standards.csv`);
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -308,4 +255,3 @@ function exportToCSV() {
 
 // Load the CSV automatically on page load
 window.onload = loadCSV;
-
