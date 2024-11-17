@@ -101,7 +101,7 @@ h1 {
 
 /* Sidebar styling - aligns to the left edge */
 #sidebar {
-    width: 400px; /* Adjust width as needed */
+    width: 500px; /* Adjust width as needed */
     padding: 10px;
     overflow-y: auto;
     height: 100%; /* Full height of #container */
@@ -111,22 +111,22 @@ h1 {
 }
 
 /* PDF viewer styling */
-#pdf-viewer {
+#pdfViewer {
     flex-grow: 1; /* Takes up remaining width */
-    overflow-x: auto;
+    overflow: auto;
     height: 100%; /* Full height of #container */
     padding: 10px;
     background-color: #f0f0f0; /* Optional background color for pdf-viewer */
 }
 
 /* Ensure canvas in viewer takes full width */
-#pdf-viewer canvas {
-    width: 100% !important;
-    height: auto;
+#pdfViewer canvas {
+    width: Auto !important;
+    height: 100%;
 }
 
 /* Remove extra margin and padding */
-#pdf-viewer .page-container {
+#pdfViewer .page-container {
     margin: 0;
     padding: 0;
 }
