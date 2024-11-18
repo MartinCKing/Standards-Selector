@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
   // Updated regex to handle space issues around slashes and amendments
-const standardPattern = /\b(?:ISO|IEC|TIR|TR|IEEE|AAMI|ASTM|DIN|BS|EN|CEN|ISO\/IEEE|ISO\/TIR|ISO\/TR|ISO\/TS|ISO\/IEEE)\s?[A-Za-z0-9\/\-]*\d{1,4}[-–]?\d{1,4}(?::\d{4})(?:\s*(?:Amd|DAmd|PRV|RLV|Rev|Amendment)\s*\d+(?::\d{4})?\s*;?)?(?:\s*\/\s*(AWI Amd|Cor|Amd|DAmd|Rev|Amendment)\s*\d+(?::\d{4})?)?\b/g;
+const standardPattern = /\b(?:ASTM\s[A-Za-z0-9\-]+(?:\s*\d{1,4}-\d{2,4}(?:[a-zA-Z]\d+)?(?:\(\d{4}\))?)|(?:ISO|IEC|TIR|TR|IEEE|AAMI|ASTM|DIN|BS|EN|CEN|ISO\/IEEE|ISO\/TIR|ISO\/TR|ISO\/TS|ISO\/IEEE)\s?[A-Za-z0-9\/\-]*\d{1,4}[-–]?\d{1,4}(?::\d{4})(?:\s*(?:Amd|DAmd|PRV|RLV|Rev|Amendment)\s*\d+(?::\d{4})?\s*;?)?(?:\s*\/\s*(AWI Amd|Cor|Amd|DAmd|Rev|Amendment)\s*\d+(?::\d{4})?)?)\b/g;
   
   let extractedStandards = new Set();  // Use a Set to avoid duplicates
   let fileName = '';  // Variable to store the filename
