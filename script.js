@@ -1,20 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
-  const standardPattern = /\b(?:ISO|IEC|IEEE|AAMI|ASTM|DIN|BS|CEN|ISO\/TS|ISO\/IEEE)\s?[A-Za-z0-9\/\-]*\d{1,4}[-–]?\d{1,4}(?::\d{4})(?:\/[A-Za-z0-9]+\d+)?(?:\s*(?:Amd|DAmd|PRV|RLV|Rev|Amendment)\s*(\d+)(?::\d{4})?)?\b/g;
 
+  // Updated regex to handle space issues around slashes and amendments
+const standardPattern = /\b(?:ISO|IEC|TIR|TR|IEEE|AAMI|ASTM|DIN|BS|EN|CEN|ISO\/IEEE|ISO\/TIR|ISO\/TR|ISO\/TS|ISO\/IEEE)\s?[A-Za-z0-9\/\-]*\d{1,4}[-–]?\d{1,4}(?::\d{4})(?:\s*(?:Amd|DAmd|PRV|RLV|Rev|Amendment)\s*\d+(?::\d{4})?\s*;?)?(?:\s*\/\s*(AWI Amd|Cor|Amd|DAmd|Rev|Amendment)\s*\d+(?::\d{4})?)?\b/g;
+  
   let extractedStandards = new Set();  // Use a Set to avoid duplicates
-  let fileName = '';  
+  let fileName = '';  // Variable to store the filename
   let csvDesignations = [];
   let csvUrls = [];
 
   // Function to normalize designation for comparison (avoid trimming suffixes)
   function normalizeDesignation(designation) {
     return designation
-    .replace(/\s*-\s*/g, '-')  // Remove spaces around hyphens
-    .replace(/\s*:\s*/g, ':')  // Remove spaces around colons
-    .replace(/\s*\//g, '/')    // Remove spaces before slashes
-    .replace(/\s*(Amd|Rev|Amendment)\s*(\d+)/, '$1 $2')  // Preserve space between Amd and number
-    .trim();                  // Trim leading and trailing spaces
+      .replace(/\s*-\s*/g, '-')  // Remove spaces around hyphens
+      .replace(/\s*:\s*/g, ':')  // Remove spaces around colons
+      .replace(/\s*\//g, '/')    // Remove spaces before slashes
+      .replace(/\s*(Amd|Rev|Amendment)\s*(\d+)/, '$1 $2')  // Preserve space between Amd and number
+      .trim();                  // Trim leading and trailing spaces
   }
 
   // Function to parse the CSV file using Papa Parse
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
   loadCSV(); // Call loadCSV when the page loads
 
   async function extractAndDisplayTextFromPDF(file) {
-    fileName = file.name;
+    fileName = file.name;  // Store the file name for each uploaded file
 
     const pdfData = new Uint8Array(await file.arrayBuffer()); // Convert the file to array buffer
     const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise; // Load the PDF document
@@ -74,6 +76,15 @@ document.addEventListener('DOMContentLoaded', function () {
         pageMatches.forEach((match) => {
           // Clean the match up and normalize it
           let cleanedMatch = normalizeDesignation(match);
+
+          // Handle amendment at the end of the standard designation
+          const amendmentMatch = match.match(/(Amd|DAmd|PRV|RLV|Rev|Amendment)\s*(\d+)(?::\d{4})?\s*;?/);
+          if (amendmentMatch) {
+            const amendment = amendmentMatch[0];  // "Amd 1", "DAmd 1", etc.
+            cleanedMatch = cleanedMatch.replace(amendment, '').trim();  // Remove amendment from the front
+            cleanedMatch = `${cleanedMatch}${amendment}`;  // Append amendment to the description without any space before it
+          }
+
           extractedStandards.add(cleanedMatch);  // Use Set to avoid duplicates
         });
       }
@@ -91,6 +102,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (moreMatches) {
       moreMatches.forEach((match) => {
         let cleanedMatch = normalizeDesignation(match);
+
+        // Handle amendment at the end of the standard designation
+        const amendmentMatch = match.match(/(Amd|DAmd|PRV|RLV|Rev|Amendment)\s*(\d+)(?::\d{4})?\s*;?/);
+        if (amendmentMatch) {
+          const amendment = amendmentMatch[0];  // "Amd 1", "DAmd 1", etc.
+          cleanedMatch = cleanedMatch.replace(amendment, '').trim();  // Remove amendment from the front
+          cleanedMatch = `${cleanedMatch}${amendment}`;  // Append amendment to the description without any space before it
+        }
+
         extractedStandards.add(cleanedMatch);  // Use Set to avoid duplicates
       });
     }
@@ -179,5 +199,52 @@ document.addEventListener('DOMContentLoaded', function () {
         await extractAndDisplayTextFromPDF(file);  // Call your function to process each file
       }
     }
+  });
+
+  // Export to CSV functionality
+  document.getElementById('exportToCSV').addEventListener('click', function () {
+    const standards = document.querySelectorAll('#sidebar .standard-entry');
+    
+    // Prepare an array to store CSV rows
+    const csvRows = [];
+
+    // Add the header row
+    csvRows.push(['Document name', 'Extracted standard', 'Matched/Unmatched', 'Link']);
+
+    // Ensure `fileName` is set when the export button is clicked
+    if (!fileName) {
+      console.error('File name is not set.');
+      return;
+    }
+
+    const documentName = fileName; // Use the fileName for the document name
+
+    // Loop through each standard entry and extract the designation, matched status, and URL
+    standards.forEach(entry => {
+      const designationElement = entry.querySelector('a');
+      const designation = designationElement ? designationElement.textContent : null;
+      const url = designationElement ? designationElement.href : null;
+      const matchedLabel = entry.querySelector('strong').textContent;
+      
+      const matchedStatus = matchedLabel.includes('Matched') ? 'Matched' : 'Unmatched';
+
+      if (designation && url) {
+        csvRows.push([documentName, designation, matchedStatus, url]);
+      }
+    });
+
+    // Create the CSV string by joining rows
+    const csvString = csvRows.map(row => row.join(',')).join('\n');
+
+    // Create a Blob to trigger the download
+    const blob = new Blob([csvString], { type: 'text/csv' });
+
+    const csvFileName = documentName + '_extracted_standards.csv';
+
+    // Create a temporary download link and trigger it
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = csvFileName;
+    link.click();
   });
 });
