@@ -25,7 +25,7 @@ $('#export').click(function() {
     // Clear search fields to reset the UI input, but keep table as is
     $('#designationSearch, #titleSearch, #abstractSearch').val('');
 
-    let csvContent = 'Designation,Title of Standard,Abstract,Link\n';
+    let csvContent = 'Designation,Title of Standard,Link\n';
 
     // Loop through each selected row and prepare data for export
     selectedRowIds.forEach(id => {
