@@ -35,7 +35,7 @@ $('#export').click(function() {
             const title = row['Title of Standard'] || '';
             const abstract = row.Abstract || '';
             const link = row.Link || '';
-            csvContent += `"${designation}","${title}","${abstract}","${link}"\n`;
+            csvContent += `"${designation}","${title}","${link}"\n`;
         }
     });
 
