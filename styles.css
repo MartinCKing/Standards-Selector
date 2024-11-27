@@ -33,6 +33,7 @@ body {
     height: calc(100vh - 250px); /* Adjusts dynamically to viewport height */
     overflow-y: auto; /* Enable vertical scrolling */
     border: 1px solid #ccc;
+    min-height: 100vh;
 }
 
 table {
