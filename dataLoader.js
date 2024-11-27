@@ -1,37 +1,74 @@
-// This function loads CSV data and populates the table
-function loadCSV() {
-    console.log("Attempting to load CSV data..."); // Debug log
+// Initialize global namespace to avoid redeclaration issues
+window.AppState = window.AppState || {};
+AppState.abstractVisible = AppState.abstractVisible ?? true; // Default visibility state for abstracts
 
-    Papa.parse('https://martincking.github.io/Standards-Selector/Standards.csv', {
-        download: true,
-        header: true,
-        complete: function(results) {
-            if (results && results.data) {
-                allRows = results.data;
-                console.log("CSV data loaded successfully:", allRows); // Debug log
-                renderTable(allRows); // Render the table after data is loaded
+// Array of CSV file URLs
+const csvFiles = [
+    'https://martincking.github.io/Standards-Selector/Standards_ISO.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IMDRF.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IEC.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_AAMI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ASTM.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IEEE.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CEN.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_FDA.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_MDCG.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_NIST.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CSA.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_BSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ANSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_EDQM.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ICH.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CIOMS.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ISPE.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IAF.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IPEC.csv',
+];
 
-                // Update the number of entries loaded using allRows.length
-                $('#entriesLoaded').text(`(${allRows.length} entries loaded)`);
-            } else {
-                console.error("Error: CSV data could not be loaded or is empty."); // Error log
-            }
-        },
-        error: function(error) {
-            console.error("Error loading CSV:", error); // Error log for CSV loading issues
-        }
-    });
+
+async function loadMultipleCSVs(files) {
+    console.log("Loading multiple CSVs...");
+    const promises = files.map(file =>
+        new Promise((resolve, reject) => {
+            Papa.parse(file, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    if (results && results.data) {
+                        resolve(results.data);
+                    } else {
+                        reject(`Error loading ${file}`);
+                    }
+                },
+                error: function(error) {
+                    reject(error);
+                },
+            });
+        })
+    );
+
+    try {
+        const allData = await Promise.all(promises);
+        allRows = allData.flatMap(data => data.slice(0, data.length - 1)); // Remove 1 row per CSV
+        const totalEntries = allData.reduce((sum, data) => sum + data.length - 1, 0); // Adjust entry count
+        renderTable(allRows);
+        $('#entriesLoaded').text(`(${totalEntries} entries loaded)`); // Update entry count
+        console.log("All CSVs loaded successfully.");
+    } catch (error) {
+        console.error("Error loading CSVs:", error);
+    }
 }
 
-// This function renders the table rows with appropriate data-id attributes
 function renderTable(data) {
-    const rowsHTML = data.map(row => {
-        const globalIndex = allRows.indexOf(row);  // Unique identifier for each row
-        const isSelected = selectedRowIds.has(globalIndex);  // Check if row is selected
-        const designationLink = row.Link ? `<a href="${row.Link}" target="_blank">${row.Designation}</a>` : row.Designation;
-        const rowClass = isSelected ? 'selected-row' : '';  // Apply selected-row class if selected
+    const rowsHTML = data.map((row, index) => {
+        const designationLink = row.Link
+            ? `<a href="${row.Link}" target="_blank">${row.Designation}</a>`
+            : row.Designation;
 
-        return `<tr data-id="${globalIndex}" class="${rowClass}">
+        const isSelected = selectedRowIds.has(allRows.indexOf(row)); // Check if the row is selected
+        const rowClass = isSelected ? 'selected-row' : ''; // Apply selected-row class if selected
+
+        return `<tr data-id="${allRows.indexOf(row)}" class="${rowClass}">
             <td>${designationLink || ''}</td>
             <td>${row['Title of Standard'] || ''}</td>
             <td>${row.Abstract || ''}</td>
@@ -40,11 +77,21 @@ function renderTable(data) {
 
     $('#dataTable tbody').html(rowsHTML);
 
-    // Maintain abstract visibility setting
-    if (!abstractVisible) {
-        $('td:nth-child(3), th:nth-child(3)').hide();
-    }
+    // Abstract column visibility
+    const isVisible = AppState.abstractVisible;
+    $('td:nth-child(3), th:nth-child(3)').toggle(isVisible);
+
+    console.log("Table rendered successfully with data.");
 }
 
-// Initial load of CSV data
-$(document).ready(() => loadCSV());
+// Event listener for toggling abstract visibility
+$('#hideAbstract').click(function () {
+    AppState.abstractVisible = !AppState.abstractVisible; // Toggle visibility state
+    $('td:nth-child(3), th:nth-child(3)').toggle(AppState.abstractVisible); // Show/Hide abstract column
+    $(this).text(AppState.abstractVisible ? 'Hide Abstract' : 'Show Abstract'); // Update button text
+});
+
+// Initial call to load multiple CSV files
+$(document).ready(() => {
+    loadMultipleCSVs(csvFiles); // Load CSV files and populate the table
+});

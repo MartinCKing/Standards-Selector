@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const standardPattern = /\b(?:ASTM\s[A-Za-z0-9\-]+(?:\s*\d{1,4}-\d{2,4}(?:[a-zA-Z]\d+)?(?:\(\d{4}\))?)|(?:CISPR|CISPR TR|ISO\/IEC|ISO|IEC TS|IEC|IEC TR|IEC SRD|TIR|TR|IEEE|AAMI|ASTM|DIN|BS|EN|CEN|ISO\/IEEE|ISO\/TIR|ISO\/TR|ISO\/TS|ISO TR|ISO\/IEEE)\s?[A-Za-z0-9\/\-]*\d{1,4}[-–]?\d{1,4}(?::\d{4})(?:\s*(?:Amd|DAmd|AMD|PRV|RLV|Rev|CSV|CMV|Cor|Amendment)\s*\d+(?::\d{4})?\s*;?)?(?:\s*\/\s*(AWI Amd|RLV|CSV|Cor|Amd|DAmd|AMD|Rev|Amendment)\s*\d+(?::\d{4})?)?)\b/g;
 
-  let fileName = '';  // Variable to store the filename
+  let fileName = '';
   let csvDesignations = [];
   let csvUrls = [];
-  let extractedStandards = {};  // Store standards per document
+  let extractedStandards = {};
 
   // Normalize designation for comparison
   function normalizeDesignation(designation) {
@@ -18,44 +18,69 @@ document.addEventListener('DOMContentLoaded', function () {
       .trim();
   }
 
-  // Load CSV file
-  async function loadCSV() {
-    const response = await fetch('https://martincking.github.io/Standards-Selector/Standards.csv');
-    const csvText = await response.text();
+  // Load multiple CSVs
+// Array of CSV file URLs
+const csvFiles = [
+    'https://martincking.github.io/Standards-Selector/Standards_ISO.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IMDRF.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IEC.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_AAMI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ASTM.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IEEE.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CEN.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_FDA.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_MDCG.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_NIST.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CSA.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_BSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ANSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_EDQM.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ICH.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CIOMS.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ISPE.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IAF.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IPEC.csv',
+];
 
-    // Use Papa Parse to handle CSV parsing
-    const parsedCSV = Papa.parse(csvText, {
-      header: false,
-      skipEmptyLines: true,
-    });
+  async function loadCSVFiles() {
+    console.log("Loading multiple CSV files...");
+    for (let file of csvFiles) {
+      const response = await fetch(file);
+      const csvText = await response.text();
 
-    // Extract designations and URLs from CSV
-    parsedCSV.data.forEach(row => {
-      const designation = row[1] ? normalizeDesignation(row[1].trim()) : null;
-      const url = row[4] && row[4].startsWith("http") ? row[4].trim() : null;
+      // Parse the CSV file
+      const parsedCSV = Papa.parse(csvText, {
+        header: false,
+        skipEmptyLines: true,
+      });
 
-      if (designation && url) {
-        csvDesignations.push(designation);
-        csvUrls.push(url);
-      }
-    });
+      // Extract designations and URLs
+      parsedCSV.data.forEach(row => {
+        const designation = row[1] ? normalizeDesignation(row[1].trim()) : null;
+        const url = row[4] && row[4].startsWith("http") ? row[4].trim() : null;
 
-    console.log("Loaded designations from CSV:", csvDesignations);
-    console.log("Loaded URLs from CSV:", csvUrls);
+        if (designation && url) {
+          csvDesignations.push(designation);
+          csvUrls.push(url);
+        }
+      });
+    }
+
+    console.log("Loaded designations from all CSVs:", csvDesignations);
+    console.log("Loaded URLs from all CSVs:", csvUrls);
   }
 
-  loadCSV();
+  loadCSVFiles();
 
   // Function to extract and display text from PDF
   async function extractAndDisplayTextFromPDF(file) {
     fileName = file.name;
-    extractedStandards[fileName] = new Set();  // Initialize new Set for the file
+    extractedStandards[fileName] = new Set();
 
     const pdfData = new Uint8Array(await file.arrayBuffer());
     const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
     let fullText = '';
 
-    // Loop through pages of the PDF
     for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
       const page = await pdfDoc.getPage(pageNum);
       const textContent = await page.getTextContent();
@@ -64,15 +89,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
       console.log(`Page ${pageNum} text:`, pageText);
 
-      // Match standards on this page
       let pageMatches = pageText.match(standardPattern);
       if (pageMatches) {
-        console.log(`Page ${pageNum} matches:`, pageMatches);
-
-        // Add matches to extractedStandards for this file
         pageMatches.forEach((match) => {
           let cleanedMatch = normalizeDesignation(match);
-
           const amendmentMatch = match.match(/(Amd|DAmd|PRV|RLV|Rev|Amendment)\s*(\d+)(?::\d{4})?\s*;?/);
           if (amendmentMatch) {
             const amendment = amendmentMatch[0];
@@ -89,12 +109,9 @@ document.addEventListener('DOMContentLoaded', function () {
     fullText = fullText.replace(/\s+/g, ' ').trim();
 
     let moreMatches = fullText.match(standardPattern);
-    console.log("Additional matches found:", moreMatches);
-
     if (moreMatches) {
       moreMatches.forEach((match) => {
         let cleanedMatch = normalizeDesignation(match);
-
         const amendmentMatch = match.match(/(Amd|DAmd|PRV|RLV|Rev|Amendment)\s*(\d+)(?::\d{4})?\s*;?/);
         if (amendmentMatch) {
           const amendment = amendmentMatch[0];
@@ -114,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function () {
   function displayExtractedStandards(fileName, standards) {
     const sidebar = document.getElementById('sidebar');
 
-    // Create a header if it doesn't exist for the file
     if (!document.getElementById(`file-header-${fileName}`)) {
       const fileHeader = document.createElement('h3');
       fileHeader.id = `file-header-${fileName}`;
@@ -128,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
       entryDiv.className = 'standard-entry';
 
       if (matchIndex !== -1) {
-        // Matched: hyperlink the standard
         const matchedLabel = document.createElement('strong');
         matchedLabel.textContent = 'Matched: ';
         const link = document.createElement('a');
@@ -141,7 +156,6 @@ document.addEventListener('DOMContentLoaded', function () {
         entryDiv.appendChild(matchedLabel);
         entryDiv.appendChild(link);
       } else {
-        // Unmatched: display as unmatched
         const unmatchedLabel = document.createElement('strong');
         unmatchedLabel.textContent = 'Unmatched: ';
         const unmatchedText = document.createTextNode(standard);
@@ -149,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
         entryDiv.appendChild(unmatchedText);
       }
 
-      sidebar.appendChild(entryDiv);  // Append the new standard entry to the sidebar
+      sidebar.appendChild(entryDiv);
     });
   }
 
@@ -180,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Event listener for file upload
   document.getElementById('pdfUpload').addEventListener('change', async (event) => {
     const files = event.target.files;
     if (files) {
