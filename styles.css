@@ -110,3 +110,18 @@ h1 {
     border-radius: 10px;
     width: 100%;
 }
+
+.light-blue-button {
+    background-color: lightblue; /* Light blue background */
+    color: black; /* Black text for contrast */
+    border: none; /* Remove border */
+    padding: 4px 4px; /* Add padding for better appearance */
+    font-size: 12x; /* Set font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.light-blue-button:hover {
+    background-color: #87CEEB; /* Slightly darker light blue on hover */
+    color: white; /* White text for better contrast */
+}
