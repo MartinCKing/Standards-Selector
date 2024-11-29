@@ -30,3 +30,15 @@ $('#clearSelections').click(function() {
     selectedRowIds.clear();
     $('#dataTable tbody tr').removeClass('selected-row');
 });
+
+// Populate the designation search field with "MDCG" when the button is clicked
+$('#MDCG').click(function () {
+    $('#designationSearch').val('MDCG'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "MDCG" when the button is clicked
+$('#FDA').click(function () {
+    $('#designationSearch').val('FDA'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
