@@ -37,8 +37,100 @@ $('#MDCG').click(function () {
     debouncedFilter(); // Trigger the filtering function
 });
 
-// Populate the designation search field with "MDCG" when the button is clicked
+// Populate the designation search field with "FDA" when the button is clicked
 $('#FDA').click(function () {
     $('#designationSearch').val('FDA'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "ICH" when the button is clicked
+$('#ICH').click(function () {
+    $('#designationSearch').val('ICH'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "IMDRF" when the button is clicked
+$('#IMDRF').click(function () {
+    $('#designationSearch').val('IMDRF'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "IPEC" when the button is clicked
+$('#IPEC').click(function () {
+    $('#designationSearch').val('IPEC'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "EDQM" when the button is clicked
+$('#EDQM').click(function () {
+    $('#designationSearch').val('EDQM'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+
+// Populate the designation search field with "CIOMS" when the button is clicked
+$('#CIOMS').click(function () {
+    $('#designationSearch').val('CIOMS'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "ISPE" when the button is clicked
+$('#ISPE').click(function () {
+    $('#designationSearch').val('ISPE'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "ISO" when the button is clicked
+$('#ISO').click(function () {
+    $('#designationSearch').val('ISO'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+
+// Populate the designation search field with "IEC" when the button is clicked
+$('#IEC').click(function () {
+    $('#designationSearch').val('IEC'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "ASTM" when the button is clicked
+$('#ASTM').click(function () {
+    $('#designationSearch').val('ASTM'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "CEN" when the button is clicked
+$('#CEN').click(function () {
+    $('#designationSearch').val('CEN'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "AAMI" when the button is clicked
+$('#AAMI').click(function () {
+    $('#designationSearch').val('AAMI'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "BSI" when the button is clicked
+$('#BSI').click(function () {
+    $('#designationSearch').val('BS'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "ANSI" when the button is clicked
+$('#ANSI').click(function () {
+    $('#designationSearch').val('ANSI'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "CSA" when the button is clicked
+$('#CSA').click(function () {
+    $('#designationSearch').val('CSA'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
+
+// Populate the designation search field with "IAF" when the button is clicked
+$('#IAF').click(function () {
+    $('#designationSearch').val('IAF'); // Set the value of the designation search input
     debouncedFilter(); // Trigger the filtering function
 });
