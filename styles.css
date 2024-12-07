@@ -37,6 +37,7 @@ body {
 }
 
 table {
+    table-layout: auto;
     width: 100%;
     border-collapse: collapse;
     background-color: white;
@@ -60,6 +61,12 @@ th {
     position: sticky; /* Sticky headers */
     top: 0;
     z-index: 10;
+}
+
+/* Set the Designation column width to fit the content */
+th:first-child, td:first-child {
+    white-space: nowrap;
+    max-width: max-content;
 }
 
 tr:nth-child(even) {
