@@ -37,7 +37,6 @@ body {
 }
 
 table {
-    table-layout: auto;
     width: 100%;
     border-collapse: collapse;
     background-color: white;
@@ -65,8 +64,7 @@ th {
 
 /* Set the Designation column width to fit the content */
 th:first-child, td:first-child {
-    white-space: nowrap;
-    max-width: 200px; /* Adjust this value as needed */
+    max-width: 300px; /* Adjust this value as needed */
     overflow: hidden;
     text-overflow: ellipsis; /* Adds '...' for overflowed content */
 }
