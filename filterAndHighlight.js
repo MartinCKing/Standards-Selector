@@ -7,6 +7,7 @@ function debouncedFilter() {
 
 // Filter table based on search input in each column, expanding to other columns if no matches
 function filterTable() {
+    const asdAcronymSearch = $('#asdAcronymSearch').val().toLowerCase();
     const designationSearch = $('#designationSearch').val().toLowerCase();
     const titleSearch = $('#titleSearch').val().toLowerCase();
     const abstractSearch = $('#abstractSearch').val().toLowerCase();
@@ -18,6 +19,7 @@ function filterTable() {
         if (designationSearch && (row.Designation || '').toLowerCase().includes(designationSearch)) matchCount++;
         if (titleSearch && (row['Title of Standard'] || '').toLowerCase().includes(titleSearch)) matchCount++;
         if (abstractSearch && (row.Abstract || '').toLowerCase().includes(abstractSearch)) matchCount++;
+        if (asdAcronymSearch && (row.Designation || '').toLowerCase().includes(asdAcronymSearch)) matchCount++;
         rowsWithMatchCounts.push({ row, matchCount });
     });
 
