@@ -19,7 +19,7 @@ function filterTable() {
         if (designationSearch && (row.Designation || '').toLowerCase().includes(designationSearch)) matchCount++;
         if (titleSearch && (row['Title of Standard'] || '').toLowerCase().includes(titleSearch)) matchCount++;
         if (abstractSearch && (row.Abstract || '').toLowerCase().includes(abstractSearch)) matchCount++;
-        if (asdAcronymSearch && (row.Designation || '').toLowerCase().includes(asdAcronymSearch)) matchCount++;
+        if (asdAcronymSearch && (row['ASD Acronym'] || '').toLowerCase().includes(asdAcronymSearch)) matchCount++;
         rowsWithMatchCounts.push({ row, matchCount });
     });
 
