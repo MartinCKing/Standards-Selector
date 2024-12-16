@@ -141,3 +141,9 @@ $('#FDA_Consensus_Standards').click(function () {
     debouncedFilter(); // Trigger the filtering function
 });
 
+// Populate the designation search field with "NIST" when the button is clicked
+$('#NIST').click(function () {
+    $('#asdAcronymSearch').val('NIST'); // Match exact CSV value
+    debouncedFilter(); // Trigger the filtering function
+});
+
