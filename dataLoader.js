@@ -24,6 +24,7 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Standards_IAF.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_IPEC.csv',
     'https://martincking.github.io/Standards-Selector/FDA_Consensus_Standards.csv',
+    'https://martincking.github.io/Standards-Selector/Guidance_PICS.csv',
 ];
 
 
