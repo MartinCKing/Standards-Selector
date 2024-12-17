@@ -147,3 +147,8 @@ $('#NIST').click(function () {
     debouncedFilter(); // Trigger the filtering function
 });
 
+// Populate the designation search field with "PIC/S" when the button is clicked
+$('#PIC/S').click(function () {
+    $('#asdAcronymSearch').val('PIC/S'); // Match exact CSV value
+    debouncedFilter(); // Trigger the filtering function
+});
