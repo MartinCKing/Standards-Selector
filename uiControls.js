@@ -15,7 +15,7 @@ $('#displaySelected').click(function() {
 });
 
 $('#hideAbstract').click(function() {
-    !abstractVisible = abstractVisible;
+    abstractVisible = !abstractVisible;
     $('td:nth-child(3), th:nth-child(3)').toggle(abstractVisible);
     $(this).text(abstractVisible ? 'Hide Abstract' : 'Show Abstract');
 });
