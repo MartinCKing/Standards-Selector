@@ -25,6 +25,43 @@
 </script>
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
+
+<script>
+    // Function to get query parameters from the URL
+    function getQueryParams() {
+        const params = {};
+        const queryString = window.location.search.substring(1);
+        const pairs = queryString.split("&");
+
+        for (let pair of pairs) {
+            const [key, value] = pair.split("=");
+            params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+        }
+
+        return params;
+    }
+
+    // Auto-populate fields based on URL parameters
+    document.addEventListener("DOMContentLoaded", function () {
+        const params = getQueryParams();
+
+        if (params.designation) {
+            document.getElementById("designationSearch").value = params.designation;
+        }
+
+        if (params.title) {
+            document.getElementById("titleSearch").value = params.title;
+        }
+
+        if (params.abstract) {
+            document.getElementById("abstractSearch").value = params.abstract;
+        }
+
+        // Optionally trigger the filter function
+        debouncedFilter();
+    });
+</script>
+
 </head>
 <body>
 <!-- Header -->
