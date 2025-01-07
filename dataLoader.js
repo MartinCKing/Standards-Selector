@@ -1,6 +1,6 @@
 // Initialize global namespace to avoid redeclaration issues
 window.AppState = window.AppState || {};
-AppState.abstractVisible = AppState.abstractVisible ?? true; // Default visibility state for abstracts
+AppState.abstractVisible = AppState.abstractVisible ?? false; // Default visibility state for abstracts
 
 // Array of CSV file URLs
 const csvFiles = [
