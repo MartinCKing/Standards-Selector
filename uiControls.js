@@ -158,3 +158,12 @@ $('#GHWP').click(function () {
     $('#asdAcronymSearch').val('GHWP'); // Match exact CSV value
     debouncedFilter(); // Trigger the filtering function
 });
+
+// Handle dropdown menu selection
+$('#guidanceDropdown').change(function () {
+    const selectedValue = $(this).val(); // Get the selected value from the dropdown
+    if (selectedValue) {
+        $('#asdAcronymSearch').val(selectedValue); // Set the value of the designation search input
+        debouncedFilter(); // Trigger the filtering function
+    }
+});

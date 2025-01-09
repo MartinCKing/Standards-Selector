@@ -17,6 +17,13 @@ body {
     font-weight: bold;
 }
 
+.dropdown-menu {
+    font-size: 16px;
+    padding: 5px;
+    width: 300px;
+    margin-right: 10px;
+}
+
 #dynamicLink {
     color: yellow;
     text-decoration: none; /* Remove underline */

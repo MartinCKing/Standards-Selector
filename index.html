@@ -97,31 +97,37 @@
         <button id="hideAbstract">Show Abstract</button>
         <button id="pdfUploadButton">Check PDF Files</button>
     </div>
-    <div class="additional-options-container" margin-top: 10px; text-align: center;">
-	<button id="MDCG" class="light-blue-button">MDCG Guidance</button>
-	<button id="FDA" class="light-blue-button">FDA Guidance</button>
-	<button id="ICH" class="light-blue-button">ICH Guidance</button>
-	<button id="IMDRF" class="light-blue-button">IMDRF Guidance</button>
-	<button id="IPEC" class="light-blue-button">IPEC Guidance</button>
-	<button id="EDQM" class="light-blue-button">EDQM Guidance</button>
-	<button id="CIOMS" class="light-blue-button">CIOMS Guidance</button>
-	<button id="ISPE" class="light-blue-button">ISPE Guidance</button>
-        <button id="NIST" class="light-blue-button">NIST Guidance</button>	
-        <button id="PICS" class="light-blue-button">PIC/S Guidance</button>	
-        <button id="GHWP" class="light-blue-button">GHWP Guidance</button>	
-    </div>
-    <div class="additional-options-container2" margin-top: 10px; text-align: center;">
-	<button id="ISO" class="light-blue-button">ISO Standards</button>
-        <button id="IEC" class="light-blue-button">IEC Standards</button>
-	<button id="ASTM" class="light-blue-button">ASTM Standards</button>
-	<button id="CEN" class="light-blue-button">CEN Standards</button>
-	<button id="AAMI" class="light-blue-button">AAMI Standards</button>
-	<button id="BSI" class="light-blue-button">BSI Standards</button>
-	<button id="ANSI" class="light-blue-button">ANSI Standards</button>
-	<button id="CSA" class="light-blue-button">CSA Standards</button>
-	<button id="IAF" class="light-blue-button">IAF Standards</button>
-	<button id="FDA_Consensus_Standards" class="light-blue-button">FDA Consensus Standards</button>  
-    </div>
+<div class="additional-options-container">
+    <select id="guidanceDropdown" class="dropdown-menu">
+        <option disabled selected>Select Guidance or Standard Group</option>
+        <optgroup label="Guidance">
+            <option value="MDCG">MDCG Guidance</option>
+            <option value="FDA">FDA Guidance</option>
+            <option value="ICH">ICH Guidance</option>
+            <option value="IMDRF">IMDRF Guidance</option>
+            <option value="IPEC">IPEC Guidance</option>
+            <option value="EDQM">EDQM Guidance</option>
+            <option value="CIOMS">CIOMS Guidance</option>
+            <option value="ISPE">ISPE Guidance</option>
+            <option value="NIST">NIST Guidance</option>
+            <option value="PICS">PIC/S Guidance</option>
+            <option value="GHWP">GHWP Guidance</option>
+        </optgroup>
+        <optgroup label="Standards">
+            <option value="ISO">ISO Standards</option>
+            <option value="IEC">IEC Standards</option>
+            <option value="ASTM">ASTM Standards</option>
+            <option value="CEN">CEN Standards</option>
+            <option value="AAMI">AAMI Standards</option>
+            <option value="BSI">BSI Standards</option>
+            <option value="ANSI">ANSI Standards</option>
+            <option value="CSA">CSA Standards</option>
+            <option value="IAF">IAF Standards</option>
+            <option value="FDA_Consensus_Standards">FDA Consensus Standards</option>
+        </optgroup>
+    </select>
+    <button id="Select Group">Go</button>
+</div>
 
 </div>
 
@@ -151,34 +157,12 @@
         </tbody>
     </table>
 </div>
-
-<!-- Container for displaying the PDF content -->
-<div id="pdf-viewer" class="pdf-viewer"></div>
-
-<!-- Sidebar for displaying extracted standards information -->
-<div id="sidebar" class="sidebar"></div>
-
-<!-- Top bar for displaying progress indicator during file processing -->
-<div id="top-bar"></div>
-
-<script>
-// JavaScript for redirecting the "Check PDF Files" button to load Extractor.html in the same window
-document.getElementById("pdfUploadButton").addEventListener("click", function() {
-    window.location.href = "Extractor.html";
 });
 </script>
 
-</body>
-</html>
-
-<!-- Container for displaying the PDF content -->
-<div id="pdf-viewer" class="pdf-viewer"></div>
-
-<!-- Sidebar for displaying extracted standards information -->
-<div id="sidebar" class="sidebar"></div>
-
-<!-- Top bar for displaying progress indicator during file processing -->
-<div id="top-bar"></div>
 
 </body>
+
+
 </html>
+
