@@ -136,7 +136,7 @@ $('#IAF').click(function () {
 });
 
 // Populate the designation search field with "FDA Consensus Standards" when the button is clicked
-$('#FDA_Consensus_Standards').click(function () {
+$('#FDACS').click(function () {
     $('#asdAcronymSearch').val('FDACS'); // Match exact CSV value
     debouncedFilter(); // Trigger the filtering function
 });
