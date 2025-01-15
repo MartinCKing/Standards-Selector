@@ -43,23 +43,41 @@
 
     // Auto-populate fields based on URL parameters
     document.addEventListener("DOMContentLoaded", function () {
-        const params = getQueryParams();
+    const params = getQueryParams();
 
-        if (params.designation) {
-            document.getElementById("designationSearch").value = params.designation;
+    if (params.designation) {
+        document.getElementById("designationSearch").value = params.designation;
+    }
+
+    if (params.title) {
+        document.getElementById("titleSearch").value = params.title;
+    }
+
+    if (params.abstract) {
+        document.getElementById("abstractSearch").value = params.abstract;
+    }
+
+    // Auto-select the FDA Consensus Standards in the dropdown if specified
+
+    if (params.dropdownwindow) {
+        const dropdown = document.getElementById("guidanceDropdown");
+        const options = dropdown.options;
+    
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === params.dropdownwindow) {
+                dropdown.selectedIndex = i;
+    
+                    // Dispatch a 'change' event to trigger any associated logic
+                    dropdown.dispatchEvent(new Event('change'));
+                    break;
+            }
         }
+    }
 
-        if (params.title) {
-            document.getElementById("titleSearch").value = params.title;
-        }
+    // Optionally trigger the filter function
+    debouncedFilter();
+});
 
-        if (params.abstract) {
-            document.getElementById("abstractSearch").value = params.abstract;
-        }
-
-        // Optionally trigger the filter function
-        debouncedFilter();
-    });
 </script>
 
 </head>
