@@ -1,4 +1,20 @@
 ASD Acronym,Designation,Title of Standard,Abstract,Link
+ISO,ISO/TS 6268-1:2025,Health informatics — Cybersecurity framework for telehealth environments — Part 1: Overview and concepts,"""This document provides a concept and overview of the overall cybersecurity framework for systems and services applied to telehealth.
+
+This document contains a general description of:
+
+—     concept and introduction of telehealth cybersecurity;
+
+—     actors of telehealth services;
+
+—     activities of telehealth services;
+
+—     environments of telehealth services;
+
+—     variables of telehealth security.""",https://www.iso.org/standard/82154.html
+ISO,ISO/TS 6201:2025,Health informatics — Personalized digital health framework,"""This document specifies a framework for the interoperability of services and information tailored towards personalized digital health informatics. It establishes a common set of requirements and data specifications necessary for multi-level interoperability, as well as for dynamic consent and knowledge sharing.""",https://www.iso.org/standard/82107.html
+ISO,ISO/TR 18965:2025,Medical devices — Examples of the application of the risk management process to cardiac valve replacement and repair systems,"""This document illustrates the implementation of the risk management process to the total product life cycle of cardiac valve replacement and repair systems. It provides specific examples of how risk management requirements and concepts can be applied to new or modified cardiac valve replacement and repair systems. The informative examples included herein are not exhaustive.""",https://www.iso.org/standard/85497.html
+ISO,ISO 18190:2025,Anaesthetic and respiratory equipment — General requirements for airway devices and related equipment,"""This document specifies the general requirements common to airway devices and related equipment.""",https://www.iso.org/standard/85638.html
 ISO ,ISO/TR 33402:2025,Good practice in reference material preparation,"""This document gives general information on the key steps for the preparation of candidate matrix reference materials (RMs) including the material specification, sourcing and selection of bulk material, and the processing of the material, which are important steps for the production of matrix RMs.
 
 The document provides information on the preparation of candidate RMs for laboratory staff who prepare and use matrix materials for their specific applications. This document can also be used by reference material producers (RMPs) as an information source for the preparation of the RMs that they produce.
