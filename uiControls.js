@@ -158,6 +158,11 @@ $('#GHWP').click(function () {
     $('#asdAcronymSearch').val('GHWP'); // Match exact CSV value
     debouncedFilter(); // Trigger the filtering function
 });
+// Populate the designation search field with "MEDDEV" when the button is clicked
+$('#MEDDEV').click(function () {
+    $('#asdAcronymSearch').val('MEDDEV'); // Match exact CSV value
+    debouncedFilter(); // Trigger the filtering function
+});
 // Populate the designation search field with "MDSAP" when the button is clicked
 $('#MDSAP').click(function () {
     $('#asdAcronymSearch').val('MDSAP'); // Match exact CSV value
