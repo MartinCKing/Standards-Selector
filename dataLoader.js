@@ -29,6 +29,7 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Guidance_MEDDEV.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_MDSAP.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_ECHA.csv',
+    'https://martincking.github.io/Standards-Selector/Guidance_GHS.csv',
 ];
 
 
