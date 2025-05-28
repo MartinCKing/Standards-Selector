@@ -128,7 +128,11 @@ $('#CSA').click(function () {
     $('#asdAcronymSearch').val('CSA'); // Set the value of the designation search input
     debouncedFilter(); // Trigger the filtering function
 });
-
+// Populate the designation search field with "ECHA" when the button is clicked
+$('#ECHA').click(function () {
+    $('#asdAcronymSearch').val('ECHA'); // Set the value of the designation search input
+    debouncedFilter(); // Trigger the filtering function
+});
 // Populate the designation search field with "IAF" when the button is clicked
 $('#IAF').click(function () {
     $('#asdAcronymSearch').val('IAF'); // Set the value of the designation search input
