@@ -149,18 +149,18 @@ MDCG,NBOG BPG 2017-2,Best practice guidance on the information required for pers
 MDCG,NBOG F 2017-7,Review of qualification for the authorisation of personnel (MDR),"Visit the link for more information",https://health.ec.europa.eu/document/download/d7183af8-a1ef-4f5d-b351-41a34f1a2049_en?filename=md_mdcg_2017_7_nbog_mdr_en.doc,
 MDCG,NBOG F 2017-8,Review of qualification for the authorisation of personnel (IVDR),"Visit the link for more information",https://health.ec.europa.eu/document/download/28cff0d2-72c7-48d0-83fb-8e698dc51671_en?filename=md_mdcg_2017_8_nbog_mdr_en.doc,
 MDCG,Q&A,"Q&A on practical aspects related to the implementation of the extended transitional period provided for in the IVDR, as amended by Regulation (EU) 2024/1860","Visit the link for more information",https://health.ec.europa.eu/document/download/dfd7a1c6-f319-4682-9bac-77bef1165818_en?filename=mdr_qna-ext-ivdr.pdf,
-MDCG,Guidance,MIR 7.3.1. PDF form SB 10449 ,Visit the link for more information,https://health.ec.europa.eu/document/download/e8ce9f53-82cb-44c8-a06e-91ad71c16b01_en?filename=md_new-reg_mir-form-v7.3.1_en.pdf
-MDCG,Guidance,request the password for specific authorised uses,Visit the link for more information,https://ec.europa.eu/eusurvey/runner/EUDAMED_MIRpwdrequest
-MDCG,Guidance,New manufacturer incident report XSD files and XSL files,Visit the link for more information,https://health.ec.europa.eu/document/download/12d3a3db-b089-482d-b0d1-44e7cd2324da_en?filename=md_new-reg_mir-xsd-xsl-v7.3.1_en.zip
-MDCG,Guidance,New manufacturer incident report helptext,Visit the link for more information,https://health.ec.europa.eu/document/download/dc6acc1b-f1ae-4512-b838-2fae869124c3_en?filename=md_new-reg_mir-help-v7.3.1_en.pdf
-MDCG,Guidance,Changelog file,Visit the link for more information,https://health.ec.europa.eu/document/download/6d4a14de-c05f-4d50-975f-f20dfa0fa1c2_en?filename=md_new-reg_mir-changelog-v7.3.1_en.txt
-MDCG,Guidance,Field safety corrective action - FSCA,Visit the link for more information,https://health.ec.europa.eu/document/download/6fd3a214-89de-4f16-a7d2-746271068cc7_en?filename=md_new-reg_fsca-report_en.pdf
-MDCG,Guidance,Field safety notice template,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32521
-MDCG,Guidance,FSN customer reply,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32516
-MDCG,Guidance,FSN distributor/importer reply,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32517
-MDCG,Guidance,FSN Q&A,Visit the link for more information,https://ec.europa.eu/docsroom/documents/31933
-MDCG,Guidance,Trend report,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32305/attachments/6/translations
-MDCG,Guidance,Periodic summary report,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32305/attachments/7/translations
+MDCG,Guidance,MIR 7.3.1. PDF form SB 10449 ,Visit the link for more information,https://health.ec.europa.eu/document/download/e8ce9f53-82cb-44c8-a06e-91ad71c16b01_en?filename=md_new-reg_mir-form-v7.3.1_en.pdf,
+MDCG,Guidance,request the password for specific authorised uses,Visit the link for more information,https://ec.europa.eu/eusurvey/runner/EUDAMED_MIRpwdrequest,
+MDCG,Guidance,New manufacturer incident report XSD files and XSL files,Visit the link for more information,https://health.ec.europa.eu/document/download/12d3a3db-b089-482d-b0d1-44e7cd2324da_en?filename=md_new-reg_mir-xsd-xsl-v7.3.1_en.zip,
+MDCG,Guidance,New manufacturer incident report helptext,Visit the link for more information,https://health.ec.europa.eu/document/download/dc6acc1b-f1ae-4512-b838-2fae869124c3_en?filename=md_new-reg_mir-help-v7.3.1_en.pdf,
+MDCG,Guidance,Changelog file,Visit the link for more information,https://health.ec.europa.eu/document/download/6d4a14de-c05f-4d50-975f-f20dfa0fa1c2_en?filename=md_new-reg_mir-changelog-v7.3.1_en.txt,
+MDCG,Guidance,Field safety corrective action - FSCA,Visit the link for more information,https://health.ec.europa.eu/document/download/6fd3a214-89de-4f16-a7d2-746271068cc7_en?filename=md_new-reg_fsca-report_en.pdf,
+MDCG,Guidance,Field safety notice template,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32521,
+MDCG,Guidance,FSN customer reply,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32516,
+MDCG,Guidance,FSN distributor/importer reply,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32517,
+MDCG,Guidance,FSN Q&A,Visit the link for more information,https://ec.europa.eu/docsroom/documents/31933,
+MDCG,Guidance,Trend report,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32305/attachments/6/translations,
+MDCG,Guidance,Periodic summary report,Visit the link for more information,https://ec.europa.eu/docsroom/documents/32305/attachments/7/translations,
 MDCG,Q&A Rev. 2,Q&A on practical aspects related to the implementation of Regulation (EU) 2023/607 - Extension of the MDR transitional period and removal of the “sell off” periods,"Visit the link for more information",https://health.ec.europa.eu/document/download/592008f6-3456-4afb-a13a-733a87da1b00_en?filename=mdr_proposal_extension-q-n-a_1.pdf,
 MDCG,SCHEER guidelines,"Update on the guidelines on the benefit-risk assessment of the presence of phthalates in certain medical devicescovering phthalates which are carcinogenic, mutagenic, toxic to reproduction (CMR) or have endocrine-disrupting (ED) properties","Visit the link for more information",https://health.ec.europa.eu/document/download/831f9b60-88de-4197-858f-d001c5b0cc26_en?filename=mdcg_scheer_o_064.pdf,
 MDCG,The CND nomenclature – Background and general principles,Jan-20,"Visit the link for more information",https://health.ec.europa.eu/document/download/69373ce1-3248-4431-be50-b2d430e61951_en?filename=md_cnd_general_principles_en.pdf,
