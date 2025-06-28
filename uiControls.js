@@ -179,6 +179,11 @@ $('#MDSAP').click(function () {
     $('#asdAcronymSearch').val('MDSAP'); // Match exact CSV value
     debouncedFilter(); // Trigger the filtering function
 });
+// Populate the designation search field with "Team-NB" when the button is clicked
+$('#Team-NB').click(function () {
+    $('#asdAcronymSearch').val('Team-NB'); // Match exact CSV value
+    debouncedFilter(); // Trigger the filtering function
+});
 // Handle dropdown menu selection
 $('#guidanceDropdown').change(function () {
     const selectedValue = $(this).val(); // Get the selected value from the dropdown
