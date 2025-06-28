@@ -30,6 +30,7 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Guidance_MDSAP.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_ECHA.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_GHS.csv',
+    'https://martincking.github.io/Standards-Selector/Guidance_Team-NB.csv',
 ];
 
 
