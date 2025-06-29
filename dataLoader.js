@@ -73,23 +73,25 @@ function renderTable(data) {
             ? `<a href="${row.Link}" target="_blank">${row.Designation}</a>`
             : row.Designation;
 
-        const isSelected = selectedRowIds.has(allRows.indexOf(row)); // Check if the row is selected
-        const rowClass = isSelected ? 'selected-row' : ''; // Apply selected-row class if selected
+        const titleLink = row.Link
+            ? `<a href="${row.Link}" target="_blank">${row['Title of Standard']}</a>`
+            : row['Title of Standard'];
+
+        const isSelected = selectedRowIds.has(allRows.indexOf(row));
+        const rowClass = isSelected ? 'selected-row' : '';
 
         return `<tr data-id="${allRows.indexOf(row)}" class="${rowClass}">
             <td>${designationLink || ''}</td>
-            <td>${row['Title of Standard'] || ''}</td>
+            <td>${titleLink || ''}</td>
             <td>${row.Abstract || ''}</td>
         </tr>`;
     }).join('');
 
     $('#dataTable tbody').html(rowsHTML);
 
-    // Abstract column visibility
+    // Show/Hide abstract column
     const isVisible = AppState.abstractVisible;
     $('td:nth-child(3), th:nth-child(3)').toggle(isVisible);
-
-    console.log("Table rendered successfully with data.");
 }
 
 // Event listener for toggling abstract visibility
