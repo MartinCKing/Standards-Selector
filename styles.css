@@ -179,5 +179,11 @@ h1 {
         padding: 6px 8px;
         margin: 2px;
     }
-}
+    /* Hide specific buttons on mobile */
+    #export,
+    #hideAbstract,
+    #pdfUploadButton {
+        display: none;
+    }
+
 
