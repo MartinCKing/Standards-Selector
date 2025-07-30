@@ -19,7 +19,17 @@ function filterTable() {
         if (designationSearch && (row.Designation || '').toLowerCase().includes(designationSearch)) matchCount++;
         if (titleSearch && (row['Title of Standard'] || '').toLowerCase().includes(titleSearch)) matchCount++;
         if (abstractSearch && (row.Abstract || '').toLowerCase().includes(abstractSearch)) matchCount++;
-        if (asdAcronymSearch && (row['ASD Acronym'] || '').toLowerCase().includes(asdAcronymSearch)) matchCount++;
+        if (asdAcronymSearch) {
+           const acronym = (row['ASD Acronym'] || '').toLowerCase();
+            if (asdAcronymSearch === 'fda') {
+            // Only match FDA Guidance, not FDA Consensus Standards
+            if (acronym === 'fda' && !(row.Designation || '').toLowerCase().includes('consensus')) {
+            matchCount++;
+            }
+          } else if (acronym.includes(asdAcronymSearch)) {
+        matchCount++;
+    }
+}
         rowsWithMatchCounts.push({ row, matchCount });
     });
 
