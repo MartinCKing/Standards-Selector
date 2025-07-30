@@ -2,6 +2,11 @@ function hideAllBanners() {
     $('#bsiBanner').hide();
 }
 
+$('#BSI').click(function () {
+    hideAllBanners();
+    $('#bsiBanner').show();
+});
+
 $('#displaySelected').click(function() {
     hideAllBanners();
     const selectedRows = [];
