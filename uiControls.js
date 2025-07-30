@@ -3,8 +3,10 @@ function hideAllBanners() {
 }
 
 $('#BSI').click(function () {
-    hideAllBanners();
-    $('#bsiBanner').show();
+    hideAllBanners();                                 // Hide all banners
+    $('#asdAcronymSearch').val('BSI');                // Set acronym filter input to 'BSI'
+    $('#bsiBanner').show();                           // Show the BSI banner
+    debouncedFilter();     
 });
 
 $('#displaySelected').click(function() {
@@ -134,14 +136,6 @@ $('#CEN').click(function () {
 $('#AAMI').click(function () {
     hideAllBanners();
     $('#asdAcronymSearch').val('AAMI'); // Set the value of the designation search input
-    debouncedFilter(); // Trigger the filtering function
-});
-
-// Populate the designation search field with "BSI" when the button is clicked
-$('#BSI').click(function () {
-    hideAllBanners();
-    $('#asdAcronymSearch').val('BSI'); // Set the value of the designation search input
-    $('#bsiBanner').show(); // Show banner
     debouncedFilter(); // Trigger the filtering function
 });
 
