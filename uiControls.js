@@ -220,9 +220,13 @@ $('#Team-NB').click(function () {
 });
 // Handle dropdown menu selection
 $('#guidanceDropdown').change(function () {
+    hideAllBanners(); // Always hide any banners first
     const selectedValue = $(this).val(); // Get the selected value from the dropdown
     if (selectedValue) {
         $('#asdAcronymSearch').val(selectedValue); // Set the value of the designation search input
         debouncedFilter(); // Trigger the filtering function
     }
+    if (selectedValue === 'BSI') {
+    $('#bsiBanner').show(); // Show the banner if BSI is selected
+}
 });
