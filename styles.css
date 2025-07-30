@@ -152,7 +152,7 @@ h1 {
 
     /* Designation column: smaller and wraps text */
     th:first-child, td:first-child {
-        max-width: 180px;
+        max-width: 120px;
         white-space: normal;
         overflow-wrap: break-word;
     }
