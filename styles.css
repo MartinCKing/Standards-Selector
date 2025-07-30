@@ -140,3 +140,44 @@ h1 {
     background-color: #87CEEB; /* Slightly darker light blue on hover */
     color: white; /* White text for better contrast */
 }
+
+/* Responsive layout for mobile (portrait) screens */
+@media screen and (max-width: 768px) {
+    /* Hide Abstract column */
+    #dataTable th:nth-child(3),
+    #dataTable td:nth-child(3),
+    #abstractSearch {
+        display: none;
+    }
+
+    /* Designation column: smaller and wraps text */
+    th:first-child, td:first-child {
+        max-width: 180px;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    /* Title column: wrap text */
+    th:nth-child(2), td:nth-child(2) {
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    /* Compact font and padding for mobile */
+    #dataTable th, #dataTable td {
+        font-size: 14px;
+        padding: 4px 6px;
+    }
+
+    /* Responsive dropdown and buttons */
+    .dropdown-menu {
+        width: 90%;
+    }
+
+    .options-container button {
+        font-size: 12px;
+        padding: 6px 8px;
+        margin: 2px;
+    }
+}
+
