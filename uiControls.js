@@ -139,6 +139,7 @@ $('#AAMI').click(function () {
 
 // Populate the designation search field with "BSI" when the button is clicked
 $('#BSI').click(function () {
+    hideAllBanners();
     $('#asdAcronymSearch').val('BSI'); // Set the value of the designation search input
     $('#bsiBanner').show(); // Show banner
     debouncedFilter(); // Trigger the filtering function
