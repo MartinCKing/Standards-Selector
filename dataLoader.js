@@ -4,6 +4,18 @@ AppState.abstractVisible = AppState.abstractVisible ?? false; // Default visibil
 
 // Array of CSV file URLs
 const csvFiles = [
+    'https://martincking.github.io/Standards-Selector/Standards_BSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ISO.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IEC.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_AAMI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ASTM.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IEEE.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CEN.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_NIST.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_CSA.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ANSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_IAF.csv',
+    'https://martincking.github.io/Standards-Selector/FDA_Consensus_Standards.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_IMDRF.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_FDA.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_MDCG.csv',
@@ -19,18 +31,6 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Guidance_ECHA.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_GHS.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_Team-NB.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_BSI.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_ISO.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_IEC.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_AAMI.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_ASTM.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_IEEE.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_CEN.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_NIST.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_CSA.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_ANSI.csv',
-    'https://martincking.github.io/Standards-Selector/Standards_IAF.csv',
-    'https://martincking.github.io/Standards-Selector/FDA_Consensus_Standards.csv',
 ];
 
 
