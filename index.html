@@ -200,11 +200,23 @@ document.getElementById("pdfUploadButton").addEventListener("click", function() 
     });
 </script>
     
-        <!-- BSI Compliance Navigator Banner (Footer) -->
-<div id="bsiBanner" style="display:none; text-align:center; margin: 20px 0;">
+<!-- BSI Compliance Navigator Banner (Footer Overlay) -->
+<div id="bsiBanner" style="
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-top: 1px solid #ccc;
+    text-align: center;
+    z-index: 9999;
+    padding: 10px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+">
   <a href="https://pages.bsigroup.com/Martin_King" target="_blank" rel="noopener">
     <img src="BSi%20Compliance%20Navigator.jpg" alt="BSI Compliance Navigator"
-         style="max-width:100%; height:auto; border:0;">
+         style="max-height: 80px; width: auto; border: 0;">
   </a>
 </div>
 </body>
