@@ -20,11 +20,16 @@ body {
     font-weight: bold;
 }
 
+/* Dropdown - Always centered (desktop & mobile) */
 .dropdown-menu {
-    font-size: 16px;
+    font-size: 10pt;          /* Always 10pt font */
     padding: 5px;
-    width: 300px;
-    margin-right: 10px;
+    width: 90%;               /* Wide enough but not full screen */
+    max-width: 400px;
+    display: block;
+    margin: 10px auto;        /* Center horizontally */
+    box-sizing: border-box;
+    text-align: center;
 }
 
 #dynamicLink {
@@ -134,7 +139,7 @@ h1 {
     color: black; /* Black text for contrast */
     border: none; /* Remove border */
     padding: 4px 4px; /* Add padding for better appearance */
-    font-size: 12x; /* Set font size */
+    font-size: 12px; /* Set font size */
     border-radius: 5px; /* Rounded corners */
     cursor: pointer; /* Pointer cursor on hover */
 }
@@ -144,35 +149,23 @@ h1 {
     color: white; /* White text for better contrast */
 }
 
-/* Responsive layout for mobile (portrait) screens */
+/* Responsive layout for mobile screens */
 @media screen and (max-width: 648px) {
-    /* Hide Abstract column */
     #dataTable th:nth-child(3),
     #dataTable td:nth-child(3),
     #abstractSearch {
         display: none;
     }
 
-    /* Designation column: smaller and wraps text */
     th:first-child, td:first-child {
         max-width: 100px;
         white-space: normal;
         overflow-wrap: break-word;
     }
 
-    /* Title column: wrap text */
     th:nth-child(2), td:nth-child(2) {
         white-space: normal;
         overflow-wrap: break-word;
-    }
-    .dropdown-menu {
-        width: 90%;              /* Take up most of the screen */
-        max-width: 100%;
-        font-size: 10pt;         /* Set font size */
-        margin: 10px auto;       /* Center horizontally */
-        display: block;
-        box-sizing: border-box;
-        text-align: center;
     }
 
     .options-container {
@@ -185,30 +178,25 @@ h1 {
         width: 100%;
         margin-bottom: 5px;
     }
-}
 
-    /* Compact font and padding for mobile */
     #dataTable th, #dataTable td {
         font-size: 14px;
         padding: 4px 6px;
     }
 
-    /* Responsive dropdown and buttons */
-    .dropdown-menu {
-        width: 90%;
-    }
-
-   .additional-options-container {
-    display: block;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-    /* Hide specific buttons on mobile */
+    /* Optional: Hide some buttons on mobile */
     #export,
     #hideAbstract,
     #pdfUploadButton {
         display: none;
     }
+}
+
+/* Optional: Center container holding dropdown */
+.additional-options-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
 }
 
