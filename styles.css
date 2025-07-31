@@ -142,7 +142,7 @@ h1 {
 }
 
 /* Responsive layout for mobile (portrait) screens */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 648px) {
     /* Hide Abstract column */
     #dataTable th:nth-child(3),
     #dataTable td:nth-child(3),
@@ -152,7 +152,7 @@ h1 {
 
     /* Designation column: smaller and wraps text */
     th:first-child, td:first-child {
-        max-width: 120px;
+        max-width: 100px;
         white-space: normal;
         overflow-wrap: break-word;
     }
@@ -183,12 +183,16 @@ h1 {
 .options-container {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
     width: 100%;
     margin-bottom: 10px;
 }
    .additional-options-container {
     display: block;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     margin-top: 10px;
 }
