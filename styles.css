@@ -48,7 +48,6 @@ body {
 
 #tableContainer {
     width: 100%;
-    max-width: 1920px;
     height: calc(100vh - 250px); /* Adjusts dynamically to viewport height */
     overflow-y: auto; /* Enable vertical scrolling */
     border: 1px solid #ccc;
