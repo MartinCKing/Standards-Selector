@@ -185,6 +185,7 @@ h1 {
     flex-wrap: wrap;
     gap: 10px;
     width: 100%;
+    margin-bottom: 10px;
 }
    .additional-options-container {
     display: block;
