@@ -50,7 +50,9 @@ body {
     width: 100%;
     max-width: 1920px;
     height: calc(100vh - 250px); /* Adjusts dynamically to viewport height */
+    overflow-x: auto
     overflow-y: auto; /* Enable vertical scrolling */
+    box-sizing: border-box;
     border: 1px solid #ccc;
     min-height: 100vh;
 }
@@ -159,6 +161,14 @@ h1 {
 
 /* Responsive layout for mobile screens */
 @media screen and (max-width: 648px) {
+     #tableContainer,
+    table {
+        max-width: 100%;
+        width: 100%;
+        overflow-x: auto;
+        box-sizing: border-box;
+    }
+
     #dataTable th:nth-child(3),
     #dataTable td:nth-child(3),
     #abstractSearch {
@@ -173,6 +183,7 @@ h1 {
 
     th:nth-child(2), td:nth-child(2) {
         white-space: normal;
+        word-wrap: break-word;
         overflow-wrap: break-word;
     }
 
