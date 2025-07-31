@@ -1,4 +1,8 @@
 /* General Styles */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -68,6 +72,10 @@ th, td {
     border: 1px solid #ccc;
     padding: 8px;
     text-align: left;
+    table-layout: fixed;          /* Prevent infinite table width */
+    word-wrap: break-word;        /* Break long words */
+    overflow-wrap: break-word;
+    white-space: normal;          /* Allow wrapping */
 }
 
 th {
