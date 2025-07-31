@@ -242,7 +242,7 @@ $('#guidanceDropdown').change(function () {
     if (params.abstract) {
         document.getElementById("abstractSearch").value = params.abstract;
     }
-
+});
     // Automatically select "BSI" on first load if no other dropdown value is given
     const dropdown = document.getElementById("guidanceDropdown");
     const hasDropdownParam = params.dropdownwindow;
@@ -267,5 +267,4 @@ $('#guidanceDropdown').change(function () {
     }
 
     debouncedFilter(); // Optional, if not already called in change
-});
 });
