@@ -229,10 +229,11 @@ $('#guidanceDropdown').change(function () {
     if (selectedValue === 'BSI') {
     $('#bsiBanner').show(); // Show the banner if BSI is selected
 }
-    document.addEventListener("DOMContentLoaded", function () {
+});
+// DOMContentLoaded block — runs only once on page load
+document.addEventListener("DOMContentLoaded", function () {
     const params = getQueryParams();
 
-    // Existing query param logic...
     if (params.designation) {
         document.getElementById("designationSearch").value = params.designation;
     }
@@ -242,4 +243,27 @@ $('#guidanceDropdown').change(function () {
     if (params.abstract) {
         document.getElementById("abstractSearch").value = params.abstract;
     }
+
+    const dropdown = document.getElementById("guidanceDropdown");
+    const hasDropdownParam = params.dropdownwindow;
+
+    if (!hasDropdownParam) {
+        for (let i = 0; i < dropdown.options.length; i++) {
+            if (dropdown.options[i].value === "BSI") {
+                dropdown.selectedIndex = i;
+                dropdown.dispatchEvent(new Event("change"));
+                break;
+            }
+        }
+    } else {
+        for (let i = 0; i < dropdown.options.length; i++) {
+            if (dropdown.options[i].value === params.dropdownwindow) {
+                dropdown.selectedIndex = i;
+                dropdown.dispatchEvent(new Event("change"));
+                break;
+            }
+        }
+    }
+
+    debouncedFilter();
 });
