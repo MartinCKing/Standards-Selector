@@ -179,23 +179,23 @@ h1 {
         padding: 6px 8px;
         margin: 2px;
     }
-    .options-container,
-    .additional-options-container {
+
+.options-container {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin: 10px 0;
-   }
-
-   .additional-options-container {
-    margin-top: 10px;
     width: 100%;
-   }
+}
+   .additional-options-container {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+}
     /* Hide specific buttons on mobile */
     #export,
     #hideAbstract,
     #pdfUploadButton {
         display: none;
     }
-
+}
 
