@@ -29,7 +29,7 @@ body {
     font-size: 10pt;          /* Always 10pt font */
     padding: 5px;
     width: 90%;               /* Wide enough but not full screen */
-    max-width: 100px;
+    max-width: 150px;
     display: block;
     margin: 10px auto;        /* Center horizontally */
     box-sizing: border-box;
@@ -177,15 +177,19 @@ h1 {
     }
 
     .options-container {
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
+         display: flex;
+         flex-wrap: wrap;               /* Wrap if screen is too narrow */
+         justify-content: center;       /* Center-align buttons */
+         gap: 10px;                     /* Space between buttons */
+         width: 100%;
     }
 
     .options-container button {
-        width: 100%;
-        margin-bottom: 5px;
-    }
+         font-size: 14px;
+         padding: 6px 12px;
+         min-width: 120px;
+         box-sizing: border-box;
+      }
 
     #dataTable th, #dataTable td {
         font-size: 14px;
