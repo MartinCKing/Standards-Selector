@@ -29,7 +29,7 @@ body {
     font-size: 10pt;          /* Always 10pt font */
     padding: 5px;
     width: 90%;               /* Wide enough but not full screen */
-    max-width: 400px;
+    max-width: 100px;
     display: block;
     margin: 10px auto;        /* Center horizontally */
     box-sizing: border-box;
@@ -48,6 +48,7 @@ body {
 
 #tableContainer {
     width: 100%;
+    max-width: 1920px;
     height: calc(100vh - 250px); /* Adjusts dynamically to viewport height */
     overflow-y: auto; /* Enable vertical scrolling */
     border: 1px solid #ccc;
