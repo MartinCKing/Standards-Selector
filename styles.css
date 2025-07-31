@@ -179,6 +179,18 @@ h1 {
         padding: 6px 8px;
         margin: 2px;
     }
+    .options-container,
+    .additional-options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+   }
+
+   .additional-options-container {
+    margin-top: 10px;
+    width: 100%;
+   }
     /* Hide specific buttons on mobile */
     #export,
     #hideAbstract,
