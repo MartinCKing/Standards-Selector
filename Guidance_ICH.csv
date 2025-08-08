@@ -2,10 +2,10 @@ ASD Acronym,Designation,Title of Standard,Abstract,Link
 ICH,ICH E2B(R3),Q&As Questions & Answers,Visit the link for more information,https://database.ich.org/sites/default/files/ICH_E2B%28R3%29_EWG_IWG_Q%26A_Step3_2025_0718_Assembly_Approved.pdf
 ICH,ICH E2B(R3),Appendix to the Implementation Guide,Visit the link for more information,https://database.ich.org/sites/default/files/ICH_E2B%28R3%29_EWG_IWG_Appendix_I%28G%29_Step3_2025_0718_Assembly_Approved_0.pdf
 ICH,ICH Q1,Q1 Introductory Overview Video,Visit the link for more information,https://admin.ich.org/sites/default/files/inline-files/ICHQ1_IntroductoryOverviewVideo_2020_1014.mp4
-ICH,ICH ICH,ICH Q1A&C in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/stability-testing/index.html#/
-ICH,ICH ICH,ICH Q1B in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/photostability-testing/index.html#/
-ICH,ICH ICH,ICH Q1D in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/bracketing-and-matrixing/index.html#/
-ICH,ICH ICH,ICH Q1E in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/evaluation-of-stability/index.html#/
+ICH,ICH Q1A&C,ICH Q1A&C in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/stability-testing/index.html#/
+ICH,ICH Q1B,ICH Q1B in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/photostability-testing/index.html#/
+ICH,ICH Q1D,ICH Q1D in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/bracketing-and-matrixing/index.html#/
+ICH,ICH Q1E,ICH Q1E in-depth training modules,Visit the link for more information,https://admin.ich.org/sites/default/files/scorm/content/evaluation-of-stability/index.html#/
 ICH,ICH Q2(R2),"Q2(R2)/Q14 Step 4 Presentation",Visit the link for more information,https://admin.ich.org/sites/default/files/inline-files/Q2_Q14%20ICH_ Step_4_Presentation_2023_1106.pdf
 ICH,ICH Q2(R2),"Q2(R2)/Q14 Map of Contents",Visit the link for more information,https://admin.ich.org/sites/default/files/inline-files/ICH_Q2%28R2%29Q14_TrainingMat_MapofContents_2025_0620.pdf
 ICH,ICH Q2(R2),"Q2(R2)/Q14 Module 1",Visit the link for more information,https://admin.ich.org/sites/default/files/inline-files/ICH_Q2%28R2%29Q14_TrainingMat_%20Module_1_2025_0620.pdf
@@ -588,4 +588,5 @@ ICH,ICH E6(R3),E6(R3),Visit the link for more information,https://www.ich.org/pa
 ICH,ICH R,Reflection Paper on GCP,Visit the link for more information,https://admin.ich.org/sites/default/files/2021-05/ICH_ReflectionPaper_GCPRenovation_2021_0519.pdf
 ICH,ICH S,Summary of the E6(3) Stakeholder Engagement Approach,Visit the link for more information,https://admin.ich.org/sites/default/files/2020-05/E6-R3_PublicEngagemenSummary_2020_0421.pdf
 ICH,ICH GCP,GCP renovation plan,Visit the link for more information,https://www.ich.org/page/reflection-papers
+
 
