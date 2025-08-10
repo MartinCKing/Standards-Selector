@@ -86,12 +86,23 @@ function highlightSearchTerms(designationSearch, titleSearch, abstractSearch) {
     });
 }
 
-function highlightDesignationTextOnly(cell, searchString) {
-    const originalHtml = cell.html();
-    const regex = new RegExp(`(<a [^>]*>)(.*?${searchString}.*?)</a>`, 'gi');
-    const highlightedHtml = originalHtml.replace(regex, function(match, openTag, linkText) {
-        const highlightedText = linkText.replace(new RegExp(`(${searchString})`, 'gi'), '<span class="highlight">$1</span>');
-        return openTag + highlightedText + '</a>';
-    });
-    cell.html(highlightedHtml);
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+function highlightDesignationTextOnly(cell, searchString) {
+  const a = cell.find('a').first();
+  const safe = escapeRegExp(searchString);
+  const re = new RegExp(`(${safe})`, 'gi');
+
+  if (a.length) {
+    // Highlight only the anchor's *text*, not attributes
+    const text = a.text();
+    a.html(text.replace(re, '<span class="highlight">$1</span>'));
+  } else {
+    // No link: highlight the cell's plain text only
+    const text = cell.text();
+    cell.html(text.replace(re, '<span class="highlight">$1</span>'));
+  }
+}
+
