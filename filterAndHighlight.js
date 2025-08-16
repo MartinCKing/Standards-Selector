@@ -35,10 +35,17 @@ function filterTable() {
     rowsWithMatchCounts.push({ row, matchCount });
   });
 
-  rowsWithMatchCounts.sort((a, b) => b.matchCount - a.matchCount);
-  const sortedData = rowsWithMatchCounts.map(item => item.row);
-  renderTable(sortedData);
-  highlightSearchTerms(designationSearch, titleSearch, abstractSearch);
+rowsWithMatchCounts.sort((a, b) => b.matchCount - a.matchCount);
+
+// If any query is present, show only rows that actually matched
+const anyQuery = asdAcronymSearch || designationSearch || titleSearch || abstractSearch;
+let sortedData = rowsWithMatchCounts;
+if (anyQuery) {
+  sortedData = rowsWithMatchCounts.filter(item => item.matchCount > 0);
+}
+
+renderTable(sortedData.map(item => item.row));
+highlightSearchTerms(designationSearch, titleSearch, abstractSearch);
 }
 
 function clearHighlights() {
@@ -126,4 +133,5 @@ function highlightSearchTerms(designationSearch, titleSearch, abstractSearch) {
     }
   });
 }
+
 
