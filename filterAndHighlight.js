@@ -19,19 +19,6 @@ function filterTable() {
     if (designationSearch && (row.Designation || '').toLowerCase().includes(designationSearch)) matchCount++;
     if (titleSearch && (row['Title of Standard'] || '').toLowerCase().includes(titleSearch)) matchCount++;
     if (abstractSearch && (row.Abstract || '').toLowerCase().includes(abstractSearch)) matchCount++;
-
-    // ASD boost: rows from the selected source jump to the top, others still show
-let sourceBoost = 0;
-if (asdAcronymSearch) {
-  const acronym = (row['ASD Acronym'] || '').toLowerCase();
-  if (asdAcronymSearch === 'fda') {
-    // Prioritize FDA Guidance but not FDA Consensus
-    if (acronym === 'fda' && !(row.Designation || '').toLowerCase().includes('consensus')) {
-      sourceBoost = 100; // tune as you like
-    }
-  } else if (acronym.includes(asdAcronymSearch)) {
-    sourceBoost = 100; // tune as you like
-  }
 }
 
 const score = matchCount + sourceBoost;
@@ -137,6 +124,7 @@ function highlightSearchTerms(designationSearch, titleSearch, abstractSearch) {
     }
   });
 }
+
 
 
 
