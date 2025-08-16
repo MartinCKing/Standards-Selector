@@ -20,27 +20,31 @@ function filterTable() {
     if (titleSearch && (row['Title of Standard'] || '').toLowerCase().includes(titleSearch)) matchCount++;
     if (abstractSearch && (row.Abstract || '').toLowerCase().includes(abstractSearch)) matchCount++;
 
-    if (asdAcronymSearch) {
-      const acronym = (row['ASD Acronym'] || '').toLowerCase();
-      if (asdAcronymSearch === 'fda') {
-        // Only match FDA Guidance, not FDA Consensus Standards
-        if (acronym === 'fda' && !(row.Designation || '').toLowerCase().includes('consensus')) {
-          matchCount++;
-        }
-      } else if (acronym.includes(asdAcronymSearch)) {
-        matchCount++;
-      }
+    // ASD boost: rows from the selected source jump to the top, others still show
+let sourceBoost = 0;
+if (asdAcronymSearch) {
+  const acronym = (row['ASD Acronym'] || '').toLowerCase();
+  if (asdAcronymSearch === 'fda') {
+    // Prioritize FDA Guidance but not FDA Consensus
+    if (acronym === 'fda' && !(row.Designation || '').toLowerCase().includes('consensus')) {
+      sourceBoost = 100; // tune as you like
     }
+  } else if (acronym.includes(asdAcronymSearch)) {
+    sourceBoost = 100; // tune as you like
+  }
+}
 
-    rowsWithMatchCounts.push({ row, matchCount });
-  });
+const score = matchCount + sourceBoost;
+rowsWithMatchCounts.push({ row, matchCount, score });
 
-rowsWithMatchCounts.sort((a, b) => b.matchCount - a.matchCount);
+// Prioritize by score (we’ll add a boost below)
+rowsWithMatchCounts.sort((a, b) => b.score - a.score || b.matchCount - a.matchCount);
 
-// If any query is present, show only rows that actually matched
-const anyQuery = asdAcronymSearch || designationSearch || titleSearch || abstractSearch;
+// Only hide rows when the user typed something.
+// If they only picked an ASD, we keep *all* rows and just reorder.
+const hasTextQuery = designationSearch || titleSearch || abstractSearch;
 let sortedData = rowsWithMatchCounts;
-if (anyQuery) {
+if (hasTextQuery) {
   sortedData = rowsWithMatchCounts.filter(item => item.matchCount > 0);
 }
 
@@ -133,5 +137,6 @@ function highlightSearchTerms(designationSearch, titleSearch, abstractSearch) {
     }
   });
 }
+
 
 
