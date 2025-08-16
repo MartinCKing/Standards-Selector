@@ -1,130 +1,173 @@
-// Debounce function for typing priority
-function debouncedFilter() {
-  clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(filterTable, 300); // Adjust debounce time as needed
-}
+/* filterAndHighlight.js
+ *
+ * - debouncedFilter(): debounce wrapper for filterTable()
+ * - filterTable():
+ *      • If user typed text (Designation/Title/Abstract), show only matching rows
+ *      • If user only picked ASD (source), show ALL rows but BOOST that source to the top
+ *      • Within matches, ASD rows are prioritized (not exclusive)
+ * - highlightSearchTerms(): highlights the active search terms in the rendered table
+ *
+ * Dependencies expected:
+ *   - jQuery
+ *   - globals.js defines: allRows, selectedRowIds, debounceTimeout (optional)
+ *   - dataLoader.js defines: renderTable(data)
+ */
 
-// Filter table based on search input in each column, expanding to other columns if no matches
-function filterTable() {
-  const asdAcronymSearch = $('#asdAcronymSearch').val().toLowerCase();
-  const designationSearch = $('#designationSearch').val().toLowerCase();
-  const titleSearch = $('#titleSearch').val().toLowerCase();
-  const abstractSearch = $('#abstractSearch').val().toLowerCase();
+(function () {
+  'use strict';
 
-  let rowsWithMatchCounts = [];
+  // ---- Debounce for typing in search inputs ---------------------------------
+  window.debouncedFilter = function debouncedFilter() {
+    if (window.debounceTimeout) clearTimeout(window.debounceTimeout);
+    window.debounceTimeout = setTimeout(filterTable, 300); // adjust if needed
+  };
 
-  allRows.forEach(row => {
-    let matchCount = 0;
+  // ---- Main filter function --------------------------------------------------
+  window.filterTable = function filterTable() {
+    const asdAcronymSearch = ($('#asdAcronymSearch').val() || '').toLowerCase().trim();
+    const designationSearch = ($('#designationSearch').val() || '').toLowerCase().trim();
+    const titleSearch       = ($('#titleSearch').val()       || '').toLowerCase().trim();
+    const abstractSearch    = ($('#abstractSearch').val()    || '').toLowerCase().trim();
 
-    if (designationSearch && (row.Designation || '').toLowerCase().includes(designationSearch)) matchCount++;
-    if (titleSearch && (row['Title of Standard'] || '').toLowerCase().includes(titleSearch)) matchCount++;
-    if (abstractSearch && (row.Abstract || '').toLowerCase().includes(abstractSearch)) matchCount++;
-}
+    const hasTextQuery = !!(designationSearch || titleSearch || abstractSearch);
+    const ASD_BOOST = 100; // tune as you like
 
-const score = matchCount + sourceBoost;
-rowsWithMatchCounts.push({ row, matchCount, score });
+    let rowsWithMatchCounts = [];
 
-// Prioritize by score (we’ll add a boost below)
-rowsWithMatchCounts.sort((a, b) => b.score - a.score || b.matchCount - a.matchCount);
-
-// Only hide rows when the user typed something.
-// If they only picked an ASD, we keep *all* rows and just reorder.
-const hasTextQuery = designationSearch || titleSearch || abstractSearch;
-let sortedData = rowsWithMatchCounts;
-if (hasTextQuery) {
-  sortedData = rowsWithMatchCounts.filter(item => item.matchCount > 0);
-}
-
-renderTable(sortedData.map(item => item.row));
-highlightSearchTerms(designationSearch, titleSearch, abstractSearch);
-}
-
-function clearHighlights() {
-  $('#dataTable tbody .highlight').contents().unwrap();
-  $('#dataTable tbody tr').removeClass('match-row');
-}
-
-// ---- Helpers for safe text-only highlighting ----
-function escapeRegExp(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-// Recursively highlight only text nodes inside $container
-function highlightTextNodes($container, searchText) {
-  if (!searchText) return;
-  const re = new RegExp(`(${escapeRegExp(searchText)})`, 'gi');
-
-  $container.contents().each(function () {
-    // Text node
-    if (this.nodeType === 3) {
-      const original = this.nodeValue;
-      const replaced = original.replace(re, '<span class="highlight">$1</span>');
-      if (replaced !== original) {
-        $(this).replaceWith(replaced);
-      }
+    // Safety: guard if allRows not ready yet
+    if (!Array.isArray(window.allRows) || window.allRows.length === 0) {
+      // nothing loaded yet; nothing to render
+      renderTable([]);
       return;
     }
-    // Element node — skip existing highlights; recurse into children
-    if (this.nodeType === 1) {
-      if ($(this).is('.highlight')) return;
-      highlightTextNodes($(this), searchText);
-    }
-  });
-}
 
-// Only highlight visible text of the designation; never touch attributes
-function highlightDesignationTextOnly(cell, searchString) {
-  const $a = cell.find('a').first();
-  const re = new RegExp(`(${escapeRegExp(searchString)})`, 'gi');
+    window.allRows.forEach((row, idx) => {
+      let matchCount = 0;
 
-  if ($a.length) {
-    const text = $a.text();
-    $a.html(text.replace(re, '<span class="highlight">$1</span>'));
-  } else {
-    const text = cell.text();
-    cell.html(text.replace(re, '<span class="highlight">$1</span>'));
-  }
-}
+      // Text matching across columns
+      const d = (row.Designation || '').toLowerCase();
+      const t = (row['Title of Standard'] || '').toLowerCase();
+      const a = (row.Abstract || '').toLowerCase();
 
-// Highlight search terms in the rendered table (safe version)
-function highlightSearchTerms(designationSearch, titleSearch, abstractSearch) {
-  $('#dataTable tbody tr').each(function () {
-    const rowId = $(this).data('id');
-    const isRowSelected = selectedRowIds.has(rowId);
+      if (designationSearch && d.includes(designationSearch)) matchCount++;
+      if (titleSearch       && t.includes(titleSearch))       matchCount++;
+      if (abstractSearch    && a.includes(abstractSearch))    matchCount++;
 
-    $(this).removeClass('match-row');
-    $(this).find('.highlight').contents().unwrap(); // clear previous highlights safely
+      // If user typed something, keep only rows that have at least one text match
+      if (hasTextQuery && matchCount === 0) return;
 
-    $(this).find('td').each(function (index) {
-      const cell = $(this);
-      const cellTextLower = cell.text().toLowerCase();
+      // ASD boost (prioritization, not filtering)
+      let sourceBoost = 0;
+      if (asdAcronymSearch) {
+        const acronym = (row['ASD Acronym'] || '').toLowerCase();
 
-      if (index === 0) {
-        // Designation column
-        if (designationSearch && cellTextLower.includes(designationSearch)) {
-          highlightDesignationTextOnly(cell, designationSearch);
-          if (!isRowSelected) cell.closest('tr').addClass('match-row');
+        if (asdAcronymSearch === 'fda') {
+          // Prioritize FDA Guidance but *not* FDA Consensus Standards
+          const isFDA = acronym === 'fda';
+          const isConsensus = d.includes('consensus');
+          if (isFDA && !isConsensus) sourceBoost = ASD_BOOST;
+        } else if (acronym.includes(asdAcronymSearch)) {
+          sourceBoost = ASD_BOOST;
         }
-        return;
       }
 
-      // Title (1) and Abstract (2): safely highlight only text nodes
-      let searchText = null;
-      if (index === 1) searchText = titleSearch;
-      if (index === 2) searchText = abstractSearch;
+      const score = matchCount + sourceBoost;
 
-      if (searchText && cellTextLower.includes(searchText)) {
-        highlightTextNodes(cell, searchText);
-        if (!isRowSelected) cell.closest('tr').addClass('match-row');
-      }
+      rowsWithMatchCounts.push({
+        row,
+        matchCount,
+        score,
+        idx,
+        acronym: (row['ASD Acronym'] || '').toLowerCase()
+      });
     });
 
-    if (isRowSelected) {
-      $(this).addClass('selected-row');
+    // Sorting:
+    // 1) boosted score (via ASD) desc
+    // 2) textual matchCount desc
+    // 3) acronym asc (stable grouping by source)
+    // 4) original index asc (stability)
+    rowsWithMatchCounts.sort((a, b) =>
+      (b.score - a.score) ||
+      (b.matchCount - a.matchCount) ||
+      a.acronym.localeCompare(b.acronym) ||
+      (a.idx - b.idx)
+    );
+
+    const sortedData = rowsWithMatchCounts.map(item => item.row);
+
+    // Render and then highlight
+    renderTable(sortedData);
+    highlightSearchTerms(designationSearch, titleSearch, abstractSearch);
+  };
+
+  // ---- Highlighter -----------------------------------------------------------
+  // Highlights the current search strings in their respective columns.
+  // It only wraps visible text nodes and avoids double-highlighting.
+  window.highlightSearchTerms = function highlightSearchTerms(desigTerm, titleTerm, absTerm) {
+    // Clear previous highlights
+    $('#dataTable .highlight').each(function () {
+      const $span = $(this);
+      $span.replaceWith($span.text());
+    });
+
+    // Helper to safely escape regex characters
+    function escapeRegex(s) {
+      return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
-  });
-}
 
+    // Recursively wrap matching text nodes within an element
+    function highlightInElement($el, term) {
+      if (!term) return;
 
+      const needle = escapeRegex(term);
+      const regex = new RegExp(needle, 'gi');
 
+      // Depth-first traversal of child nodes
+      $el.contents().each(function () {
+        // element node
+        if (this.nodeType === 1) {
+          const $child = $(this);
+          // Skip already highlighted segments
+          if ($child.is('.highlight')) return;
+          highlightInElement($child, term);
+          return;
+        }
 
+        // text node
+        if (this.nodeType === 3) {
+          const text = this.nodeValue;
+          if (!text) return;
+          if (!regex.test(text)) return;
+
+          // Reset regex lastIndex for subsequent operations
+          regex.lastIndex = 0;
+
+          // Replace matched portions with <span class="highlight">
+          const replaced = text.replace(regex, (m) => `<span class="highlight">${m}</span>`);
+          const $frag = $(replaced);
+          $(this).replaceWith($frag);
+        }
+      });
+    }
+
+    // Column map: 1-based nth-child:
+    // 1 = Designation, 2 = Title, 3 = Abstract
+    if (desigTerm) {
+      $('#dataTable tbody tr td:nth-child(1)').each(function () {
+        highlightInElement($(this), desigTerm);
+      });
+    }
+    if (titleTerm) {
+      $('#dataTable tbody tr td:nth-child(2)').each(function () {
+        highlightInElement($(this), titleTerm);
+      });
+    }
+    if (absTerm) {
+      $('#dataTable tbody tr td:nth-child(3)').each(function () {
+        highlightInElement($(this), absTerm);
+      });
+    }
+  };
+
+})();
