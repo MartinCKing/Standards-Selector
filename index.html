@@ -225,6 +225,44 @@ document.getElementById("pdfUploadButton").addEventListener("click", function() 
          style="max-height: 80px; width: auto; border: 0;">
   </a>
 </div>
+<!-- Cookie Consent Popup -->
+<div id="cookie-popup" style="position:fixed;bottom:20px;left:20px;right:20px;background:#fff;border:1px solid #ccc;padding:20px;z-index:9999;font-family:sans-serif;">
+  <p>Cookies are used to improve your experience and analyze site usage. By clicking “Accept,” you agree to our use of cookies for analytics.</p>
+  <button id="accept-cookies" style="margin-right:10px;">Accept</button>
+  <button id="decline-cookies">Decline</button>
+</div>
+
+<script>
+  // Check stored consent on page load
+  const storedConsent = localStorage.getItem("cookieConsent");
+  if (storedConsent) {
+    document.getElementById("cookie-popup").style.display = "none";
+    window.clarity('consentv2', {
+      ad_storage: storedConsent,
+      analytics_storage: storedConsent
+    });
+  }
+
+  // Handle Accept
+  document.getElementById("accept-cookies").onclick = function() {
+    window.clarity('consentv2', {
+      ad_storage: "granted",
+      analytics_storage: "granted"
+    });
+    localStorage.setItem("cookieConsent", "granted");
+    document.getElementById("cookie-popup").style.display = "none";
+  };
+
+  // Handle Decline
+  document.getElementById("decline-cookies").onclick = function() {
+    window.clarity('consentv2', {
+      ad_storage: "denied",
+      analytics_storage: "denied"
+    });
+    localStorage.setItem("cookieConsent", "denied");
+    document.getElementById("cookie-popup").style.display = "none";
+  };
+</script>
 </body>
 </html>
 
