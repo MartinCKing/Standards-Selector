@@ -31,6 +31,7 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Guidance_ECHA.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_GHS.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_Team-NB.csv',
+    'https://martincking.github.io/Standards-Selector/Guidance_edpb.csv',
 ];
 
 
@@ -105,3 +106,4 @@ $('#hideAbstract').click(function () {
 $(document).ready(() => {
     loadMultipleCSVs(csvFiles); // Load CSV files and populate the table
 });
+
