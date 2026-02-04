@@ -5,6 +5,7 @@ AppState.abstractVisible = AppState.abstractVisible ?? false; // Default visibil
 // Array of CSV file URLs
 const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Standards_BSI.csv',
+    'https://martincking.github.io/Standards-Selector/Standards_ISO_2026.csv',
     'https://martincking.github.io/Standards-Selector/Standards_ISO.csv',
     'https://martincking.github.io/Standards-Selector/Standards_IEC.csv',
     'https://martincking.github.io/Standards-Selector/Standards_AAMI.csv',
@@ -106,4 +107,5 @@ $('#hideAbstract').click(function () {
 $(document).ready(() => {
     loadMultipleCSVs(csvFiles); // Load CSV files and populate the table
 });
+
 
