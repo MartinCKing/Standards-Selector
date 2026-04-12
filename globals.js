@@ -1,5 +1,7 @@
 // Global variables shared across all scripts
-let allRows = [];           // Store all data rows
-let selectedRowIds = new Set();  // Track selected rows
-let abstractVisible = false;  // Track abstract visibility state
-let debounceTimeout;         // Timeout for debouncing
+window.AppState = window.AppState || {};
+window.AppState.abstractVisible = window.AppState.abstractVisible ?? false;
+
+window.allRows = window.allRows || [];
+window.selectedRowIds = window.selectedRowIds || new Set();
+window.debounceTimeout = window.debounceTimeout || null;

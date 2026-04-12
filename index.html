@@ -10,96 +10,89 @@
     <title>Applicable Standards & Guidance Selector</title>
     <link rel="icon" href="QARA.png" type="image/png">
 
-    <!-- Link to External CSS and JavaScript -->
     <link rel="stylesheet" href="styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-    <script src="globals.js" defer></script> <!-- Load shared globals first -->
-    <script src="dataLoader.js" defer></script> <!-- Loads CSV data and populates table -->
+
+    <script src="globals.js" defer></script>
+    <script src="dataLoader.js" defer></script>
     <script src="filterAndHighlight.js" defer></script>
     <script src="rowSelection.js" defer></script>
     <script src="uiControls.js" defer></script>
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "pk2zhnwh9p");
-</script>
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-81366NTXDQ');
-</script>
-<script>
-    // Function to get query parameters from the URL
-    function getQueryParams() {
-        const params = {};
-        const queryString = window.location.search.substring(1);
-        const pairs = queryString.split("&");
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "pk2zhnwh9p");
+    </script>
 
-        for (let pair of pairs) {
-            const [key, value] = pair.split("=");
-            params[decodeURIComponent(key)] = decodeURIComponent(value || "");
-        }
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-81366NTXDQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-81366NTXDQ');
+    </script>
 
-        return params;
-    }
+    <script>
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString ? queryString.split("&") : [];
 
-    // Auto-populate fields based on URL parameters
-    document.addEventListener("DOMContentLoaded", function () {
-    const params = getQueryParams();
-
-    if (params.designation) {
-        document.getElementById("designationSearch").value = params.designation;
-    }
-
-    if (params.title) {
-        document.getElementById("titleSearch").value = params.title;
-    }
-
-    if (params.abstract) {
-        document.getElementById("abstractSearch").value = params.abstract;
-    }
-
-    // Auto-select the FDA Consensus Standards in the dropdown if specified
-
-    if (params.dropdownwindow) {
-        const dropdown = document.getElementById("guidanceDropdown");
-        const options = dropdown.options;
-    
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value === params.dropdownwindow) {
-                dropdown.selectedIndex = i;
-    
-                    // Dispatch a 'change' event to trigger any associated logic
-                    dropdown.dispatchEvent(new Event('change'));
-                    break;
+            for (const pair of pairs) {
+                const [key, value] = pair.split("=");
+                params[decodeURIComponent(key)] = decodeURIComponent(value || "");
             }
+
+            return params;
         }
-    }
 
-    // Optionally trigger the filter function
-    debouncedFilter();
-});
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = getQueryParams();
 
-</script>
+            if (params.designation) {
+                document.getElementById("designationSearch").value = params.designation;
+            }
 
+            if (params.title) {
+                document.getElementById("titleSearch").value = params.title;
+            }
+
+            if (params.abstract) {
+                document.getElementById("abstractSearch").value = params.abstract;
+            }
+
+            if (params.dropdownwindow) {
+                const dropdown = document.getElementById("guidanceDropdown");
+                const options = dropdown.options;
+
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].value === params.dropdownwindow) {
+                        dropdown.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // Important:
+            // Do NOT call debouncedFilter() here.
+            // Do NOT dispatch dropdown change here.
+            // dataLoader.js will do that only after the CSVs are loaded.
+        });
+    </script>
 </head>
 <body>
-<!-- Header -->
 <header class="custom-header">
     <div class="content-container">
         <div class="image-container" style="display: inline-block; align-items: center; text-align: center;">
             <a href="https://www.linkedin.com/groups/12741229/">
                 <img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Logo.svg.original.svg" alt="LinkedIn Logo" style="width:10%; height: 10%;">
                 <img src="QARA1.png" alt="QARA Logo" style="width:3%; height: 3%;">
-            </a>          
+            </a>
             <h1 style="font-size: 100%; align-items: center; padding: 0px;">
                 Ask ✅ - Med Minds 🔎 Applicable Standards & Guidance Selector
             </h1>
@@ -110,67 +103,60 @@
     </div>
 </header>
 
-<!-- A link placed below the textarea, aligned center 
-<div id="linkContainer" style="margin-top: 0px; text-align: center;">
-    <a id="dynamicLink" href="Ask ✅ - Med Minds 🔎 Applicable Standards Selector.pdf" target="_blank">
-       Instructions For Use
-    </a>-->
+<span id="entriesLoaded" style="margin-left: 10px;">(0 entries loaded)</span>
 
-    <span id="entriesLoaded" style="margin-left: 10px;">(0 entries loaded)</span>
-
-    <div class="options-container">
-        <button id="displaySelected">Show Selected</button>
-        <button id="clearSelections">Clear Selections</button>
-        <button id="export">Export Selected</button>
-        <button id="hideAbstract" style="display: none;">Show Abstract</button>
-        <button id="pdfUploadButton" style="display: none;">Check PDF Files</button>
-    </div>
-    <div class="additional-options-container">
-    <select id="guidanceDropdown" class="dropdown-menu">
-    <option disabled selected>Select Guidance or Standard Group</option>
-        <optgroup label="Guidance">
-            <option value="CIOMS">CIOMS Guidance</option>
-            <option value="ECHA">ECHA Guidance</option>
-            <option value="EDQM">EDQM Guidance</option>
-            <option value="FDA">FDA Guidance</option>
-            <option value="GHWP">GHWP Guidance</option>
-            <option value="GHS">GHS Guidance</option>
-            <option value="ICH">ICH Guidance</option>
-            <option value="IMDRF">IMDRF Guidance</option>
-            <option value="IPEC">IPEC Guidance</option>
-            <option value="ISPE">ISPE Guidance</option>
-            <option value="NIST">NIST Guidance</option>
-            <option value="PICS">PIC/S Guidance</option>
-            <option value="MDCG">MDCG Guidance</option>
-            <option value="MEDDEV">MEDDEV Guidance</option>
-            <option value="MDSAP">MDSAP Guidance</option>
-            <option value="Team-NB">Team-NB Guidance</option> 
-            <option value="EDPB">EDPB Guidance</option>             
-        </optgroup>
-        <optgroup label="Standards">
-            <option value="BSI">BSI Standards</option>
-            <option value="ISO">ISO Standards</option>
-            <option value="IEC">IEC Standards</option>
-            <option value="ASTM">ASTM Standards</option>
-            <option value="CEN">CEN Standards</option>
-            <option value="AAMI">AAMI Standards</option>
-            <option value="ANSI">ANSI Standards</option>
-            <option value="CSA">CSA Standards</option>
-            <option value="IAF">IAF Standards</option>
-            <option value="FDACS">FDA Consensus Standards</option>
-        </optgroup>
-    </select>
+<div class="options-container">
+    <button id="displaySelected">Show Selected</button>
+    <button id="clearSelections">Clear Selections</button>
+    <button id="export">Export Selected</button>
+    <button id="hideAbstract" style="display: none;">Show Abstract</button>
+    <button id="pdfUploadButton" style="display: none;">Check PDF Files</button>
 </div>
 
+<div class="additional-options-container">
+<select id="guidanceDropdown" class="dropdown-menu" onchange="applyGuidanceDropdownFilter()">
+    <option value="">Select Guidance or Standard Group</option>
+    <optgroup label="Guidance">
+        <option value="CIOMS">CIOMS Guidance</option>
+        <option value="ECHA">ECHA Guidance</option>
+        <option value="EDQM">EDQM Guidance</option>
+        <option value="FDA">FDA Guidance</option>
+        <option value="GHWP">GHWP Guidance</option>
+        <option value="GHS">GHS Guidance</option>
+        <option value="ICH">ICH Guidance</option>
+        <option value="IMDRF">IMDRF Guidance</option>
+        <option value="IPEC">IPEC Guidance</option>
+        <option value="ISPE">ISPE Guidance</option>
+        <option value="NIST">NIST Guidance</option>
+        <option value="PICS">PIC/S Guidance</option>
+        <option value="MDCG">MDCG Guidance</option>
+        <option value="MEDDEV">MEDDEV Guidance</option>
+        <option value="MDSAP">MDSAP Guidance</option>
+        <option value="Team-NB">Team-NB Guidance</option>
+        <option value="EDPB">EDPB Guidance</option>
+    </optgroup>
+    <optgroup label="Standards">
+        <option value="BSI">BSI Standards</option>
+        <option value="ISO">ISO Standards</option>
+        <option value="IEC">IEC Standards</option>
+        <option value="ASTM">ASTM Standards</option>
+        <option value="CEN">CEN Standards</option>
+        <option value="AAMI">AAMI Standards</option>
+        <option value="ANSI">ANSI Standards</option>
+        <option value="CSA">CSA Standards</option>
+        <option value="IAF">IAF Standards</option>
+        <option value="FDACS">FDA Consensus Standards</option>
+    </optgroup>
+</select>
 </div>
 
-<!-- Table for CSV Data with Column Search Inputs -->
 <input type="hidden" id="asdAcronymSearch">
+
 <div id="tableContainer">
     <table id="dataTable">
         <thead>
             <tr>
-
+                <th>Copilot</th>
                 <th>
                     Designation
                     <input type="text" id="designationSearch" placeholder="Search Designation (Number)" onkeyup="debouncedFilter()">
@@ -186,28 +172,20 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Table body content goes here -->
         </tbody>
     </table>
 </div>
 
-<!-- Container for displaying the PDF content -->
 <div id="pdf-viewer" class="pdf-viewer"></div>
-
-<!-- Sidebar for displaying extracted standards information -->
 <div id="sidebar" class="sidebar"></div>
-
-<!-- Top bar for displaying progress indicator during file processing -->
 <div id="top-bar"></div>
 
 <script>
-// JavaScript for redirecting the "Check PDF Files" button to load Extractor.html in the same window
-document.getElementById("pdfUploadButton").addEventListener("click", function() {
-    window.location.href = "Extractor.html";
+    document.getElementById("pdfUploadButton").addEventListener("click", function() {
+        window.location.href = "Extractor.html";
     });
 </script>
-    
-<!-- BSI Compliance Navigator Banner (Footer Overlay) -->
+
 <div id="bsiBanner" style="
     display: none;
     position: fixed;
@@ -221,49 +199,44 @@ document.getElementById("pdfUploadButton").addEventListener("click", function() 
     padding: 10px;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 ">
-  <a href="https://pages.bsigroup.com/Martin_King" target="_blank" rel="noopener">
-    <img src="BSi%20Compliance%20Navigator.jpg" alt="BSI Compliance Navigator"
-         style="max-height: 80px; width: auto; border: 0;">
-  </a>
+    <a href="https://pages.bsigroup.com/Martin_King" target="_blank" rel="noopener">
+        <img src="BSi%20Compliance%20Navigator.jpg" alt="BSI Compliance Navigator" style="max-height: 80px; width: auto; border: 0;">
+    </a>
 </div>
-<!-- Cookie Consent Popup -->
+
 <div id="cookie-popup" style="position:fixed;bottom:20px;left:20px;right:20px;background:#fff;border:1px solid #ccc;padding:20px;z-index:9999;font-family:sans-serif;color:#000;">
-  <p>Cookies are used to improve your experience and analyze site usage. By clicking “Accept,” you agree to our use of cookies for analytics.</p>
-  <button id="accept-cookies" style="margin-right:10px;">Accept</button>
-  <button id="decline-cookies">Decline</button>
+    <p>Cookies are used to improve your experience and analyze site usage. By clicking “Accept,” you agree to our use of cookies for analytics.</p>
+    <button id="accept-cookies" style="margin-right:10px;">Accept</button>
+    <button id="decline-cookies">Decline</button>
 </div>
 
 <script>
-  // Check stored consent on page load
-  const storedConsent = localStorage.getItem("cookieConsent");
-  if (storedConsent) {
-    document.getElementById("cookie-popup").style.display = "none";
-    window.clarity('consentv2', {
-      ad_storage: storedConsent,
-      analytics_storage: storedConsent
-    });
-  }
+    const storedConsent = localStorage.getItem("cookieConsent");
+    if (storedConsent) {
+        document.getElementById("cookie-popup").style.display = "none";
+        window.clarity('consentv2', {
+            ad_storage: storedConsent,
+            analytics_storage: storedConsent
+        });
+    }
 
-  // Handle Accept
-  document.getElementById("accept-cookies").onclick = function() {
-    window.clarity('consentv2', {
-      ad_storage: "granted",
-      analytics_storage: "granted"
-    });
-    localStorage.setItem("cookieConsent", "granted");
-    document.getElementById("cookie-popup").style.display = "none";
-  };
+    document.getElementById("accept-cookies").onclick = function() {
+        window.clarity('consentv2', {
+            ad_storage: "granted",
+            analytics_storage: "granted"
+        });
+        localStorage.setItem("cookieConsent", "granted");
+        document.getElementById("cookie-popup").style.display = "none";
+    };
 
-  // Handle Decline
-  document.getElementById("decline-cookies").onclick = function() {
-    window.clarity('consentv2', {
-      ad_storage: "denied",
-      analytics_storage: "denied"
-    });
-    localStorage.setItem("cookieConsent", "denied");
-    document.getElementById("cookie-popup").style.display = "none";
-  };
+    document.getElementById("decline-cookies").onclick = function() {
+        window.clarity('consentv2', {
+            ad_storage: "denied",
+            analytics_storage: "denied"
+        });
+        localStorage.setItem("cookieConsent", "denied");
+        document.getElementById("cookie-popup").style.display = "none";
+    };
 </script>
 </body>
 </html>
-

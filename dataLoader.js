@@ -1,8 +1,14 @@
-// Initialize global namespace to avoid redeclaration issues
 window.AppState = window.AppState || {};
-AppState.abstractVisible = AppState.abstractVisible ?? false; // Default visibility state for abstracts
+AppState.abstractVisible = AppState.abstractVisible ?? false;
 
-// Array of CSV file URLs
+window.allRows = window.allRows || [];
+window.selectedRowIds = window.selectedRowIds || new Set();
+
+const tableElement = document.getElementById('dataTable');
+const tableBody = tableElement ? tableElement.querySelector('tbody') : null;
+const entriesLoaded = document.getElementById('entriesLoaded');
+const hideAbstractButton = document.getElementById('hideAbstract');
+
 const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Standards_BSI.csv',
     'https://martincking.github.io/Standards-Selector/Standards_ISO_2026.csv',
@@ -35,77 +41,116 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Guidance_edpb.csv',
 ];
 
+function normalizeText(value) {
+    return String(value || "").replace(/\s+/g, " ").trim();
+}
 
-async function loadMultipleCSVs(files) {
-    console.log("Loading multiple CSVs...");
-    const promises = files.map(file =>
-        new Promise((resolve, reject) => {
-            Papa.parse(file, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    if (results && results.data) {
-                        resolve(results.data);
-                    } else {
-                        reject(`Error loading ${file}`);
-                    }
-                },
-                error: function(error) {
-                    reject(error);
-                },
-            });
-        })
-    );
+function getStableRowIndex(row) {
+    return window.allRows.indexOf(row);
+}
 
-    try {
-        const allData = await Promise.all(promises);
-        allRows = allData.flatMap(data => data.slice(0, data.length - 1)); // Remove 1 row per CSV
-        const totalEntries = allData.reduce((sum, data) => sum + data.length - 1, 0); // Adjust entry count
-        renderTable(allRows);
-        $('#entriesLoaded').text(`(${totalEntries} entries loaded)`); // Update entry count
-        console.log("All CSVs loaded successfully.");
-    } catch (error) {
-        console.error("Error loading CSVs:", error);
+function setAbstractVisibility() {
+    const isVisible = AppState.abstractVisible;
+
+    document.querySelectorAll('#dataTable th:nth-child(4), #dataTable td:nth-child(4)').forEach(cell => {
+        cell.style.display = isVisible ? '' : 'none';
+    });
+
+    if (hideAbstractButton) {
+        hideAbstractButton.textContent = isVisible ? 'Hide Abstract' : 'Show Abstract';
     }
 }
 
 function renderTable(data) {
-    const rowsHTML = data.map((row, index) => {
-        const designationLink = row.Link
-            ? `<a href="${row.Link}" target="_blank">${row.Designation}</a>`
-            : row.Designation;
+    if (!tableBody) return;
 
-        const titleLink = row.Link
-            ? `<a href="${row.Link}" target="_blank">${row['Title of Standard']}</a>`
-            : row['Title of Standard'];
+    const rowsHTML = data.map((row) => {
+        const designation = normalizeText(row.Designation);
+        const title = normalizeText(row['Title of Standard']);
+        const abstract = normalizeText(row.Abstract);
+        const link = normalizeText(row.Link);
 
-        const isSelected = selectedRowIds.has(allRows.indexOf(row));
+        const designationLink = link
+            ? `<a href="${link}" target="_blank" rel="noopener">${designation}</a>`
+            : designation;
+
+        const titleLink = link
+            ? `<a href="${link}" target="_blank" rel="noopener">${title}</a>`
+            : title;
+
+        const query = encodeURIComponent(`${designation} ${title}`.trim());
+        const copilot = `<a href="https://www.bing.com/copilotsearch?q=${query}&showconv=1" target="_blank" rel="noopener"><b>Copilot</b></a>`;
+
+        const stableRowIndex = getStableRowIndex(row);
+        const isSelected = window.selectedRowIds.has(stableRowIndex);
         const rowClass = isSelected ? 'selected-row' : '';
 
-        return `<tr data-id="${allRows.indexOf(row)}" class="${rowClass}">
-            <td>${designationLink || ''}</td>
-            <td>${titleLink || ''}</td>
-            <td>${row.Abstract || ''}</td>
-        </tr>`;
-    }).join('');
+        return `
+            <tr class="${rowClass}" data-index="${stableRowIndex}">
+                <td>${copilot}</td>
+                <td>${designationLink}</td>
+                <td>${titleLink}</td>
+                <td>${abstract}</td>
+            </tr>
+        `;
+    }).join("");
 
-    $('#dataTable tbody').html(rowsHTML);
-
-    // Show/Hide abstract column
-    const isVisible = AppState.abstractVisible;
-    $('td:nth-child(3), th:nth-child(3)').toggle(isVisible);
+    tableBody.innerHTML = rowsHTML;
+    setAbstractVisibility();
 }
 
-// Event listener for toggling abstract visibility
-$('#hideAbstract').click(function () {
-    AppState.abstractVisible = !AppState.abstractVisible; // Toggle visibility state
-    $('td:nth-child(3), th:nth-child(3)').toggle(AppState.abstractVisible); // Show/Hide abstract column
-    $(this).text(AppState.abstractVisible ? 'Hide Abstract' : 'Show Abstract'); // Update button text
+function loadCSV(file) {
+    return new Promise((resolve, reject) => {
+        Papa.parse(file, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete(results) {
+                if (results && results.data) {
+                    resolve(results.data);
+                } else {
+                    reject(new Error(`No data from ${file}`));
+                }
+            },
+            error(error) {
+                reject(error);
+            }
+        });
+    });
+}
+
+async function loadMultipleCSVs(files) {
+    try {
+        const allData = await Promise.all(files.map(loadCSV));
+        window.allRows = allData.flat();
+
+        renderTable(window.allRows);
+
+        if (entriesLoaded) {
+            entriesLoaded.textContent = `(${window.allRows.length} entries loaded)`;
+        }
+
+        if (typeof debouncedFilter === 'function') {
+            debouncedFilter();
+        }
+
+        console.log("All CSVs loaded successfully.");
+    } catch (error) {
+        console.error("Error loading CSVs:", error);
+        if (entriesLoaded) {
+            entriesLoaded.textContent = "(Error loading entries)";
+        }
+    }
+}
+
+if (hideAbstractButton) {
+    hideAbstractButton.addEventListener('click', function () {
+        AppState.abstractVisible = !AppState.abstractVisible;
+        setAbstractVisibility();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    setAbstractVisibility();
+    loadMultipleCSVs(csvFiles);
 });
-
-// Initial call to load multiple CSV files
-$(document).ready(() => {
-    loadMultipleCSVs(csvFiles); // Load CSV files and populate the table
-});
-
-

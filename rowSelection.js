@@ -1,48 +1,69 @@
-// Initialize the set to keep track of selected rows
+document.addEventListener('DOMContentLoaded', function () {
+    const tableBody = document.querySelector('#dataTable tbody');
+    const showSelectedButton = document.getElementById('displaySelected');
+    const clearSelectionsButton = document.getElementById('clearSelections');
 
-
-// Row selection logic
-$('#dataTable').on('click', 'tr', function() {
-    const rowId = $(this).data('id');  // Get the unique identifier for the row
-    const row = $(this);
-
-    // Check if the row is already selected
-    if (selectedRowIds.has(rowId)) {
-        selectedRowIds.delete(rowId);  // Remove from selected if already selected
-        row.removeClass('selected-row').removeClass('match-row');
-        console.log(`Row ${rowId} deselected. Current selection:`, Array.from(selectedRowIds));
-    } else {
-        selectedRowIds.add(rowId);  // Add to selected if not already selected
-        row.removeClass('match-row').addClass('selected-row');
-        console.log(`Row ${rowId} selected. Current selection:`, Array.from(selectedRowIds));
+    if (!window.selectedRowIds) {
+        window.selectedRowIds = new Set();
     }
-});
 
-// Export selected rows to CSV
-$('#export').click(function() {
-    // Do not clear highlights or reset the table
+    function getVisibleRows() {
+        return Array.from(document.querySelectorAll('#dataTable tbody tr'));
+    }
 
-    // Clear search fields to reset the UI input, but keep table as is
-    $('#designationSearch, #titleSearch, #abstractSearch').val('');
+    function refreshSelectedStyling() {
+        getVisibleRows().forEach(row => {
+            const rowIndex = Number(row.dataset.index);
+            row.classList.toggle('selected-row', window.selectedRowIds.has(rowIndex));
+        });
+    }
 
-    let csvContent = 'Designation,Title of Standard,Link\n';
+    if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+            const clickedLink = event.target.closest('a');
+            if (clickedLink) return;
 
-    // Loop through each selected row and prepare data for export
-    selectedRowIds.forEach(id => {
-        const row = allRows[id];
-        if (row) {
-            const designation = row.Designation || '';
-            const title = row['Title of Standard'] || '';
-            const abstract = row.Abstract || '';
-            const link = row.Link || '';
-            csvContent += `"${designation}","${title}","${link}"\n`;
-        }
-    });
+            const row = event.target.closest('tr');
+            if (!row) return;
 
-    // Create a Blob from the CSV content and trigger download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'selected_rows.csv';
-    link.click();
+            const rowIndex = Number(row.dataset.index);
+            if (Number.isNaN(rowIndex)) return;
+
+            if (window.selectedRowIds.has(rowIndex)) {
+                window.selectedRowIds.delete(rowIndex);
+            } else {
+                window.selectedRowIds.add(rowIndex);
+            }
+
+            refreshSelectedStyling();
+        });
+    }
+
+    if (showSelectedButton) {
+        showSelectedButton.addEventListener('click', function () {
+            if (!window.allRows || window.allRows.length === 0) return;
+
+            const selectedRows = window.allRows.filter((row, index) => window.selectedRowIds.has(index));
+            renderTable(selectedRows);
+
+            if (typeof highlightSearchTerms === 'function') {
+                const designationSearch = ($('#designationSearch').val() || '').toLowerCase();
+                const titleSearch = ($('#titleSearch').val() || '').toLowerCase();
+                const abstractSearch = ($('#abstractSearch').val() || '').toLowerCase();
+                highlightSearchTerms(designationSearch, titleSearch, abstractSearch);
+            }
+        });
+    }
+
+    if (clearSelectionsButton) {
+        clearSelectionsButton.addEventListener('click', function () {
+            window.selectedRowIds.clear();
+
+            if (typeof debouncedFilter === 'function') {
+                debouncedFilter();
+            } else {
+                renderTable(window.allRows || []);
+            }
+        });
+    }
 });
