@@ -84,6 +84,27 @@
             // dataLoader.js will do that only after the CSVs are loaded.
         });
     </script>
+
+    <style>
+        #tableContainer {
+            width: 100%;
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        #dataTable thead th {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 2;
+        }
+
+        body {
+            overflow: hidden;
+        }
+    </style>
+
 </head>
 <body>
 <header class="custom-header">
