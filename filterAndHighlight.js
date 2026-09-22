@@ -82,6 +82,11 @@ function getDropdownSourceScore(row, selectedGroup) {
       if (acronym === 'nist') return 5;
       if (designationStartsWith(designation, ['nist '])) return 4;
       return 0;
+      
+    case 'mdsap':
+      if (acronym === 'mdsap') return 5;
+      if (designationStartsWith(designation, ['mdsap '])) return 4;
+      return 0;
 
     case 'pics':
       if (acronym === 'pics' || acronym === 'pic/s') return 5;
