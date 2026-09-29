@@ -1,4 +1,35 @@
 ASD Acronym,Designation,Title of Standard,Abstract,Link
+IMDRF,Document,Scene Setting - Global regulatory landscape for digital health technology,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/1%20Andrew%20Makmur%20%28NUHS%29.pptx
+IMDRF,Document,Session 1- Software Characterization and Risk Categorization – From Guidance to Practice,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/1.1%20Daniel%20Yoon%20%28HC%29.pptx
+IMDRF,Document,Session 2 - AI Governance and Machine Learning Practices (GMLP),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/2.1%20Gabby%20Commatteo%20%28MHRA%29.pptx
+IMDRF,Document,Session 3 - Predetermined Change Control Plans (PCCP),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/3.1%20Neil%20Mafnas%20%28US%20FDA%29.pptx
+IMDRF,Document,Session 4 - Cybersecurity,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/4.1%20Seung-pyo%20Kim%20%28MFDS%29.pptx
+IMDRF,PDF,Australia (TGA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Australia%20%28TGA%29.pdf
+IMDRF,PDF,Brazil (ANVISA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Brazil%20%28ANVISA%29.pdf
+IMDRF,PDF,Canada (Health Canada),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Canada%20%28Health%20Canada%29.pdf
+IMDRF,PDF,China (NMPA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/China%20%28NMPA%29.pdf
+IMDRF,PDF,European Union (European Commission),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/European%20Union%20%28European%20Commission%29.pdf
+IMDRF,PDF,Japan (PMDA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Japan%20%28PMDA%29.pdf
+IMDRF,PDF,Russia (MoH),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Russia%20%28MoH%29.pdf
+IMDRF,PDF,Switzerland (Swissmedic),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Switzerland%20%28Swissmedic%29.pdf
+IMDRF,PDF,Singapore (HSA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Singapore%20%28HSA%29.pdf
+IMDRF,PDF,United Kingdom (MHRA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/UK%20%28MHRA%29.pdf
+IMDRF,PDF,South Korea (MFDS),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/South%20Korea%20%28MFDS%29.pdf
+IMDRF,PDF,United States of America (FDA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/United%20States%20of%20America%20%28FDA%29.pdf
+IMDRF,PDF,Argentina (ANMAT),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Argentina%20%28ANMAT%29.pdf
+IMDRF,PDF,Saudi Arabia (SFDA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Saudi%20Arabia%20%28SFDA%29.pdf
+IMDRF,PDF,The World Health Organisation (WHO),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/WHO.pdf
+IMDRF,PDF,Cuba (CECMED),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Cuba%20%28CECMED%29.pdf
+IMDRF,PDF,Paraguay (DINAVISA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Paraguay%20%28DINAVISA%29.pdf
+IMDRF,PDF,Tanzania (TMDA),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Tanzania%20%28TMDA%29.pdf
+IMDRF,PDF,Israel (MTIIR),Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Israel%20%28MTIIR%29.pdf
+IMDRF,PDF,APEC RHSC,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/APEC%20RHSC.pdf
+IMDRF,PDF,SEARN,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/SEARN.pdf
+IMDRF,PDF,Working Group Updates - Consolidated,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/Working%20Group%20Updates%20Sep2026.pdf
+IMDRF,PDF,DITTA and GMTA,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/DITTA-GMTA.pdf
+IMDRF,PDF,IMDRF Industry Group,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/IMDRF%20Industry%20Group.pdf
+IMDRF,PDF,APACMed,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/APACMed.pdf
+IMDRF,PDF,Singapore Manufacturing Federation - Medical Technology Industry Group,Visit the link for more information,https://www.imdrf.org/sites/default/files/2026-09/SMF%20MTIG.pdf
 IMDRF,IMDRF/MC/N1FINAL:2025 (Edition 8), IMDRF Terms of Reference,Visit the link for more information,https://www.imdrf.org/documents/imdrf-terms-reference
 IMDRF,IMDRF/MC/N2FINAL:2025 (Edition 13), IMDRF Standard Operating Procedures,Visit the link for more information,https://www.imdrf.org/documents/imdrf-standard-operating-procedures
 IMDRF,IMDRF/NCAR WG/N14 FINAL:2025 (Edition 5),Medical Devices: Post-Market Surveillance: National Competent Authority Report Exchange Criteria and Report Form,Visit the link for more information,https://www.imdrf.org/documents/medical-devices-post-market-surveillance-national-competent-authority-report-exchange-criteria-and-report-form
