@@ -29,6 +29,7 @@ const csvFiles = [
     'https://martincking.github.io/Standards-Selector/Standards_IEEE.csv',
     'https://martincking.github.io/Standards-Selector/Standards_CEN.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_FDA.csv',
+    'https://martincking.github.io/Standards-Selector/FDA_CBER_SOPPs.csv',
     'https://martincking.github.io/Standards-Selector/Guidance_MDCG.csv',
     'https://martincking.github.io/Standards-Selector/Standards_NIST.csv',
     'https://martincking.github.io/Standards-Selector/Standards_CSA.csv',
